@@ -10,13 +10,16 @@
     "lint": "eslint . --fix",
     "format": "prettier --write src/",
     "test:unit": "vitest",
-    "test:unit:coverage": "vitest run --coverage"
+    "test:unit:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "vue": "^3.5.41"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^26.5.0",
     "@vitejs/plugin-vue": "^6.0.8",
     "@vitest/coverage-v8": "^5.0.0",
     "@vue/test-utils": "^2.5.0",
