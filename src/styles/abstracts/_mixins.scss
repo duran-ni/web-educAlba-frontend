@@ -1,0 +1,10 @@
+@use 'variables' as *;
+
+// Mixin para media queries mobile-first, requisito de responsive (Mobile y Desktop)
+@mixin respond-to($breakpoint) {
+  @if $breakpoint == tablet {
+    @media (min-width: $breakpoint-tablet) { @content; }
+  } @else if $breakpoint == desktop {
+    @media (min-width: $breakpoint-desktop) { @content; }
+  }
+}

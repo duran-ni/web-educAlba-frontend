@@ -1,0 +1,15 @@
+@use 'abstracts/variables' as *;
+@use 'abstracts/mixins' as *;
+@forward 'abstracts/variables';
+@forward 'abstracts/mixins';
+@use 'base/reset';
+
+body {
+  font-family: $font-body;
+  color: $color-text-dark;
+  background-color: $color-background;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: $font-heading;
+}
