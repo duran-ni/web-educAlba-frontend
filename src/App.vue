@@ -1,10 +1,10 @@
 <script setup>
-import AppLogo from './components/AppLogo.vue'
+import { RouterView } from 'vue-router'
 </script>
 
 <template>
   <main class="app">
-    <AppLogo message="EducAlba" />
+    <RouterView />
   </main>
 </template>
 
@@ -13,3 +13,4 @@ import AppLogo from './components/AppLogo.vue'
   min-height: 100vh;
 }
 </style>
+
