@@ -1,7 +1,15 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
+import AppLogo from './components/AppLogo.vue'
 </script>
 
 <template>
-  <HelloWorld />
+  <main class="app">
+    <AppLogo message="EducAlba" />
+  </main>
 </template>
+
+<style lang="scss">
+.app {
+  min-height: 100vh;
+}
+</style>
