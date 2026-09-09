@@ -10,4 +10,8 @@ describe('http service', () => {
   it('sends JSON content type by default', () => {
     expect(http.defaults.headers['Content-Type']).toBe('application/json')
   })
+
+  it('sends credentials (cookies) with requests', () => {
+    expect(http.defaults.withCredentials).toBe(true)
+  })
 })
