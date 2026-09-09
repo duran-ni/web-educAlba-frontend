@@ -13,6 +13,16 @@ export default [
     },
   },
   {
+    // Archivos de configuracion que se ejecutan en entorno Node (no navegador),
+    // por eso necesitan la variable global "process"
+    files: ['*.config.js'],
+    languageOptions: {
+      globals: {
+        process: 'readonly',
+      },
+    },
+  },
+  {
     ignores: ['dist/**', 'node_modules/**'],
   },
 ]
