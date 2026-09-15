@@ -10,4 +10,10 @@ describe('AppLogo.vue', () => {
 
     expect(wrapper.find('img.app-logo').exists()).toBe(true)
   })
+
+ it('has an accessible alt text describing the logo', () => {
+    const wrapper = mount(AppLogo)
+
+    expect(wrapper.find('img.app-logo').attributes('alt')).toBe('Logo de EducAlba')
+  })
 })

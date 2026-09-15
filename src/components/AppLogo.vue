@@ -1,5 +1,5 @@
 <template>
-  <img class="app-logo" src="@/assets/logo.webp" alt="" />
+  <img class="app-logo" src="@/assets/logo.webp" alt="Logo de EducAlba" />
 </template>
 
 <style lang="scss">
