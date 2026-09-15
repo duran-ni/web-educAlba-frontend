@@ -5,11 +5,9 @@ import AppLogo from '../AppLogo.vue'
 
 // Grupo de pruebas para el componente AppLogo
 describe('AppLogo.vue', () => {
-  it('renders the message prop correctly', () => {
-    const wrapper = mount(AppLogo, {
-      props: { message: 'Hello Vitest' },
-    })
+  it('renders the logo image', () => {
+    const wrapper = mount(AppLogo)
 
-    expect(wrapper.text()).toContain('Hello Vitest')
+    expect(wrapper.find('img.app-logo').exists()).toBe(true)
   })
 })

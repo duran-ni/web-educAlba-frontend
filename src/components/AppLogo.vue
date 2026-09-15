@@ -1,18 +1,10 @@
 <template>
-  <p class="app-logo">{{ message }}</p>
+  <p class="app-logo" src="@/assets/logo.webp" alt="" />
 </template>
-
-<script setup>
-defineProps({
-  message: {
-    type: String,
-    required: true,
-  },
-})
-</script>
 
 <style lang="scss">
 .app-logo {
-  font-family: $font-heading;
+  height: 48px;
+  width: auto;
 }
 </style>
