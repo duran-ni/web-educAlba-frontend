@@ -1,5 +1,5 @@
 <template>
-  <p class="app-logo" src="@/assets/logo.webp" alt="" />
+  <img class="app-logo" src="@/assets/logo.webp" alt="" />
 </template>
 
 <style lang="scss">
