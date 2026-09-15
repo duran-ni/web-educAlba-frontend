@@ -15,3 +15,7 @@ $font-doodle: 'Playwrite IN', cursive;
 // Breakpoints (mobile-first)
 $breakpoint-tablet: 768px;
 $breakpoint-desktop: 1024px;
+
+// Fondo cuadriculado (identidad visual doodle)
+$grid-line-color: rgba($color-primary, 0.08);
+$grid-cell-size: 24px;
