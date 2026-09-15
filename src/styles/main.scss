@@ -3,6 +3,7 @@
 @forward 'abstracts/variables';
 @forward 'abstracts/mixins';
 @use 'base/reset';
+@use 'components/grid-background';
 
 body {
   font-family: $font-body;
