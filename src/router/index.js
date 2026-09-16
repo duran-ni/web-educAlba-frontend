@@ -7,6 +7,31 @@ const routes = [
     name: 'home',
     component: () => import('@/views/HomeView.vue'),
   },
+   {
+    path: '/talleres',
+    name: 'workshops',
+    component: () => import('@/views/WorkshopsView.vue'),
+  },
+   {
+    path: '/refuerzo',
+    name: 'reinforcement',
+    component: () => import('@/views/ReinforcementView.vue'),
+  },
+   {
+    path: '/quienes-somos',
+    name: 'about',
+    component: () => import('@/views/AboutView.vue'),
+  },
+   {
+    path: '/que-hacemos',
+    name: 'what-we-do',
+    component: () => import('@/views/WhatWeDoView.vue'),
+  },
+   {
+    path: '/galeria',
+    name: 'gallery',
+    component: () => import('@/views/GalleryView.vue'),
+  },
   {
     path: '/login',
     name: 'login',
