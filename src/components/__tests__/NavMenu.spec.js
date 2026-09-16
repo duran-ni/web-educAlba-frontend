@@ -41,4 +41,16 @@ describe('NavMenu.vue', () => {
       'Galería',
     ])
   })
+
+  it('marks the link matching the current route as active', async () => {
+    await router.push('/talleres')
+    await router.isReady()
+    const wrapper = mount(NavMenu, {
+      global: { plugins: [router] },
+    })
+
+    const activeLinks = wrapper.findAll('.nav-menu__link--active')
+    expect(activeLinks).toHaveLength(1)
+    expect(activeLinks[0].text()).toBe('Talleres')
+  })
 })
