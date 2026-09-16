@@ -1,7 +1,3 @@
-<script setup>
-import AppLogo from '@/components/AppLogo.vue'
-</script>
-
 <template>
-  <AppLogo message="EducAlba" />
+  <h1>Inicio</h1>
 </template>
