@@ -9,12 +9,14 @@
 <script setup>
 import { RouterLink } from 'vue-router'
 import AppLogo from './AppLogo.vue'
+import NavMenu from './NavMenu.vue'
 </script>
 
 <style lang="scss">
 .app-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   padding: 1rem 1.5rem;
 
   &__logo-link {
