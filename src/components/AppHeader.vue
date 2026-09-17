@@ -3,7 +3,8 @@
     <RouterLink :to="{ name: 'home' }" class="app-header__logo-link">
       <AppLogo />
     </RouterLink>
-     <NavMenu />
+    <NavMenu />
+    <LoginButton />
   </header>
 </template>
 
@@ -11,6 +12,7 @@
 import { RouterLink } from 'vue-router'
 import AppLogo from './AppLogo.vue'
 import NavMenu from './NavMenu.vue'
+import LoginButton from './LoginButton.vue'
 </script>
 
 <style lang="scss">
