@@ -3,6 +3,7 @@
     <RouterLink :to="{ name: 'home' }" class="app-header__logo-link">
       <AppLogo />
     </RouterLink>
+     <NavMenu />
   </header>
 </template>
 
