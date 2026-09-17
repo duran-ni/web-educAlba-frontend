@@ -4,7 +4,7 @@ test.describe('Router navigation', () => {
   test('shows the home view at "/"', async ({ page }) => {
     await page.goto('/')
 
-    await expect(page.getByText('EducAlba')).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Inicio' })).toBeVisible()
   })
 
   test('shows the login view at "/login"', async ({ page }) => {
