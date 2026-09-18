@@ -53,4 +53,19 @@ describe('NavMenu.vue', () => {
     expect(activeLinks).toHaveLength(1)
     expect(activeLinks[0].text()).toBe('Talleres')
   })
+
+    it('applies the open modifier class when isOpen is true', async () => {
+    await router.push('/')
+    await router.isReady()
+    const wrapper = mount(NavMenu, { props: { isOpen: true }, global: { plugins: [router] } })
+    expect(wrapper.find('.nav-menu__list').classes()).toContain('nav-menu__list--open')
+  })
+
+  it('emits "navigate" when a link is clicked', async () => {
+    await router.push('/')
+    await router.isReady()
+    const wrapper = mount(NavMenu, { global: { plugins: [router] } })
+    await wrapper.get('.nav-menu__link').trigger('click')
+    expect(wrapper.emitted('navigate')).toHaveLength(1)
+  })
 })
