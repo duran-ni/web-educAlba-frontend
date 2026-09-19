@@ -8,6 +8,11 @@ const router = createRouter({
   history: createWebHistory(),
   routes: [
     { path: '/', name: 'home', component: { template: '<div />' } },
+    { path: '/talleres', name: 'workshops', component: { template: '<div />' } },
+    { path: '/refuerzo', name: 'reinforcement', component: { template: '<div />' } },
+    { path: '/quienes-somos', name: 'about', component: { template: '<div />' } },
+    { path: '/que-hacemos', name: 'what-we-do', component: { template: '<div />' } },
+    { path: '/galeria', name: 'gallery', component: { template: '<div />' } },
     { path: '/login', name: 'login', component: { template: '<div />' } },
   ],
 })
