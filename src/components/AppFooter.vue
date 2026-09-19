@@ -1,7 +1,9 @@
 <template>
-  <footer class="app-footer">
-    <FooterContact />
-    <FooterSocial />
+  <footer class="app-footer" :class="{ 'app-footer--reduced': variant === 'reduced' }">
+    <template v-if="variant === 'full'">
+      <FooterContact />
+      <FooterSocial />
+    </template>
     <FooterLegal />
   </footer>
 </template>
@@ -10,6 +12,13 @@
 import FooterContact from './FooterContact.vue'
 import FooterSocial from './FooterSocial.vue'
 import FooterLegal from './FooterLegal.vue'
+
+defineProps({
+  variant: {
+    type: String,
+    default: 'full',
+  },
+})
 </script>
 
 <style lang="scss">
@@ -24,6 +33,12 @@ import FooterLegal from './FooterLegal.vue'
     flex-direction: row;
     justify-content: space-between;
     align-items: flex-start;
+  }
+
+  &--reduced {
+    @include respond-to(tablet) {
+      justify-content: center;
+    }
   }
 }
 </style>
