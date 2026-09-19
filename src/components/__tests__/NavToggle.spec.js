@@ -22,4 +22,10 @@ describe('NavToggle.vue', () => {
     const wrapper = mount(NavToggle)
     expect(wrapper.attributes('aria-controls')).toBe('main-nav')
   })
+
+  it('links to a custom region via aria-controls when provided', () => {
+    const wrapper = mount(NavToggle, { props: { controls: 'user-nav-list' } })
+    expect(wrapper.attributes('aria-controls')).toBe('user-nav-list')
+  })
+
 })

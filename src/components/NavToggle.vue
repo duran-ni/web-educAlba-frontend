@@ -4,7 +4,7 @@
     class="nav-toggle"
     :class="{ 'nav-toggle--active': isOpen }"
     :aria-expanded="isOpen"
-    aria-controls="main-nav"
+    :aria-controls="controls"
     @click="$emit('toggle')"
   >
     <span class="nav-toggle__bar"></span>
@@ -19,6 +19,12 @@ defineProps({
   isOpen: {
     type: Boolean,
     default: false,
+  },
+  // Id del elemento que este botón controla mediante aria-controls.
+  // Por defecto apunta al menú público ("main-nav"); UserNav lo sobrescribe con "user-nav-list"
+  controls: {
+    type: String,
+    default: 'main-nav',
   },
 })
 
