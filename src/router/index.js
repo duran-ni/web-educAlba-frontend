@@ -7,27 +7,27 @@ const routes = [
     name: 'home',
     component: () => import('@/views/HomeView.vue'),
   },
-   {
+  {
     path: '/talleres',
     name: 'workshops',
     component: () => import('@/views/WorkshopsView.vue'),
   },
-   {
+  {
     path: '/refuerzo',
     name: 'reinforcement',
     component: () => import('@/views/ReinforcementView.vue'),
   },
-   {
+  {
     path: '/quienes-somos',
     name: 'about',
     component: () => import('@/views/AboutView.vue'),
   },
-   {
+  {
     path: '/que-hacemos',
     name: 'what-we-do',
     component: () => import('@/views/WhatWeDoView.vue'),
   },
-   {
+  {
     path: '/galeria',
     name: 'gallery',
     component: () => import('@/views/GalleryView.vue'),
@@ -40,7 +40,31 @@ const routes = [
   {
     path: '/dashboard',
     name: 'dashboard',
-    component: () => import('@/views/DashboardView.vue'),
+    component: () => import('@/views/UserDashboardView.vue'),
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/dashboard/mis-talleres',
+    name: 'my-workshops',
+    component: () => import('@/views/MyWorkshopsView.vue'),
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/dashboard/mi-perfil',
+    name: 'my-profile',
+    component: () => import('@/views/MyProfileView.vue'),
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/admin',
+    name: 'admin',
+    component: () => import('@/views/AdminDashboardView.vue'),
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/admin/gestion',
+    name: 'management',
+    component: () => import('@/views/ManagementView.vue'),
     meta: { requiresAuth: true },
   },
   {
