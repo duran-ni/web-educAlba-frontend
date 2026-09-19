@@ -15,6 +15,18 @@
         <NavToggle :is-open="isMenuOpen" @toggle="toggleMenu" />
       </div>
     </template>
+
+    <template v-else-if="variant === 'admin'">
+      <AdminNav />
+    </template>
+
+    <template v-else-if="variant === 'user'">
+      <UserNav :is-open="isMenuOpen" @navigate="closeMenu" />
+
+      <div class="app-header__actions">
+        <NavToggle :is-open="isMenuOpen" controls="user-nav-list" @toggle="toggleMenu" />
+      </div>
+    </template>
   </header>
 </template>
 
@@ -25,6 +37,8 @@ import AppLogo from './AppLogo.vue'
 import NavMenu from './NavMenu.vue'
 import LoginButton from './LoginButton.vue'
 import NavToggle from './NavToggle.vue'
+import AdminNav from './AdminNav.vue'
+import UserNav from './UserNav.vue'
 
 defineProps({
   variant: {

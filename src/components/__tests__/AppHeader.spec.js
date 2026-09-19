@@ -14,6 +14,11 @@ const router = createRouter({
     { path: '/que-hacemos', name: 'what-we-do', component: { template: '<div />' } },
     { path: '/galeria', name: 'gallery', component: { template: '<div />' } },
     { path: '/login', name: 'login', component: { template: '<div />' } },
+    { path: '/admin', name: 'admin', component: { template: '<div />' } },
+    { path: '/admin/gestion', name: 'management', component: { template: '<div />' } },
+    { path: '/dashboard', name: 'dashboard', component: { template: '<div />' } },
+    { path: '/dashboard/mis-talleres', name: 'my-workshops', component: { template: '<div />' } },
+    { path: '/dashboard/mi-perfil', name: 'my-profile', component: { template: '<div />' } },
   ],
 })
 
@@ -36,4 +41,26 @@ describe('AppHeader.vue', () => {
     expect(wrapper.find('.nav-menu').exists()).toBe(false)
     expect(wrapper.find('.login-button').exists()).toBe(false)
   })
+   it('renders the admin navigation in the admin variant', async () => {
+    await router.push('/')
+    await router.isReady()
+    const wrapper = mount(AppHeader, {
+      props: { variant: 'admin' },
+      global: { plugins: [router] },
+    })
+    expect(wrapper.find('.admin-nav').exists()).toBe(true)
+    expect(wrapper.find('.nav-menu').exists()).toBe(false)
+  })
+
+  it('renders the user navigation and its toggle in the user variant', async () => {
+    await router.push('/')
+    await router.isReady()
+    const wrapper = mount(AppHeader, {
+      props: { variant: 'user' },
+      global: { plugins: [router] },
+    })
+    expect(wrapper.find('.user-nav').exists()).toBe(true)
+    expect(wrapper.find('.nav-toggle').attributes('aria-controls')).toBe('user-nav-list')
+  })
 })
+
