@@ -30,3 +30,25 @@ describe('Public navigation', () => {
     expect(wrapper.find('main').text()).toContain(heading)
   })
 })
+
+describe('Header/footer variant on the login route', () => {
+  afterEach(async () => {
+    await router.push('/')
+  })
+
+  it('shows the reduced header and footer on /login', async () => {
+    await router.push({ name: 'login' })
+    await router.isReady()
+    const wrapper = mount(App, { global: { plugins: [router] } })
+    expect(wrapper.find('.nav-menu').exists()).toBe(false)
+    expect(wrapper.find('.footer-contact').exists()).toBe(false)
+  })
+
+  it('shows the full header and footer on public views', async () => {
+    await router.push({ name: 'home' })
+    await router.isReady()
+    const wrapper = mount(App, { global: { plugins: [router] } })
+    expect(wrapper.find('.nav-menu').exists()).toBe(true)
+    expect(wrapper.find('.footer-contact').exists()).toBe(true)
+  })
+})
