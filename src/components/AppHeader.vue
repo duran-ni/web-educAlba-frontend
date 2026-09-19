@@ -1,15 +1,20 @@
 <template>
-  <header class="app-header grid-background">
+  <header
+    class="app-header grid-background"
+    :class="{ 'app-header--reduced': variant === 'reduced' }"
+  >
     <RouterLink :to="{ name: 'home' }" class="app-header__logo-link">
       <AppLogo />
     </RouterLink>
 
-    <NavMenu :is-open="isMenuOpen" @navigate="closeMenu" />
+    <template v-if="variant === 'full'">
+      <NavMenu :is-open="isMenuOpen" @navigate="closeMenu" />
 
-    <div class="app-header__actions">
-      <LoginButton />
-      <NavToggle :is-open="isMenuOpen" @toggle="toggleMenu" />
-    </div>
+      <div class="app-header__actions">
+        <LoginButton />
+        <NavToggle :is-open="isMenuOpen" @toggle="toggleMenu" />
+      </div>
+    </template>
   </header>
 </template>
 
@@ -20,6 +25,13 @@ import AppLogo from './AppLogo.vue'
 import NavMenu from './NavMenu.vue'
 import LoginButton from './LoginButton.vue'
 import NavToggle from './NavToggle.vue'
+
+defineProps({
+  variant: {
+    type: String,
+    default: 'full',
+  },
+})
 
 const isMenuOpen = ref(false)
 
@@ -39,6 +51,10 @@ function closeMenu() {
   align-items: center;
   justify-content: space-between;
   padding: 1rem 1.5rem;
+
+  &--reduced {
+    justify-content: center;
+  }
 
   &__logo-link {
     display: inline-flex;
