@@ -25,7 +25,7 @@ const footerVariant = computed(() => (headerVariant.value === 'full' ? 'full' : 
 
 <template>
   <AppHeader :variant="headerVariant" />
-  <main class="app">
+  <main class="app grid-background">
     <RouterView />
   </main>
   <AppFooter :variant="footerVariant" />

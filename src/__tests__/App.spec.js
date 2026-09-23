@@ -51,4 +51,11 @@ describe('Header/footer variant on the login route', () => {
     expect(wrapper.find('.nav-menu').exists()).toBe(true)
     expect(wrapper.find('.footer-contact').exists()).toBe(true)
   })
+
+    it('applies the shared grid background to the main content', async () => {
+    await router.push({ name: 'home' })
+    await router.isReady()
+    const wrapper = mount(App, { global: { plugins: [router] } })
+    expect(wrapper.find('main').classes()).toContain('grid-background')
+  })
 })
