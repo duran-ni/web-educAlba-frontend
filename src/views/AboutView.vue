@@ -1,3 +1,7 @@
 <template>
-    <h1>Quiénes Somos</h1>
+    <PageHeading title="Quiénes Somos" />
 </template>
+
+<script setup>
+import PageHeading from '@/components/PageHeading.vue'
+</script>
