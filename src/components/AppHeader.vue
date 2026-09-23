@@ -1,6 +1,6 @@
 <template>
   <header
-    class="app-header grid-background"
+    class="app-header"
     :class="{ 'app-header--reduced': variant === 'reduced' }"
   >
     <RouterLink :to="{ name: 'home' }" class="app-header__logo-link">
@@ -65,6 +65,8 @@ function closeMenu() {
   align-items: center;
   justify-content: space-between;
   padding: 1rem 1.5rem;
+  background-color: $color-background;
+  border-bottom: 2px dashed $color-primary;
 
   &--reduced {
     justify-content: center;
