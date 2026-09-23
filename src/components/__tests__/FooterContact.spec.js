@@ -13,4 +13,9 @@ describe('FooterContact.vue', () => {
     const wrapper = mount(FooterContact)
     expect(wrapper.find('a[href^="tel:"]').exists()).toBe(true)
   })
+
+  it('renders an icon for each contact item', () => {
+    const wrapper = mount(FooterContact)
+    expect(wrapper.findAll('.footer-contact__icon')).toHaveLength(3)
+  })
 })
