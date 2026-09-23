@@ -13,7 +13,7 @@
           />
           <circle cx="12" cy="9" r="2.5" fill="none" stroke="currentColor" stroke-width="2" />
         </svg>
-        C/ Cooperativa Pablo Iglesias, 2 bajo 10 33920 Riaño-Langreo
+        {{ CONTACT.address }}
       </li>
       <li class="footer-contact__item">
         <svg class="footer-contact__icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -25,7 +25,7 @@
             stroke-linejoin="round"
           />
         </svg>
-        <a href="tel:+34622291309" class="footer-contact__link">+34 622 29 13 09</a>
+        <a href="CONTACT.phoneHref" class="footer-contact__link">{{ CONTACT.phone }}</a>
       </li>
       <li class="footer-contact__item">
         <svg class="footer-contact__icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -39,11 +39,15 @@
             stroke-linejoin="round"
           />
         </svg>
-        <a href="mailto:refuerzoeducalba@gmail.com" class="footer-contact__link">refuerzoeducalba@gmail.com</a>
+        <a href="CONTACT.emailHref" class="footer-contact__link">{{ CONTACT.email }}</a>
       </li>
     </ul>
   </div>
 </template>
+
+<script setup>
+import { CONTACT } from '@/config/contact.js'
+</script>
 
 <style lang="scss">
 .footer-contact {
