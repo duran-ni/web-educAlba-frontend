@@ -66,14 +66,20 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    color: $color-text-dark;
-    transition: color 0.2s ease, background-color 0.2s ease;
+    transition: transform 0.2s ease;
 
     &:hover,
     &:focus-visible {
-      color: $color-primary;
-      background-color: $color-background-soft;
+      transform: scale(1.1);
     }
+  }
+
+  &__link--instagram {
+    color: $color-accent-pink;
+  }
+
+  &__link--whatsapp {
+    color: $color-whatsapp;
   }
 
   &__icon {
