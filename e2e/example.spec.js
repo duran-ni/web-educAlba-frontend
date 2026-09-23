@@ -4,5 +4,5 @@ import { test, expect } from '@playwright/test'
 test('homepage displays the app title', async ({ page }) => {
   await page.goto('/')
 
-  await expect(page.getByAltText('Logo de EducAlba')).toBeVisible()
+  await expect(page.locator('.app-header').getByAltText('Logo de EducAlba')).toBeVisible()
 })
