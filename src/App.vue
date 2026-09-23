@@ -34,5 +34,10 @@ const footerVariant = computed(() => (headerVariant.value === 'full' ? 'full' : 
 <style lang="scss">
 .app {
   min-height: 100vh;
+  padding: 0 1rem;
+
+  @include respond-to(tablet) {
+    padding: 0 4rem;
+  }
 }
 </style>
