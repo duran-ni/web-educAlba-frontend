@@ -25,7 +25,7 @@
             stroke-linejoin="round"
           />
         </svg>
-        <a href="CONTACT.phoneHref" class="footer-contact__link">{{ CONTACT.phone }}</a>
+        <a :href="CONTACT.phoneHref" class="footer-contact__link">{{ CONTACT.phone }}</a>
       </li>
       <li class="footer-contact__item">
         <svg class="footer-contact__icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -39,7 +39,7 @@
             stroke-linejoin="round"
           />
         </svg>
-        <a href="CONTACT.emailHref" class="footer-contact__link">{{ CONTACT.email }}</a>
+        <a :href="CONTACT.emailHref" class="footer-contact__link">{{ CONTACT.email }}</a>
       </li>
     </ul>
   </div>
