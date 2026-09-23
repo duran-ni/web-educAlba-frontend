@@ -1,51 +1,65 @@
 <template>
   <section class="hero-welcome">
-    <img
-      class="hero-welcome__image"
-      src="@/assets/hero-doodles.jpg"
-      alt="Ilustración decorativa estilo cuaderno: un arcoíris, un sol sonriente, una mariposa, una flor, nubes, corazones, estrellas y un libro abierto con lápices de colores, sobre un fondo de papel cuadriculado"
-      loading="lazy"
-    />
     <p class="hero-welcome__tagline">Enseñar con paciencia, aprender con confianza</p>
+    <div class="hero-welcome__image-wrapper">
+      <img
+        class="hero-welcome__image"
+        src="@/assets/hero-doodles.jpg"
+        alt="Ilustración doodle con un arcoíris, un sol sonriente y material escolar sobre fondo de cuaderno"
+        loading="lazy"
+      />
+    </div>
   </section>
 </template>
 
-<script setup></script>
+<script setup>
+</script>
 
 <style lang="scss">
 .hero-welcome {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   gap: 1.5rem;
 
   @include respond-to(tablet) {
     flex-direction: row;
     justify-content: space-between;
-  }
-
-  &__image {
-    width: 100%;
-    max-width: 400px;
-    border-radius: 1rem;
-
-    @include respond-to(tablet) {
-      flex: 1;
-    }
+    align-items: center;
   }
 
   &__tagline {
     margin: 0;
     font-family: $font-doodle;
-    font-size: 1.5rem;
+    font-size: 3rem;
+    line-height: 1.3;
     color: $color-primary;
-    text-align: center;
+    text-align: left;
 
     @include respond-to(tablet) {
       flex: 1;
-      font-size: 2rem;
-      text-align: left;
+      font-size: 4rem;
     }
+  }
+
+  &__image-wrapper {
+    width: 100%;
+    max-width: 400px;
+    overflow: hidden;
+    background-color: $color-background;
+    transform: rotate(2deg);
+    @include doodle-frame;
+
+    @include respond-to(tablet) {
+      flex: 1;
+    }
+  }
+
+  &__image {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
   }
 }
 </style>
