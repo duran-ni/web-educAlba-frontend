@@ -1,3 +1,7 @@
 <template>
-  <h1>Talleres</h1>
+  <PageHeading title="Talleres" />
 </template>
+
+<script setup>
+import PageHeading from '@/components/PageHeading.vue'
+</script>
