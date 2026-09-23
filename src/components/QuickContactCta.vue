@@ -14,9 +14,22 @@
         </svg>
         Llámanos
       </a>
-      <a :href="CONTACT.emailHref" class="quick-contact-cta__link" aria-label="Escribir un email a EducAlba">
+      <a
+        :href="CONTACT.emailHref"
+        class="quick-contact-cta__link"
+        aria-label="Escribir un email a EducAlba"
+      >
         <svg class="quick-contact-cta__icon" viewBox="0 0 24 24" aria-hidden="true">
-          <rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="2" />
+          <rect
+            x="3"
+            y="5"
+            width="18"
+            height="14"
+            rx="2"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          />
           <path
             d="M4 7l8 6 8-6"
             fill="none"
@@ -38,25 +51,43 @@ import { CONTACT } from '@/config/contact.js'
 
 <style lang="scss">
 .quick-contact-cta {
-  padding: 1.5rem;
-  border-radius: 1rem;
-  background-color: $color-background-soft;
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  max-width: 40rem;
+  margin: 3rem auto 0;
+  padding: 2rem 1.5rem;
+  background-color: $color-background-highlight;
+  transform: rotate(1deg);
+  @include doodle-frame;
+
+  @include respond-to(tablet) {
+    margin-top: 4rem;
+  }
 
   &__heading {
-    margin: 0 0 1rem;
-    font-size: 1.25rem;
+    margin: 0;
+    font-family: $font-doodle;
+    font-size: 1.75rem;
+    color: $color-primary;
+    text-align: center;
+
+    @include respond-to(tablet) {
+        font-size: 2.25rem;
+    }
   }
 
   &__links {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 0.75rem;
+    gap: 1.5rem;
 
     @include respond-to(tablet) {
-      flex-direction: row;
+        flex-direction: row;
     }
+
   }
 
   &__link {
@@ -66,7 +97,7 @@ import { CONTACT } from '@/config/contact.js'
     gap: 0.5rem;
     padding: 0.75rem 1.5rem;
     border-radius: 999px;
-    background-color: $color-primary;
+    background-color: $color-accent-pink-medium;
     color: $color-background;
     text-decoration: none;
     font-weight: 600;
