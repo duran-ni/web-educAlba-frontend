@@ -8,4 +8,11 @@ describe('HeroWelcome.vue', () => {
     const wrapper = mount(HeroWelcome)
     expect(wrapper.find('.hero-welcome__tagline').text()).toBe('Enseñar con paciencia, aprender con confianza')
   })
+
+   it('renders the welcome image with descriptive alt text', () => {
+    const wrapper = mount(HeroWelcome)
+    const image = wrapper.find('.hero-welcome__image')
+    expect(image.exists()).toBe(true)
+    expect(image.attributes('alt')).not.toBe('')
+  })
 })
