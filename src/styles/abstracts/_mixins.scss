@@ -12,3 +12,11 @@
     }
   }
 }
+
+// Mixin del marco "doodle": borde asimétrico dibujado a mano + sombra desplazada.
+// Es la seña de identidad visual de EducAlba para tarjetas, marcos de imagen y CTAs.
+@mixin doodle-frame {
+  border: 2px solid $color-text-dark;
+  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  box-shadow: 4px 4px 0 0 $color-text-dark;
+}
