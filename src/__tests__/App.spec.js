@@ -6,7 +6,7 @@ import router from '../router'
 
 // Cada caso es una ruta destino y el texto que debe aparecer una vez cargada esa vista
 const NAVIGATION_CASES = [
-  { name: 'home', heading: 'Inicio' },
+  { name: 'home', heading: 'Enseñar con paciencia, aprender con confianza' },
   { name: 'workshops', heading: 'Talleres' },
   { name: 'reinforcement', heading: 'Refuerzo' },
   { name: 'about', heading: 'Quiénes Somos' },
