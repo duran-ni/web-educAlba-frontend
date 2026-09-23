@@ -1,3 +1,7 @@
 <template>
-    <h1>Refuerzo</h1>
+    <PageHeading title="Refuerzo" />
 </template>
+
+<script setup>
+import PageHeading from '@/components/PageHeading.vue'
+</script>
