@@ -49,7 +49,7 @@ defineProps({
 
   &__brand {
     display: flex;
-    flex-direction: colum;
+    flex-direction: column;
     align-items: center;
     gap: 0.5rem;
 
