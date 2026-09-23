@@ -21,11 +21,13 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 1.5rem;
+  margin-top: 2rem;
 
   @include respond-to(tablet) {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    margin-top: 3rem;
   }
 
   &__tagline {
