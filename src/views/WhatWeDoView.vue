@@ -1,3 +1,7 @@
 <template>
-    <h1>Qué Hacemos</h1>
+    <PageHeading title="Qué Hacemos" />
 </template>
+
+<script setup>
+import PageHeading from '@/components/PageHeading.vue'
+</script>
