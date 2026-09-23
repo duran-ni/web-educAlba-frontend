@@ -2,14 +2,7 @@
   <nav class="footer-social" aria-label="Redes sociales">
     <ul class="footer-social__list">
       <li class="footer-social__item">
-
-        <a
-          href="https://www.instagram.com/educa_lba?stkn=cWU2cHRiNWttdjZ5"
-          class="footer-social__link"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Instagram de EducAlba"
-        >
+        <a href="https://www.instagram.com/educa_lba?stkn=cWU2cHRiNWttdjZ5" class="footer-social__link footer-social__link--instagram" target="_blank" rel="noopener noreferrer" aria-label="Instagram de EducAlba">
           <svg class="footer-social__icon" viewBox="0 0 24 24" aria-hidden="true">
             <rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2" />
             <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2" />
@@ -18,29 +11,10 @@
         </a>
       </li>
       <li class="footer-social__item">
-
-        <a
-          href="https://wa.me/34622291309?text=Hola%2C%20me%20gustar%C3%ADa%20m%C3%A1s%20informaci%C3%B3n"
-          class="footer-social__link"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Escribir por WhatsApp a EducAlba"
-        >
+        <a href="https://wa.me/34622291309?text=Hola%2C%20me%20gustar%C3%ADa%20m%C3%A1s%20informaci%C3%B3n" class="footer-social__link footer-social__link--whatsapp" target="_blank" rel="noopener noreferrer" aria-label="Escribir por WhatsApp a EducAlba">
           <svg class="footer-social__icon" viewBox="0 0 24 24" aria-hidden="true">
-            <path
-              d="M12 3a9 9 0 0 0-7.75 13.5L3 21l4.6-1.2A9 9 0 1 0 12 3Z"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linejoin="round"
-            />
-            <path
-              d="M8.5 8.5c0 4 3 7 7 7"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-            />
+            <path d="M12 3a9 9 0 0 0-7.75 13.5L3 21l4.6-1.2A9 9 0 1 0 12 3Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
+            <path d="M8.5 8.5c0 4 3 7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
           </svg>
         </a>
       </li>
