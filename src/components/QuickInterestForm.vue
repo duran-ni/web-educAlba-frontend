@@ -105,7 +105,7 @@ async function handleSubmit() {
   max-width: 26rem;
   margin: 2rem auto 0;
   padding: 1.5rem;
-  background-color: $color-accent-yellow;
+  background-color: $color-accent-yellow-soft;
   transform: rotate(-1deg);
   @include doodle-frame;
 
