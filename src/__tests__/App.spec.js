@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest'
-import { mount } from '@vue/test-utils'
+import { mount, flushPromises } from '@vue/test-utils'
 
 import App from '../App.vue'
 import router from '../router'
@@ -26,6 +26,7 @@ describe('Public navigation', () => {
     const wrapper = mount(App, {
       global: { plugins: [router] },
     })
+    await flushPromises()
 
     expect(wrapper.find('main').text()).toContain(heading)
   })
@@ -40,6 +41,7 @@ describe('Header/footer variant on the login route', () => {
     await router.push({ name: 'login' })
     await router.isReady()
     const wrapper = mount(App, { global: { plugins: [router] } })
+    await flushPromises()
     expect(wrapper.find('.nav-menu').exists()).toBe(false)
     expect(wrapper.find('.footer-contact').exists()).toBe(false)
   })
@@ -48,14 +50,16 @@ describe('Header/footer variant on the login route', () => {
     await router.push({ name: 'home' })
     await router.isReady()
     const wrapper = mount(App, { global: { plugins: [router] } })
+    await flushPromises()
     expect(wrapper.find('.nav-menu').exists()).toBe(true)
     expect(wrapper.find('.footer-contact').exists()).toBe(true)
   })
 
-    it('applies the shared grid background to the main content', async () => {
+  it('applies the shared grid background to the main content', async () => {
     await router.push({ name: 'home' })
     await router.isReady()
     const wrapper = mount(App, { global: { plugins: [router] } })
+    await flushPromises()
     expect(wrapper.find('main').classes()).toContain('grid-background')
   })
 })
