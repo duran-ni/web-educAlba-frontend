@@ -1,0 +1,14 @@
+@use '../abstracts/variables' as *;
+@use '../abstracts/mixins' as *;
+
+// Contenedor del contenido enmarcado entre la cabecera y el pie de página.
+// Vive en un archivo de estilos global (no en App.vue) porque los distintos
+// layouts (público, autenticación, administrador, usuario) lo reutilizan por igual.
+.app {
+  min-height: 100vh;
+  padding: 0 1rem;
+
+  @include respond-to(tablet) {
+    padding: 0 4rem;
+  }
+}

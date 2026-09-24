@@ -4,6 +4,7 @@
 @forward 'abstracts/mixins';
 @use 'base/reset';
 @use 'components/grid-background';
+@use 'components/page-content';
 
 body {
   font-family: $font-body;
