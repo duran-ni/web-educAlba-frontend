@@ -7,9 +7,9 @@
 .app {
   display: flow-root;
   min-height: 100vh;
-  padding: 0 1rem;
+  padding: 0 1rem 2rem;
 
   @include respond-to(tablet) {
-    padding: 0 4rem;
+    padding: 0 4rem 3rem;
   }
 }

@@ -34,6 +34,7 @@ defineProps({
   gap: 1.5rem;
   padding: 2rem 1.5rem;
   background-color: $color-background-alt;
+  border-top: 4px double $color-primary;
 
   @include respond-to(tablet) {
     flex-direction: row;
