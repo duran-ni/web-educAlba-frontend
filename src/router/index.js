@@ -1,76 +1,53 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-// Rutas públicas y protegidas de la aplicación
+// Rutas de la aplicación, agrupadas por layout: cada área (pública, autenticación,
+// usuario, administrador) anida sus vistas dentro del layout que le corresponde,
+// en vez de calcular a mano la variante de cabecera/pie de página en App.vue.
 const routes = [
   {
     path: '/',
-    name: 'home',
-    component: () => import('@/views/HomeView.vue'),
-  },
-  {
-    path: '/talleres',
-    name: 'workshops',
-    component: () => import('@/views/WorkshopsView.vue'),
-  },
-  {
-    path: '/refuerzo',
-    name: 'reinforcement',
-    component: () => import('@/views/ReinforcementView.vue'),
-  },
-  {
-    path: '/quienes-somos',
-    name: 'about',
-    component: () => import('@/views/AboutView.vue'),
-  },
-  {
-    path: '/que-hacemos',
-    name: 'what-we-do',
-    component: () => import('@/views/WhatWeDoView.vue'),
-  },
-  {
-    path: '/galeria',
-    name: 'gallery',
-    component: () => import('@/views/GalleryView.vue'),
+    component: () => import('@/layouts/PublicLayout.vue'),
+    children: [
+      { path: '', name: 'home', component: () => import('@/views/HomeView.vue') },
+      { path: 'talleres', name: 'workshops', component: () => import('@/views/WorkshopsView.vue') },
+      { path: 'refuerzo', name: 'reinforcement', component: () => import('@/views/ReinforcementView.vue') },
+      { path: 'quienes-somos', name: 'about', component: () => import('@/views/AboutView.vue') },
+      { path: 'que-hacemos', name: 'what-we-do', component: () => import('@/views/WhatWeDoView.vue') },
+      { path: 'galeria', name: 'gallery', component: () => import('@/views/GalleryView.vue') },
+    ],
   },
   {
     path: '/login',
-    name: 'login',
-    component: () => import('@/views/LoginView.vue'),
+    component: () => import('@/layouts/AuthLayout.vue'),
+    children: [
+      { path: '', name: 'login', component: () => import('@/views/LoginView.vue') },
+    ],
   },
   {
     path: '/dashboard',
-    name: 'dashboard',
-    component: () => import('@/views/UserDashboardView.vue'),
+    component: () => import('@/layouts/UserLayout.vue'),
     meta: { requiresAuth: true },
-  },
-  {
-    path: '/dashboard/mis-talleres',
-    name: 'my-workshops',
-    component: () => import('@/views/MyWorkshopsView.vue'),
-    meta: { requiresAuth: true },
-  },
-  {
-    path: '/dashboard/mi-perfil',
-    name: 'my-profile',
-    component: () => import('@/views/MyProfileView.vue'),
-    meta: { requiresAuth: true },
+    children: [
+      { path: '', name: 'dashboard', component: () => import('@/views/UserDashboardView.vue') },
+      { path: 'mis-talleres', name: 'my-workshops', component: () => import('@/views/MyWorkshopsView.vue') },
+      { path: 'mi-perfil', name: 'my-profile', component: () => import('@/views/MyProfileView.vue') },
+    ],
   },
   {
     path: '/admin',
-    name: 'admin',
-    component: () => import('@/views/AdminDashboardView.vue'),
+    component: () => import('@/layouts/AdminLayout.vue'),
     meta: { requiresAuth: true },
-  },
-  {
-    path: '/admin/gestion',
-    name: 'management',
-    component: () => import('@/views/ManagementView.vue'),
-    meta: { requiresAuth: true },
+    children: [
+      { path: '', name: 'admin', component: () => import('@/views/AdminDashboardView.vue') },
+      { path: 'gestion', name: 'management', component: () => import('@/views/ManagementView.vue') },
+    ],
   },
   {
     path: '/:pathMatch(.*)*',
-    name: 'not-found',
-    component: () => import('@/views/NotFoundView.vue'),
+    component: () => import('@/layouts/PublicLayout.vue'),
+    children: [
+      { path: '', name: 'not-found', component: () => import('@/views/NotFoundView.vue') },
+    ],
   },
 ]
 
