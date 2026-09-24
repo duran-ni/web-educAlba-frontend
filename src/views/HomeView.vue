@@ -24,12 +24,12 @@ import QuickContactCta from '@/components/QuickContactCta.vue'
   grid-template-columns: 1fr;
   gap: 1.5rem;
   align-items: start;
-  margin-top: 2rem;
+  margin-top: 5rem;
 
   @include respond-to(tablet) {
     grid-template-columns: repeat(2, 1fr);
     gap: 2rem;
-    margin-top: 3rem;
+    margin-top: 7rem;
   }
 }
 </style>

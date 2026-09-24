@@ -56,14 +56,14 @@ import { CONTACT } from '@/config/contact.js'
   align-items: center;
   gap: 1rem;
   max-width: 40rem;
-  margin: 3rem auto 0;
+  margin: 5rem auto 0;
   padding: 2rem 1.5rem;
   background-color: $color-background-highlight;
   transform: rotate(1deg);
   @include doodle-frame;
 
   @include respond-to(tablet) {
-    margin-top: 4rem;
+    margin-top: 7rem;
   }
 
   &__heading {
