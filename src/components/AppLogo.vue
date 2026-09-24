@@ -4,7 +4,7 @@
 
 <style lang="scss">
 .app-logo {
-  height: 48px;
+  height: 85px;
   width: auto;
 }
 </style>

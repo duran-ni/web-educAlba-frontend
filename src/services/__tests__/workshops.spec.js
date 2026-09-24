@@ -1,0 +1,16 @@
+import { describe, it, expect, vi } from 'vitest'
+
+import http from '../http'
+import { fetchNextWorkshop } from '../workshops'
+
+vi.mock('../http', () => ({
+  default: { get: vi.fn() },
+}))
+
+describe('workshops service', () => {
+  it('requests the next upcoming workshop from the public endpoint', () => {
+    fetchNextWorkshop()
+
+    expect(http.get).toHaveBeenCalledWith('/public/workshops/next')
+  })
+})
