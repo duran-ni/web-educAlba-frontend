@@ -5,6 +5,7 @@
 // Vive en un archivo de estilos global (no en App.vue) porque los distintos
 // layouts (público, autenticación, administrador, usuario) lo reutilizan por igual.
 .app {
+  display: flow-root;
   min-height: 100vh;
   padding: 0 1rem;
 
