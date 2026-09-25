@@ -33,7 +33,7 @@ describe('WorkshopsCalendar.vue', () => {
     const wrapper = mount(WorkshopsCalendar)
     await flushPromises()
 
-    expect(wrapper.find('.workshops-calendar__heading').text()).toBe('Octubre de 2026')
+    expect(wrapper.find('.workshops-calendar__heading').text()).toBe('Octubre 2026')
     expect(wrapper.findAll('button')).toHaveLength(31)
     expect(wrapper.findAll('.workshops-calendar__day--empty')).toHaveLength(3)
   })
