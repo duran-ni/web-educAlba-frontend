@@ -58,10 +58,13 @@ const year = today.getFullYear()
 const month = today.getMonth()
 
 // Nombre del mes en curso en español, con la primera letra en mayúscula
-// ("octubre de 2026" -> "Octubre de 2026")
+// ("octubre" -> "Octubre 2026"). Se formatea el mes y el año por separado,
+// en vez de usar el formato combinado de Intl, para no arrastrar el "de"
+// que añade por defecto (p.ej. "octubre de 2026").
 const monthLabel = computed(() => {
-  const label = new Intl.DateTimeFormat('es-ES', { month: 'long', year: 'numeric' }).format(today)
-  return label.charAt(0).toUpperCase() + label.slice(1)
+  const monthName = new Intl.DateTimeFormat('es-ES', { month: 'long' }).format(today)
+  const capitalizedMonthName = monthName.charAt(0).toUpperCase() + monthName.slice(1)
+  return `${capitalizedMonthName} ${year}`
 })
 
 // Número de días que tiene el mes en curso (día 0 del mes siguiente = último día de este mes)
@@ -121,7 +124,7 @@ function dayAriaLabel(day) {
 
 <style lang="scss">
 .workshops-calendar {
-  max-width: 32rem;
+  max-width: 56rem;
   margin: 0 auto;
   padding: 1.5rem;
   background-color: $color-background-alt;
