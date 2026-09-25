@@ -55,9 +55,14 @@ const formattedDate = computed(() => formatWorkshopDate(props.workshop.date))
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  padding: 1.5rem;
+  padding: 3rem;
   background-color: $color-background-highlight;
   @include doodle-frame;
+
+  @include respond-to(tablet) {
+    max-width: 35rem;
+    justify-self: center;
+  }
 
   &:nth-child(odd) {
     transform: rotate(1deg);
@@ -65,6 +70,22 @@ const formattedDate = computed(() => formatWorkshopDate(props.workshop.date))
 
   &:nth-child(even) {
     transform: rotate(-1deg);
+  }
+
+  &:nth-child(4n+1) {
+    background-color: $color-accent-yellow-soft;
+  }
+
+  &:nth-child(4n+2) {
+    background-color: $color-accent-pink;
+  }
+
+  &:nth-child(4n+3) {
+    background-color: $color-accent-green-soft;
+  }
+
+  &:nth-child(4n+4) {
+    background-color: $color-background-soft;
   }
 
   &__name {
@@ -78,6 +99,7 @@ const formattedDate = computed(() => formatWorkshopDate(props.workshop.date))
   &__description {
     margin: 0;
     color: $color-text-dark;
+
   }
 
   &__details {

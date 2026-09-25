@@ -38,7 +38,7 @@ onMounted(async () => {
 
 <style lang="scss">
 .workshops-list {
-  margin-top: 3rem;
+  margin-top: 5.5rem;
 
   &__message {
     margin: 0;
@@ -49,14 +49,14 @@ onMounted(async () => {
   &__grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 1.5rem;
+    gap: 5rem;
 
     @include respond-to(tablet) {
       grid-template-columns: repeat(2, 1fr);
     }
 
     @include respond-to(desktop) {
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, 1fr);
     }
   }
 }
