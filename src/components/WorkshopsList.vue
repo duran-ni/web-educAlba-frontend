@@ -38,6 +38,8 @@ onMounted(async () => {
 
 <style lang="scss">
 .workshops-list {
+  margin-top: 3rem;
+
   &__message {
     margin: 0;
     color: $color-text-dark;

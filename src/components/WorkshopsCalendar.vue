@@ -124,14 +124,14 @@ function dayAriaLabel(day) {
 
 <style lang="scss">
 .workshops-calendar {
-  max-width: 56rem;
+  max-width: 52rem;
   margin: 0 auto;
   padding: 1.5rem;
   background-color: $color-background-alt;
   @include doodle-frame;
 
   &__heading {
-    margin: 0 0 1rem;
+    margin: 0 0 2.5rem;
     font-family: $font-doodle;
     font-size: 1.5rem;
     color: $color-primary;
@@ -140,9 +140,11 @@ function dayAriaLabel(day) {
   }
 
   &__grid {
+    max-width: 35rem;
+    margin: 0 auto;
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 0.5rem;
+    gap: 0.35rem;
     text-align: center;
   }
 
@@ -153,7 +155,7 @@ function dayAriaLabel(day) {
   &__weekday {
     font-family: $font-heading;
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: 900;
     color: $color-text-dark;
   }
 
@@ -162,16 +164,22 @@ function dayAriaLabel(day) {
     display: flex;
     align-items: center;
     justify-content: center;
-    border: none;
-    border-radius: 50%;
-    background: transparent;
+    border: 1px solid $color-background-soft;
+    border-radius: 0.375rem;
+    background-color: $color-background-soft;
     font-family: $font-body;
-    font-size: 0.875rem;
+    font-size: 0.8rem;
     color: $color-text-dark;
     cursor: default;
 
+    &--empty {
+      border-color: transparent;
+      background-color: transparent;
+    }
+
     &--marked {
       background-color: $color-accent-pink-medium;
+      border-color: $color-accent-pink-medium;
       color: $color-background;
       font-weight: 600;
       cursor: pointer;

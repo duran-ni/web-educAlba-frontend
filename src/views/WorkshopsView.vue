@@ -4,12 +4,16 @@
       Talleres
       <span class="workshops-heading__highlight" aria-hidden="true"></span>
     </h1>
+    <p class="workshops-heading__subtitle">Talleres impartidos en Academia EducAlba</p>
   </header>
+
+  <WorkshopsCalendar />
 
   <WorkshopsList />
 </template>
 
 <script setup>
+import WorkshopsCalendar from '@/components/WorkshopsCalendar.vue'
 import WorkshopsList from '@/components/WorkshopsList.vue'
 </script>
 
@@ -46,6 +50,13 @@ import WorkshopsList from '@/components/WorkshopsList.vue'
     opacity: 0.5;
     transform: rotate(-2deg);
     z-index: -1;
+  }
+
+  &__subtitle {
+    margin: 2rem 0 0;
+    font-family: $font-doodle;
+    font-size: 2rem;
+    color: $color-green-dark;
   }
 }
 </style>
