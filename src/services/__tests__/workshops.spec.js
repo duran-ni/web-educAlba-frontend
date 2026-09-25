@@ -13,4 +13,10 @@ describe('workshops service', () => {
 
     expect(http.get).toHaveBeenCalledWith('/public/workshops/next')
   })
+
+  it('requests the full list of active workshops from the public endpoint', () => {
+    fetchWorkshops()
+
+    expect(http.get).toHaveBeenCalledWith('/public/workshops')
+  })
 })
