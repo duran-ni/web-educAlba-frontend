@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 
 import http from '../http'
-import { fetchNextWorkshop } from '../workshops'
+import { fetchNextWorkshop, fetchWorkshops } from '../workshops'
 
 vi.mock('../http', () => ({
   default: { get: vi.fn() },
