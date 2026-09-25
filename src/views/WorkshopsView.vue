@@ -19,6 +19,9 @@ import WorkshopsList from '@/components/WorkshopsList.vue'
   margin-top: 2rem;
   margin-bottom: 2.5rem;
 
+  @include respond-to(tablet) {
+    margin-top: 3rem;
+  }
 
   &__title {
     position: relative;
@@ -29,7 +32,6 @@ import WorkshopsList from '@/components/WorkshopsList.vue'
     color: $color-primary;
 
     @include respond-to(tablet) {
-      margin-top: 3rem;
       font-size: 4rem;
     }
   }
