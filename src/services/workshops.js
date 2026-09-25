@@ -5,3 +5,8 @@ import http from './http'
 export function fetchNextWorkshop() {
   return http.get('/public/workshops/next')
 }
+
+// Consulta el listado completo de talleres activos, ordenados por fecha
+export function fetchWorkshops() {
+  return http.get('/public/workshops')
+}
