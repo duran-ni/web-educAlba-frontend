@@ -40,23 +40,10 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { fetchNextWorkshop } from '@/services/workshops'
+import { formatWorkshopDate } from '@/utils/formatWorkshopDate'
 
 const status = ref('loading')
 const workshop = ref(null)
-
-// Convierte la fecha ISO del backend (aaaa-mm-dd) en texto legible en español.
-// Se construye el Date con año/mes/día locales (no con "new Date(isoString)")
-// para evitar el desfase de un día que provoca la interpretación en UTC.
-function formatWorkshopDate(isoDate) {
-  const [year, month, day] = isoDate.split('-').map(Number)
-  const date = new Date(year, month - 1, day)
-
-  return new Intl.DateTimeFormat('es-ES', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-  }).format(date)
-}
 
 const formattedDate = computed(() => (workshop.value ? formatWorkshopDate(workshop.value.date) : ''))
 
