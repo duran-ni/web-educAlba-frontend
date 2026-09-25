@@ -6,7 +6,16 @@
     <div class="workshop-card__details">
       <div class="workshop-card__detail-row">
         <svg class="workshop-card__icon" viewBox="0 0 24 24" aria-hidden="true">
-          <rect x="3" y="5" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="2" />
+          <rect
+            x="3"
+            y="5"
+            width="18"
+            height="16"
+            rx="2"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          />
           <path
             d="M3 9h18M8 3v4M16 3v4"
             fill="none"
@@ -20,9 +29,11 @@
 
       <div v-if="workshop.recommendedAge" class="workshop-card__detail-row">
         <svg class="workshop-card__icon" viewBox="0 0 24 24" aria-hidden="true">
-          <circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="2" />
+          <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2" />
+          <circle cx="9" cy="10" r="1.2" fill="currentColor" />
+          <circle cx="15" cy="10" r="1.2" fill="currentColor" />
           <path
-            d="M4 21c0-4 4-6 8-6s8 2 8 6"
+            d="M8 14.5 Q12 18.5 16 14.5"
             fill="none"
             stroke="currentColor"
             stroke-width="2"
@@ -72,19 +83,19 @@ const formattedDate = computed(() => formatWorkshopDate(props.workshop.date))
     transform: rotate(-1deg);
   }
 
-  &:nth-child(4n+1) {
+  &:nth-child(4n + 1) {
     background-color: $color-accent-yellow-soft;
   }
 
-  &:nth-child(4n+2) {
+  &:nth-child(4n + 2) {
     background-color: $color-accent-pink;
   }
 
-  &:nth-child(4n+3) {
+  &:nth-child(4n + 3) {
     background-color: $color-accent-green-soft;
   }
 
-  &:nth-child(4n+4) {
+  &:nth-child(4n + 4) {
     background-color: $color-background-soft;
   }
 
@@ -99,7 +110,6 @@ const formattedDate = computed(() => formatWorkshopDate(props.workshop.date))
   &__description {
     margin: 0;
     color: $color-text-dark;
-
   }
 
   &__details {
