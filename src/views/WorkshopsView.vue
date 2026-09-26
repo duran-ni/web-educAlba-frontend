@@ -31,11 +31,14 @@
   <WorkshopsCalendar />
 
   <WorkshopsList />
+
+  <WorkshopEnrollmentForm />
 </template>
 
 <script setup>
 import WorkshopsCalendar from '@/components/WorkshopsCalendar.vue'
 import WorkshopsList from '@/components/WorkshopsList.vue'
+import WorkshopEnrollmentForm from '@/components/WorkshopEnrollmentForm.vue';
 </script>
 
 <style lang="scss">
