@@ -32,7 +32,7 @@
           stroke-linecap="round"
         />
       </svg>
-      <span class="next-workshop-card__date">{{ formattedDate }}</span>
+      <span class="next-workshop-card__date">{{ formattedDate }} . {{ formattedTime }}</span>
     </div>
   </section>
 </template>
@@ -41,11 +41,13 @@
 import { ref, computed, onMounted } from 'vue'
 import { fetchNextWorkshop } from '@/services/workshops'
 import { formatWorkshopDate } from '@/utils/formatWorkshopDate'
+import { formatWorkshopTime } from '@/utils/formatWorkshopTime'
 
 const status = ref('loading')
 const workshop = ref(null)
 
 const formattedDate = computed(() => (workshop.value ? formatWorkshopDate(workshop.value.date) : ''))
+const formattedTime = computed(() => (workshop.value ? formatWorkshopTime(workshop.value.time) : ''))
 
 onMounted(async () => {
   try {
