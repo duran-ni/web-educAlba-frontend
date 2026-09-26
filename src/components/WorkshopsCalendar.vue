@@ -37,6 +37,7 @@
         class="workshops-calendar__detail-item"
       >
         <p class="workshops-calendar__detail-name">{{ workshop.name }}</p>
+        <p class="workshops-calendar__detail-time">{{ formatWorkshopTime(workshop.time) }}</p>
         <p class="workshops-calendar__detail-description">{{ workshop.description }}</p>
       </article>
     </div>
@@ -50,6 +51,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { fetchWorkshops } from '@/services/workshops'
+import { formatWorkshopTime } from '../utils/formatWorkshopTime'
 
 const WEEKDAY_LABELS = ['L', 'M', 'X', 'J', 'V', 'S', 'D']
 
@@ -207,6 +209,15 @@ function dayAriaLabel(day) {
     font-family: $font-heading;
     font-weight: 600;
     color: $color-primary;
+  }
+
+  &__detail-time {
+    margin: 0.25rem 0 0;
+    font-family: $font-heading;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: $color-text-dark;
+    opacity: 0.8;
   }
 
   &__detail-description {
