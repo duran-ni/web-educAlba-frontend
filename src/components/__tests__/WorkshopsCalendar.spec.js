@@ -47,6 +47,7 @@ describe('WorkshopsCalendar.vue', () => {
           name: 'Manos a la obra',
           description: 'Un taller sensorial.',
           date: '2026-10-24',
+          time: '11:00:00',
           recommendedAge: '1-2 años',
           room: null,
           active: true,
@@ -61,7 +62,7 @@ describe('WorkshopsCalendar.vue', () => {
     expect(findDayButton(wrapper, 10).classes()).not.toContain('workshops-calendar__day--marked')
   })
 
-  it('shows the workshop detail on hover, and hides it again when the cursor leaves', async () => {
+  it('shows the workshop detail (including its time) on hover, and hides it again when the cursor leaves', async () => {
     fetchWorkshops.mockResolvedValue({
       status: 200,
       data: [
@@ -70,6 +71,7 @@ describe('WorkshopsCalendar.vue', () => {
           name: 'Manos a la obra',
           description: 'Un taller sensorial.',
           date: '2026-10-24',
+          time: '11:00:00',
           recommendedAge: '1-2 años',
           room: null,
           active: true,
@@ -84,6 +86,7 @@ describe('WorkshopsCalendar.vue', () => {
 
     await day24.trigger('mouseenter')
     expect(wrapper.text()).toContain('Manos a la obra')
+    expect(wrapper.text()).toContain('11:00 h')
 
     await day24.trigger('mouseleave')
     expect(wrapper.text()).not.toContain('Manos a la obra')
@@ -98,6 +101,7 @@ describe('WorkshopsCalendar.vue', () => {
           name: 'Manos a la obra',
           description: 'Un taller sensorial.',
           date: '2026-10-24',
+          time: '11:00:00',
           recommendedAge: '1-2 años',
           room: null,
           active: true,
