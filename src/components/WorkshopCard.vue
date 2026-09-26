@@ -24,7 +24,7 @@
             stroke-linecap="round"
           />
         </svg>
-        <span>{{ formattedDate }}</span>
+        <span>{{ formattedDate }} . {{ formattedTime }}</span>
       </div>
 
       <div v-if="workshop.recommendedAge" class="workshop-card__detail-row">
@@ -49,6 +49,7 @@
 <script setup>
 import { computed } from 'vue'
 import { formatWorkshopDate } from '@/utils/formatWorkshopDate'
+import { formatWorkshopTime } from '@/utils/formatWorkshopTime'
 
 const props = defineProps({
   // Datos del taller a mostrar (tal como los devuelve el backend)
@@ -59,6 +60,7 @@ const props = defineProps({
 })
 
 const formattedDate = computed(() => formatWorkshopDate(props.workshop.date))
+const formattedTime = computed(() => formatWorkshopTime(props.workshop.time))
 </script>
 
 <style lang="scss">
