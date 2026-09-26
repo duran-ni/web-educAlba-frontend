@@ -9,4 +9,9 @@ describe('formatWorkshopTime', () => {
   it('keeps the leading zero of single-digit hours and minutes', () => {
     expect(formatWorkshopTime('09:05:00')).toBe('09:05 h')
   })
+
+  it('returns an empty string when there is no time', () => {
+    expect(formatWorkshopTime(null)).toBe('')
+    expect(formatWorkshopTime(undefined)).toBe('')
+  })
 })
