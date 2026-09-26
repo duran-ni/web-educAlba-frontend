@@ -13,7 +13,7 @@ describe('NextWorkshopCard.vue', () => {
     vi.clearAllMocks()
   })
 
-  it('shows the workshop name and description when there is an upcoming workshop', async () => {
+  it('shows the workshop name, description, date and time when there is an upcoming workshop', async () => {
     fetchNextWorkshop.mockResolvedValueOnce({
       status: 200,
       data: {
@@ -21,6 +21,7 @@ describe('NextWorkshopCard.vue', () => {
         name: 'Taller de Robótica Creativa',
         description: 'Aprende a construir tus propios inventos.',
         date: '2026-06-15',
+        time: '11:00:00',
         recommendedAge: '8-12 años',
         room: 'Aula 2',
         active: true,
@@ -32,6 +33,7 @@ describe('NextWorkshopCard.vue', () => {
 
     expect(wrapper.text()).toContain('Taller de Robótica Creativa')
     expect(wrapper.text()).toContain('Aprende a construir tus propios inventos.')
+    expect(wrapper.text()).toContain('11:00 h')
   })
 
   it('shows an empty state when there are no upcoming workshops', async () => {
