@@ -1,8 +1,27 @@
-import { describe, it, expect, afterEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 
 import App from '../App.vue'
 import router from '../router'
+import { fetchNextWorkshop, fetchWorkshops } from '@/services/workshops'
+
+// Simulamos el servicio de talleres para que las pruebas de navegación
+// no dependan de un backend real ni de la velocidad de la red
+vi.mock('@/services/workshops', () => ({
+  fetchNextWorkshop: vi.fn(),
+  fetchWorkshops: vi.fn(),
+}))
+
+// Respuestas por defecto: sin próximo taller y sin talleres activos.
+// Cada test que necesite otro escenario puede sobreescribirlas.
+beforeEach(() => {
+  fetchNextWorkshop.mockResolvedValue({ status: 204, data: null })
+  fetchWorkshops.mockResolvedValue({ status: 200, data: [] })
+})
+
+afterEach(() => {
+  vi.clearAllMocks()
+})
 
 // Cada caso es una ruta destino y el texto que debe aparecer una vez cargada esa vista
 const NAVIGATION_CASES = [
