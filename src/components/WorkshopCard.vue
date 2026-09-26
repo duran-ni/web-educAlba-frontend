@@ -24,7 +24,7 @@
             stroke-linecap="round"
           />
         </svg>
-        <span>{{ formattedDate }} . {{ formattedTime }}</span>
+        <span>{{ formattedDate }} / {{ formattedTime }}</span>
       </div>
 
       <div v-if="workshop.recommendedAge" class="workshop-card__detail-row">
