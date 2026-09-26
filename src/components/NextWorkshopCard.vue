@@ -32,7 +32,7 @@
           stroke-linecap="round"
         />
       </svg>
-      <span class="next-workshop-card__date">{{ formattedDate }} . {{ formattedTime }}</span>
+      <span class="next-workshop-card__date">{{ formattedDate }} / {{ formattedTime }}</span>
     </div>
   </section>
 </template>
