@@ -7,21 +7,20 @@ const routes = [
   {
     path: '/',
     component: () => import('@/layouts/PublicLayout.vue'),
-    children: [
+        children: [
       { path: '', name: 'home', component: () => import('@/views/HomeView.vue') },
       { path: 'talleres', name: 'workshops', component: () => import('@/views/WorkshopsView.vue') },
       { path: 'refuerzo', name: 'reinforcement', component: () => import('@/views/ReinforcementView.vue') },
       { path: 'quienes-somos', name: 'about', component: () => import('@/views/AboutView.vue') },
       { path: 'que-hacemos', name: 'what-we-do', component: () => import('@/views/WhatWeDoView.vue') },
       { path: 'galeria', name: 'gallery', component: () => import('@/views/GalleryView.vue') },
+      { path: 'contacto', name: 'contact', component: () => import('@/views/ContactView.vue') },
     ],
   },
   {
     path: '/login',
     component: () => import('@/layouts/AuthLayout.vue'),
-    children: [
-      { path: '', name: 'login', component: () => import('@/views/LoginView.vue') },
-    ],
+    children: [{ path: '', name: 'login', component: () => import('@/views/LoginView.vue') }],
   },
   {
     path: '/dashboard',
@@ -29,8 +28,16 @@ const routes = [
     meta: { requiresAuth: true },
     children: [
       { path: '', name: 'dashboard', component: () => import('@/views/UserDashboardView.vue') },
-      { path: 'mis-talleres', name: 'my-workshops', component: () => import('@/views/MyWorkshopsView.vue') },
-      { path: 'mi-perfil', name: 'my-profile', component: () => import('@/views/MyProfileView.vue') },
+      {
+        path: 'mis-talleres',
+        name: 'my-workshops',
+        component: () => import('@/views/MyWorkshopsView.vue'),
+      },
+      {
+        path: 'mi-perfil',
+        name: 'my-profile',
+        component: () => import('@/views/MyProfileView.vue'),
+      },
     ],
   },
   {
@@ -39,7 +46,11 @@ const routes = [
     meta: { requiresAuth: true },
     children: [
       { path: '', name: 'admin', component: () => import('@/views/AdminDashboardView.vue') },
-      { path: 'gestion', name: 'management', component: () => import('@/views/ManagementView.vue') },
+      {
+        path: 'gestion',
+        name: 'management',
+        component: () => import('@/views/ManagementView.vue'),
+      },
     ],
   },
   {
