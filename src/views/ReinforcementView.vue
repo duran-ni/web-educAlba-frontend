@@ -3,32 +3,44 @@
     <svg class="reinforcement-heading__star" viewBox="0 0 100 100" aria-hidden="true">
       <path d="M50 10C50 30 70 50 90 50C70 50 50 70 50 90C50 70 30 50 10 50C30 50 50 30 50 10Z" />
     </svg>
-
     <svg class="reinforcement-heading__waves" viewBox="0 0 100 100" aria-hidden="true">
-      <path
-        d="M10 50 Q 30 10 50 50 T 90 50"
-        class="reinforcement-heading__wave reinforcement-heading__wave--primary"
-      />
-      <path
-        d="M10 60 Q 30 20 50 60 T 90 60"
-        class="reinforcement-heading__wave reinforcement-heading__wave--pink"
-      />
+      <path d="M10 50 Q 30 10 50 50 T 90 50" class="reinforcement-heading__wave reinforcement-heading__wave--primary" />
+      <path d="M10 60 Q 30 20 50 60 T 90 60" class="reinforcement-heading__wave reinforcement-heading__wave--pink" />
     </svg>
-
     <h1 class="reinforcement-heading__title">
       Clases de Refuerzo
       <span class="reinforcement-heading__highlight" aria-hidden="true"></span>
     </h1>
-
     <p class="reinforcement-heading__subtitle">
       ¡Dale un empujón a tus notas! Reforzamos los conocimientos con una metodología práctica, cercana y muy divertida.
     </p>
   </header>
 
   <ReinforcementStages />
+
+  <section class="tutoring-cta">
+    <h2 class="tutoring-cta__title">¿Necesitas ayuda con algo específico?</h2>
+    <RouterLink
+      class="tutoring-cta__button"
+      :to="{ name: 'contact', query: { subject: 'Solicitud de tutoría personalizada' } }"
+    >
+      Reserva una tutoría
+      <svg class="tutoring-cta__arrow" viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          d="M4 12h14M13 6l6 6-6 6"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+    </RouterLink>
+  </section>
 </template>
 
 <script setup>
+import { RouterLink } from 'vue-router'
 import ReinforcementStages from '@/components/ReinforcementStages.vue'
 </script>
 
@@ -124,6 +136,55 @@ import ReinforcementStages from '@/components/ReinforcementStages.vue'
     &--pink {
       stroke: $color-accent-pink;
     }
+  }
+}
+
+.tutoring-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  margin: 4rem auto;
+  padding: 0 1.5rem;
+  text-align: center;
+
+  &__title {
+    margin: 0;
+    font-family: $font-heading;
+    font-size: 1.75rem;
+    color: $color-text-dark;
+  }
+
+  &__button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border: 2px solid $color-primary;
+    border-radius: 999px;
+    background-color: transparent;
+    color: $color-primary;
+    font-family: $font-body;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 0.2s ease, color 0.2s ease;
+
+    &:hover,
+    &:focus-visible {
+      background-color: $color-primary;
+      color: $color-background;
+    }
+
+    &:hover .tutoring-cta__arrow,
+    &:focus-visible .tutoring-cta__arrow {
+      transform: translateX(0.25rem);
+    }
+  }
+
+  &__arrow {
+    width: 1.125rem;
+    height: 1.125rem;
+    transition: transform 0.2s ease;
   }
 }
 </style>
