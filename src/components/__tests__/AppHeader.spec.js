@@ -13,6 +13,7 @@ const router = createRouter({
     { path: '/quienes-somos', name: 'about', component: { template: '<div />' } },
     { path: '/que-hacemos', name: 'what-we-do', component: { template: '<div />' } },
     { path: '/galeria', name: 'gallery', component: { template: '<div />' } },
+    { path: '/contacto', name: 'contact', component: { template: '<div />' } },
     { path: '/login', name: 'login', component: { template: '<div />' } },
     { path: '/admin', name: 'admin', component: { template: '<div />' } },
     { path: '/admin/gestion', name: 'management', component: { template: '<div />' } },
