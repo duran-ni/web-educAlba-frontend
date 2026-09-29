@@ -29,7 +29,7 @@ defineProps({
   },
 })
 
-// Los 6 enlaces principales de navegación pública, en el orden que pide la historia
+// Los 7 enlaces principales de navegación pública.
 const links = [
   { label: 'Inicio', to: { name: 'home' } },
   { label: 'Talleres', to: { name: 'workshops' } },
@@ -37,6 +37,7 @@ const links = [
   { label: 'Quiénes Somos', to: { name: 'about' } },
   { label: 'Qué Hacemos', to: { name: 'what-we-do' } },
   { label: 'Galería', to: { name: 'gallery' } },
+  { label: 'Contacto', to: { name: 'contact' } },
 ]
 </script>
 
