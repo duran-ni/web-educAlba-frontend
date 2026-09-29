@@ -4,7 +4,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 import NavMenu from '../NavMenu.vue'
 
-// Router mínimo de prueba, con las mismas 6 rutas públicas que usa el menú real
+// Router mínimo de prueba, con las mismas 7 rutas públicas que usa el menú real
 const router = createRouter({
   history: createWebHistory(),
   routes: [
@@ -14,6 +14,7 @@ const router = createRouter({
     { path: '/quienes-somos', name: 'about', component: { template: '<div />' } },
     { path: '/que-hacemos', name: 'what-we-do', component: { template: '<div />' } },
     { path: '/galeria', name: 'gallery', component: { template: '<div />' } },
+    { path: '/contacto', name: 'contact', component: { template: '<div />' } },
   ],
 })
 
@@ -22,14 +23,14 @@ describe('NavMenu.vue', () => {
     router.push('/')
   })
 
-  it('renders the 6 main navigation links', async () => {
+  it('renders the 7 main navigation links', async () => {
     await router.isReady()
     const wrapper = mount(NavMenu, {
       global: { plugins: [router] },
     })
 
     const links = wrapper.findAll('.nav-menu__link')
-    expect(links).toHaveLength(6)
+    expect(links).toHaveLength(7)
 
     const labels = links.map((link) => link.text())
     expect(labels).toEqual([
@@ -39,6 +40,7 @@ describe('NavMenu.vue', () => {
       'Quiénes Somos',
       'Qué Hacemos',
       'Galería',
+      'Contacto',
     ])
   })
 
