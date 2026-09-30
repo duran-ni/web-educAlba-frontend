@@ -49,7 +49,7 @@ import ReinforcementStages from '@/components/ReinforcementStages.vue'
   position: relative;
   text-align: center;
   margin-top: 2rem;
-  margin-bottom: 4rem;
+  margin-bottom: 10rem;
 
   @include respond-to(tablet) {
     margin-top: 3rem;
@@ -144,14 +144,17 @@ import ReinforcementStages from '@/components/ReinforcementStages.vue'
   flex-direction: column;
   align-items: center;
   gap: 1.5rem;
-  margin: 4rem auto;
+  margin-top: 10rem;
+  margin-bottom: 4rem;
+  margin-left: auto;
+  margin-right: auto;
   padding: 0 1.5rem;
   text-align: center;
 
   &__title {
     margin: 0;
-    font-family: $font-heading;
-    font-size: 1.75rem;
+    font-family: $font-doodle;
+    font-size: 2.5rem;
     color: $color-text-dark;
   }
 
