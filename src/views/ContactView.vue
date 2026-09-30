@@ -18,25 +18,21 @@
 
       <section class="contact-info">
         <h2 class="contact-info__title">Dónde estamos</h2>
-        <ul class="contact-info__list">
-          <li class="contact-info__item">
-            <span class="contact-info__label">Dirección</span>
-            {{ CONTACT.address }}
-          </li>
-          <li class="contact-info__item">
-            <a class="contact-info__link" :href="CONTACT.phoneHref">
-              <span class="contact-info__label">Teléfono</span>
-              {{ CONTACT.phone }}
-            </a>
-          </li>
-          <li class="contact-info__item">
-            <a class="contact-info__link" :href="CONTACT.emailHref">
-              <span class="contact-info__label">Email</span>
-              {{ CONTACT.email }}
-            </a>
-          </li>
-        </ul>
+
+        <iframe
+          class="contact-info__map"
+          :src="mapEmbedUrl"
+          title="Mapa de ubicación de EducAlba"
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+        ></iframe>
+
+        <p class="contact-info__address">
+          <span class="contact-info__label">Dirección</span>
+          {{ CONTACT.address }}
+        </p>
       </section>
+
     </div>
   </div>
 </template>
@@ -55,6 +51,12 @@ const initialSubject = computed(() => {
   const subject = route.query.subject
   return typeof subject === 'string' ? subject : ''
 })
+
+// URL del mapa embebido de Google Maps, generada a partir de la direccion real
+// de la academia (config/contact.js), para no duplicar el dato a mano aqui
+const mapEmbedUrl = computed(
+  () => `https://www.google.com/maps?q=${encodeURIComponent(CONTACT.address)}&output=embed`
+)
 </script>
 
 <style lang="scss">
@@ -62,7 +64,7 @@ const initialSubject = computed(() => {
   position: relative;
   text-align: center;
   margin-top: 2rem;
-  margin-bottom: 3rem;
+  margin-bottom: 7rem;
 
   @include respond-to(tablet) {
     margin-top: 3rem;
@@ -72,9 +74,9 @@ const initialSubject = computed(() => {
     position: relative;
     z-index: 1;
     display: inline-block;
-    margin: 1rem 0 0;
+    margin: 3rem 0 0;
     font-family: $font-doodle;
-    font-size: 3.5rem;
+    font-size: 4rem;
     color: $color-primary;
   }
 
@@ -91,14 +93,15 @@ const initialSubject = computed(() => {
   }
 
   &__subtitle {
-    max-width: 42rem;
-    margin: 3rem auto 0;
-    padding: 1rem 1.5rem;
+    max-width: 45rem;
+    margin: 5rem auto 0;
+    padding: 1.5rem 1.5rem;
     border: 2px dashed $color-text-dark;
     border-radius: 1rem;
     background-color: rgba($color-background, 0.8);
     font-family: $font-body;
-    font-size: 1.125rem;
+    font-size: 1.5rem;
+    font-weight: 700;
     color: $color-text-dark;
   }
 
@@ -139,24 +142,18 @@ const initialSubject = computed(() => {
   border: 2px dashed $color-text-dark;
   border-radius: 1rem;
   background-color: $color-background-soft;
+  transform: translateX(7rem);
 
   &__title {
     margin: 0 0 1rem;
-    font-family: $font-heading;
+    font-family: $font-doodle;
     font-size: 1.5rem;
     color: $color-primary;
   }
 
-  &__list {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  &__item {
+  &__address {
+    margin: 0 0 1rem;
+    margin-top: 2rem;
     font-family: $font-body;
     font-size: 1rem;
     color: $color-text-dark;
@@ -171,15 +168,13 @@ const initialSubject = computed(() => {
     color: $color-primary;
   }
 
-  &__link {
+  &__map {
     display: block;
-    color: inherit;
-    text-decoration: none;
-
-    &:hover,
-    &:focus-visible {
-      text-decoration: underline;
-    }
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    border: 2px solid $color-text-dark;
+    border-radius: 0.75rem;
+    margin-top: 2rem;
   }
 }
 </style>
