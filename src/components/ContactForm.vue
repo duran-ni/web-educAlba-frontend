@@ -51,7 +51,7 @@
           id="contact-message"
           v-model.trim="message"
           class="contact-form__input contact-form__input--textarea"
-          rows="4"
+          rows="7"
           placeholder="Escribe aquí tu mensaje..."
           :aria-invalid="Boolean(messageError)"
           :aria-describedby="messageError ? 'contact-message-error' : undefined"
@@ -153,7 +153,7 @@ async function handleSubmit() {
   flex-direction: column;
   gap: 1rem;
   background-color: $color-accent-yellow-soft;
-  transform: rotate(1deg);
+  transform: translateX(-5rem) rotate(-3deg);
   @include doodle-frame;
 
   &__tape {
@@ -174,8 +174,8 @@ async function handleSubmit() {
   }
 
   &__label {
-    font-family: $font-heading;
-    font-size: 0.875rem;
+    font-family: $font-doodle;
+    font-size: 1.125rem;
     font-weight: 600;
     color: $color-text-dark;
   }
