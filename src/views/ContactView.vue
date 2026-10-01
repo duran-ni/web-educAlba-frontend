@@ -19,20 +19,28 @@
       <section class="contact-info">
         <h2 class="contact-info__title">Dónde estamos</h2>
 
-        <iframe
-          class="contact-info__map"
-          :src="mapEmbedUrl"
-          title="Mapa de ubicación de EducAlba"
-          loading="lazy"
-          referrerpolicy="no-referrer-when-downgrade"
-        ></iframe>
+        <a
+          class="contact-info__map-link"
+          :href="mapLinkUrl"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Abrir la ubicación de EducAlba en Google Maps"
+        >
+          <iframe
+            class="contact-info__map"
+            :src="mapEmbedUrl"
+            title="Mapa de ubicación de EducAlba"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            tabindex="-1"
+          ></iframe>
+        </a>
 
         <p class="contact-info__address">
           <span class="contact-info__label">Dirección</span>
           {{ CONTACT.address }}
         </p>
       </section>
-
     </div>
   </div>
 </template>
@@ -52,11 +60,18 @@ const initialSubject = computed(() => {
   return typeof subject === 'string' ? subject : ''
 })
 
-// URL del mapa embebido de Google Maps, generada a partir de la direccion real
-// de la academia (config/contact.js), para no duplicar el dato a mano aqui
-const mapEmbedUrl = computed(
-  () => `https://www.google.com/maps?q=${encodeURIComponent(CONTACT.address)}&output=embed`
-)
+// Version de la direccion formateada especificamente para que Google Maps la
+// localice bien (con comas entre calle, codigo postal, localidad, provincia y
+// pais). No se muestra en pantalla: solo se usa para construir las URLs del
+// mapa. El texto que ve la persona sigue siendo CONTACT.address, tal cual.
+const MAP_SEARCH_ADDRESS = 'Urbanización Cooperativa Pablo Iglesias, 2, 33920 Riaño, Langreo, Asturias, España'
+
+// URL del mapa embebido de Google Maps, generada a partir de la direccion
+// formateada para busquedas (MAP_SEARCH_ADDRESS)
+const mapEmbedUrl = computed(() => `https://www.google.com/maps?q=${encodeURIComponent(MAP_SEARCH_ADDRESS)}&output=embed`)
+
+// URL real de Google Maps (no la de "embed") para abrir la ubicacion en una pestana nueva al hacer clic
+const mapLinkUrl = computed(() => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(MAP_SEARCH_ADDRESS)}`)
 </script>
 
 <style lang="scss">
@@ -168,13 +183,19 @@ const mapEmbedUrl = computed(
     color: $color-primary;
   }
 
+  &__map-link {
+    display: block;
+    border: 2px solid $color-text-dark;
+    border-radius: 0.75rem;
+    overflow: hidden;
+  }
+
   &__map {
     display: block;
     width: 100%;
     aspect-ratio: 4 / 3;
-    border: 2px solid $color-text-dark;
-    border-radius: 0.75rem;
-    margin-top: 2rem;
+    border: none;
+    pointer-events: none;
   }
 }
 </style>
