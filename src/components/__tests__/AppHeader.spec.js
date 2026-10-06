@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { createRouter, createWebHistory } from 'vue-router'
+import { createPinia } from 'pinia'
 
 import AppHeader from '../AppHeader.vue'
 
@@ -27,7 +28,7 @@ describe('AppHeader.vue', () => {
   it('renders the navigation menu and login button in the full variant', async () => {
     await router.push('/')
     await router.isReady()
-    const wrapper = mount(AppHeader, { global: { plugins: [router] } })
+    const wrapper = mount(AppHeader, { global: { plugins: [router, createPinia()] } })
     expect(wrapper.find('.nav-menu').exists()).toBe(true)
     expect(wrapper.find('.login-button').exists()).toBe(true)
   })
@@ -37,7 +38,7 @@ describe('AppHeader.vue', () => {
     await router.isReady()
     const wrapper = mount(AppHeader, {
       props: { variant: 'reduced' },
-      global: { plugins: [router] },
+      global: { plugins: [router, createPinia()] },
     })
     expect(wrapper.find('.nav-menu').exists()).toBe(false)
     expect(wrapper.find('.login-button').exists()).toBe(false)
@@ -47,7 +48,7 @@ describe('AppHeader.vue', () => {
     await router.isReady()
     const wrapper = mount(AppHeader, {
       props: { variant: 'admin' },
-      global: { plugins: [router] },
+      global: { plugins: [router, createPinia()] },
     })
     expect(wrapper.find('.admin-nav').exists()).toBe(true)
     expect(wrapper.find('.nav-menu').exists()).toBe(false)
@@ -58,7 +59,7 @@ describe('AppHeader.vue', () => {
     await router.isReady()
     const wrapper = mount(AppHeader, {
       props: { variant: 'user' },
-      global: { plugins: [router] },
+      global: { plugins: [router, createPinia()] },
     })
     expect(wrapper.find('.user-nav').exists()).toBe(true)
     expect(wrapper.find('.nav-toggle').attributes('aria-controls')).toBe('user-nav-list')
