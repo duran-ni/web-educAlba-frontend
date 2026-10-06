@@ -11,12 +11,18 @@
           {{ link.label }}
         </RouterLink>
       </li>
+      <li class="user-nav__item">
+        <button type="button" class="user-nav__link user-nav__logout" @click="handleLogout">
+          Salir
+        </button>
+      </li>
     </ul>
   </nav>
 </template>
 
 <script setup>
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 
 defineProps({
   isOpen: {
@@ -25,17 +31,25 @@ defineProps({
   },
 })
 
-defineEmits(['navigate'])
+const emit = defineEmits(['navigate'])
 
-// Opciones de ejemplo del área privada del alumno/familia.
-// Pendiente de confirmar con el cliente el listado definitivo — "Salir" es la única fija.
+const router = useRouter()
+const authStore = useAuthStore()
+
+// Opciones del área privada del alumno/familia.
+// Pendiente de confirmar con el cliente el listado definitivo.
 const links = [
   { label: 'Inicio', to: { name: 'dashboard' } },
   { label: 'Mis Talleres', to: { name: 'my-workshops' } },
   { label: 'Mi Perfil', to: { name: 'my-profile' } },
-  // "Salir" navega de momento a Inicio; el cierre de sesión real llega con la historia de Logout
-  { label: 'Salir', to: { name: 'home' } },
 ]
+
+// Cierra la sesion del alumno/familia, cierra el menu movil y vuelve a Inicio
+async function handleLogout() {
+  emit('navigate')
+  await authStore.logout()
+  router.push({ name: 'home' })
+}
 </script>
 
 <style lang="scss">
@@ -65,6 +79,14 @@ const links = [
       font-weight: 600;
       color: $color-primary;
     }
+  }
+
+  &__logout {
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    cursor: pointer;
   }
 }
 </style>
