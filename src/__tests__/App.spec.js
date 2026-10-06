@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
+import { createPinia, setActivePinia } from 'pinia'
 
 import App from '../App.vue'
 import router from '../router'
@@ -12,9 +13,12 @@ vi.mock('@/services/workshops', () => ({
   fetchWorkshops: vi.fn(),
 }))
 
-// Respuestas por defecto: sin próximo taller y sin talleres activos.
-// Cada test que necesite otro escenario puede sobreescribirlas.
+// El guard de navegacion del router consulta ahora la store de autenticacion
+// (useAuthStore) en cada cambio de ruta, asi que estos tests necesitan una
+// instancia de Pinia activa antes de poder navegar, igual que hace main.js
+// en la aplicacion real antes de instalar el router
 beforeEach(() => {
+  setActivePinia(createPinia())
   fetchNextWorkshop.mockResolvedValue({ status: 204, data: null })
   fetchWorkshops.mockResolvedValue({ status: 200, data: [] })
 })
