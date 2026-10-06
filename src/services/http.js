@@ -14,11 +14,15 @@ const http = axios.create({
   },
 })
 
-// Interceptor de respuesta: gestiona errores de autenticación de forma centralizada
+// Interceptor de respuesta: gestiona errores de autenticación de forma centralizada.
+// skipAuthRedirect permite que ciertas peticiones (como la comprobacion silenciosa
+// de sesion al arrancar la aplicacion) reciban un 401 sin forzar una redireccion,
+// porque ahi un 401 es un resultado normal y esperado (visitante no autenticado),
+// no una sesion que ha caducado a mitad de uso
 http.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    if (error.response?.status === 401 && !error.config?.skipAuthRedirect) {
       router.push({ name: 'login' })
     }
 
