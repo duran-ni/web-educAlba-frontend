@@ -1,0 +1,18 @@
+import { ref, computed } from 'vue'
+import { defineStore } from 'pinia'
+import { login as loginRequest } from '@/services/auth'
+
+// Store de autenticacion: guarda los datos del usuario que ha iniciado sesion
+// (id, email, roles), disponibles para cualquier componente de la aplicacion
+// sin tener que pasarlos de padres a hijos a mano
+export const useAuthStore = defineStore('auth', () => {
+  const user = ref(null)
+  const isAuthenticated = computed(() => user.value !== null)
+
+  async function login(credentials) {
+    const response = await loginRequest(credentials)
+    user.value = response.data
+  }
+
+  return { user, isAuthenticated, login }
+})
