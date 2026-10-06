@@ -3,14 +3,18 @@ import http from './http'
 // Inicia sesion enviando las credenciales como cabecera HTTP Basic Auth en
 // esta unica peticion. Si son correctas, el backend crea la sesion (cookie
 // JSESSIONID) y devuelve los datos del usuario autenticado; las peticiones
-// siguientes ya no necesitan volver a enviar la contrasena, viajan con esa
-// cookie automaticamente (gracias a "withCredentials: true" en http.js)
+// siguientes ya no necesitan volver a enviar la contraseña, viajan con esa
+// cookie automaticamente (gracias a "withCredentials: true" en http.js).
+// skipAuthRedirect: unas credenciales incorrectas ya devuelven un 401 que la
+// propia pantalla de login gestiona (ver LoginForm.vue); no hace falta que
+// el interceptor global intente redirigir tambien a "login" en ese caso
 export function login(credentials) {
   return http.get('/auth/me', {
     auth: {
       username: credentials.email,
       password: credentials.password,
     },
+    skipAuthRedirect: true,
   })
 }
 
@@ -19,4 +23,13 @@ export function login(credentials) {
 // propia cookie de sesion ya identifica al usuario que se quiere desconectar
 export function logout() {
   return http.post('/auth/logout')
+}
+
+// Comprueba si ya existe una sesion activa en el backend (cookie JSESSIONID
+// valida), sin enviar credenciales: si el navegador aun conserva esa cookie,
+// el backend devuelve los datos del usuario sin pedir nada mas.
+// skipAuthRedirect: un 401 aqui es un resultado normal (visitante sin sesion
+// iniciada), no un error que deba forzar una redireccion a "login"
+export function getCurrentUser() {
+  return http.get('/auth/me', { skipAuthRedirect: true })
 }
