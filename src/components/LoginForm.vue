@@ -90,8 +90,11 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { ROLES } from '@/config/roles'
 
+const router = useRouter()
 const authStore = useAuthStore()
 
 const email = ref('')
@@ -121,10 +124,17 @@ async function handleSubmit() {
   try {
     await authStore.login({ email: email.value, password: password.value })
     status.value = 'idle'
-    // TODO: redirigir segun el rol del usuario (siguiente subtarea de US31)
+    redirectAfterLogin()
   } catch {
     status.value = 'error'
     submitErrorMessage.value = 'Usuario o contraseña incorrectos.'
+  }
+
+  // Tras un login correcto, cada rol aterriza en su propia zona de la aplicacion:
+  // el administrador en el panel de gestion, y el resto de usuarios en su dashboard
+  function redirectAfterLogin() {
+    const roles = authStore.user?.roles ?? []
+    router.push(roles.includes(ROLES.ADMIN) ? { name: 'admin' } : { name: 'dashboard' })
   }
 }
 </script>
