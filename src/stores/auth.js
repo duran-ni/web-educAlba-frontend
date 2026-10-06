@@ -1,6 +1,6 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
-import { login as loginRequest } from '@/services/auth'
+import { login as loginRequest, logout as logoutRequest } from '@/services/auth'
 
 // Store de autenticacion: guarda los datos del usuario que ha iniciado sesion
 // (id, email, roles), disponibles para cualquier componente de la aplicacion
@@ -14,5 +14,16 @@ export const useAuthStore = defineStore('auth', () => {
     user.value = response.data
   }
 
-  return { user, isAuthenticated, login }
+  // Cierra la sesion: avisa al backend para que invalide la sesion real y,
+  // tanto si la peticion tiene exito como si falla (p. ej. la sesion ya
+  // habia caducado), limpia igualmente el usuario guardado en el frontend
+  async function logout() {
+    try {
+      await logoutRequest()
+    } finally {
+      user.value = null
+    }
+  }
+
+  return { user, isAuthenticated, login, logout }
 })
