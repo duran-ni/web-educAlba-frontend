@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { createRouter, createWebHistory } from 'vue-router'
+import { createPinia } from 'pinia'
 
 import AdminNav from '../AdminNav.vue'
 
@@ -21,7 +22,7 @@ describe('AdminNav.vue', () => {
 
   it('renders the 4 admin navigation links', async () => {
     await router.isReady()
-    const wrapper = mount(AdminNav, { global: { plugins: [router] } })
+    const wrapper = mount(AdminNav, { global: { plugins: [router, createPinia()] } })
     const links = wrapper.findAll('.admin-nav__link')
     expect(links).toHaveLength(4)
     expect(links.map((link) => link.text())).toEqual(['Inicio', 'Talleres', 'Refuerzo', 'Gestión'])
@@ -30,7 +31,7 @@ describe('AdminNav.vue', () => {
   it('marks the link matching the current route as active', async () => {
     await router.push({ name: 'management' })
     await router.isReady()
-    const wrapper = mount(AdminNav, { global: { plugins: [router] } })
+    const wrapper = mount(AdminNav, { global: { plugins: [router, createPinia()] } })
     const activeLinks = wrapper.findAll('.admin-nav__link--active')
     expect(activeLinks).toHaveLength(1)
     expect(activeLinks[0].text()).toBe('Gestión')
