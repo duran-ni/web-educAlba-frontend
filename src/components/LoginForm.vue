@@ -41,15 +41,28 @@
         </svg>
         Contraseña
       </label>
-      <input
-        id="login-password"
-        v-model="password"
-        class="login-form__input"
-        type="password"
-        placeholder="••••••••"
-        :aria-invalid="Boolean(passwordError)"
-        :aria-describedby="passwordError ? 'login-password-error' : undefined"
-      />
+      <div class="login-form__input-wrapper">
+        <input
+          id="login-password"
+          v-model="password"
+          class="login-form__input"
+          :type="showPassword ? 'text' : 'password'"
+          placeholder="••••••••"
+          :aria-invalid="Boolean(passwordError)"
+          :aria-describedby="passwordError ? 'login-password-error' : undefined"
+        />
+        <button
+          type="button"
+          class="login-form__toggle-password"
+          :aria-label="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+          :aria-pressed="showPassword"
+          @click="showPassword = !showPassword"
+        >
+          <span class="material-symbols-outlined" aria-hidden="true">
+            {{ showPassword ? 'visibility_off' : 'visibility' }}
+          </span>
+        </button>
+      </div>
       <p v-if="passwordError" id="login-password-error" class="login-form__field-error">
         {{ passwordError }}
       </p>
@@ -100,6 +113,7 @@ const authStore = useAuthStore()
 const email = ref('')
 const password = ref('')
 const rememberMe = ref(false)
+const showPassword = ref(false)
 
 const emailError = ref('')
 const passwordError = ref('')
@@ -221,8 +235,15 @@ async function handleSubmit() {
     stroke-linejoin: round;
   }
 
+  &__input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
   &__input {
-    padding: 0.5rem 0;
+    flex: 1;
+    padding: 0.5rem 2rem 0.5rem 0;
     background: transparent;
     border: none;
     border-bottom: 2px dashed $color-text-dark;
@@ -233,6 +254,28 @@ async function handleSubmit() {
     &:focus-visible {
       outline: none;
       border-bottom-color: $color-primary;
+    }
+  }
+
+  &__toggle-password {
+    position: absolute;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    background: none;
+    border: none;
+    color: $color-text-dark;
+    cursor: pointer;
+
+    .material-symbols-outlined {
+      font-size: 1.25rem;
+    }
+
+    &:hover,
+    &:focus-visible {
+      color: $color-primary;
     }
   }
 
