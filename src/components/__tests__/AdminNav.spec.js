@@ -20,12 +20,12 @@ describe('AdminNav.vue', () => {
     router.push('/')
   })
 
-  it('renders the 4 admin navigation links', async () => {
+  it('renders the 5 admin navigation links', async () => {
     await router.isReady()
     const wrapper = mount(AdminNav, { global: { plugins: [router, createPinia()] } })
     const links = wrapper.findAll('.admin-nav__link')
-    expect(links).toHaveLength(4)
-    expect(links.map((link) => link.text())).toEqual(['Inicio', 'Talleres', 'Refuerzo', 'Gestión'])
+    expect(links).toHaveLength(5)
+    expect(links.map((link) => link.text())).toEqual(['Inicio', 'Talleres', 'Refuerzo', 'Gestión', 'Salir'])
   })
 
   it('marks the link matching the current route as active', async () => {
