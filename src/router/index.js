@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
+import { useAuthStore } from '@/stores/auth'
+
 // Rutas de la aplicación, agrupadas por layout: cada área (pública, autenticación,
 // usuario, administrador) anida sus vistas dentro del layout que le corresponde,
 // en vez de calcular a mano la variante de cabecera/pie de página en App.vue.
@@ -72,12 +74,13 @@ const router = createRouter({
 })
 
 // Guard de navegación: protege las rutas marcadas con "meta.requiresAuth"
-// TODO: sustituir el placeholder por la comprobación real del useAuthStore
-// cuando se implemente la Historia de Login
+// comprobando si hay un usuario autenticado en la store. La comprobacion de
+// sesion activa al recargar la pagina (via /api/auth/me) llega con la
+// Historia de Cerrar sesion
 router.beforeEach((to) => {
-  const isAuthenticated = false // placeholder temporal
+  const authStore = useAuthStore()
 
-  if (to.meta.requiresAuth && !isAuthenticated) {
+  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     return { name: 'login' }
   }
 })
