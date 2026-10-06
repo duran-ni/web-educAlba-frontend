@@ -90,6 +90,9 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useAuthStore } from '@/stores/auth'
+
+const authStore = useAuthStore()
 
 const email = ref('')
 const password = ref('')
@@ -108,14 +111,21 @@ function validate() {
   return !emailError.value && !passwordError.value
 }
 
-// TODO: conectar con el backend (siguiente subtarea de US31:
-// "Conectar el envio con el endpoint de autenticacion de backend")
 async function handleSubmit() {
   if (!validate()) {
     return
   }
 
-  status.value = 'idle'
+  status.value = 'submitting'
+
+  try {
+    await authStore.login({ email: email.value, password: password.value })
+    status.value = 'idle'
+    // TODO: redirigir segun el rol del usuario (siguiente subtarea de US31)
+  } catch {
+    status.value = 'error'
+    submitErrorMessage.value = 'Usuario o contraseña incorrectos.'
+  }
 }
 </script>
 
