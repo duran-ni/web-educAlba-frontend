@@ -28,14 +28,16 @@
         :aria-invalid="Boolean(emailError)"
         :aria-describedby="emailError ? 'login-email-error' : undefined"
       />
-      <p v-if="emailError" id="login-email-error" class="login-form__field-error">{{ emailError }}</p>
+      <p v-if="emailError" id="login-email-error" class="login-form__field-error">
+        {{ emailError }}
+      </p>
     </div>
 
     <div class="login-form__field">
       <label class="login-form__label" for="login-password">
         <svg class="login-form__label-icon" viewBox="0 0 24 24" aria-hidden="true">
-          <circle cx="8" cy="14" r="3.5" />
-          <path d="M11 11.5 19 3.5 M15 4.5l2.5 2.5 M18.5 4l-0.01 0.01" />
+          <circle cx="6" cy="12" r="4" />
+          <path d="M10 12H21 M17 12V15 M20 12V15" />
         </svg>
         Contraseña
       </label>
@@ -48,7 +50,9 @@
         :aria-invalid="Boolean(passwordError)"
         :aria-describedby="passwordError ? 'login-password-error' : undefined"
       />
-      <p v-if="passwordError" id="login-password-error" class="login-form__field-error">{{ passwordError }}</p>
+      <p v-if="passwordError" id="login-password-error" class="login-form__field-error">
+        {{ passwordError }}
+      </p>
     </div>
 
     <div class="login-form__row">
@@ -74,7 +78,11 @@
       </svg>
     </button>
 
-    <p v-if="status === 'error'" class="login-form__message login-form__message--error" role="alert">
+    <p
+      v-if="status === 'error'"
+      class="login-form__message login-form__message--error"
+      role="alert"
+    >
       {{ submitErrorMessage }}
     </p>
   </form>
@@ -120,7 +128,7 @@ async function handleSubmit() {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
-  background-color: $color-accent-yellow-soft;
+  background-color: $color-accent-green-soft;
   transform: rotate(-2deg);
   transition: transform 0.2s ease;
   @include doodle-frame;
@@ -150,7 +158,7 @@ async function handleSubmit() {
 
   &__heading {
     text-align: center;
-    margin-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
   }
 
   &__title {
@@ -161,9 +169,9 @@ async function handleSubmit() {
   }
 
   &__subtitle {
-    margin: 0;
+    margin-top: 2.5rem;
     font-family: $font-body;
-    font-size: 1rem;
+    font-size: 1.25rem;
     color: $color-text-dark;
   }
 
@@ -220,6 +228,7 @@ async function handleSubmit() {
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
+    margin-top: 0.75rem;
     font-family: $font-body;
     font-size: 0.875rem;
   }
@@ -244,7 +253,7 @@ async function handleSubmit() {
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    margin-top: 0.5rem;
+    margin-top: 1.5rem;
     padding: 0.875rem 1.5rem;
     border: 2px solid $color-text-dark;
     border-radius: 999px;
