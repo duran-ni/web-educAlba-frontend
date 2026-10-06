@@ -13,3 +13,10 @@ export function login(credentials) {
     },
   })
 }
+
+// Cierra la sesion en el backend: invalida la sesion del servidor y borra
+// la cookie JSESSIONID. No hace falta volver a enviar credenciales, la
+// propia cookie de sesion ya identifica al usuario que se quiere desconectar
+export function logout() {
+  return http.post('/auth/logout')
+}
