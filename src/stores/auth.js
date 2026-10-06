@@ -1,6 +1,6 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
-import { login as loginRequest, logout as logoutRequest } from '@/services/auth'
+import { login as loginRequest, logout as logoutRequest, getCurrentUser, } from '@/services/auth'
 
 // Store de autenticacion: guarda los datos del usuario que ha iniciado sesion
 // (id, email, roles), disponibles para cualquier componente de la aplicacion
@@ -25,5 +25,18 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  return { user, isAuthenticated, login, logout }
+  // Comprueba, al arrancar la aplicacion, si el navegador conserva una
+  // cookie de sesion valida (por ejemplo, tras refrescar la pagina). Si la
+  // hay, rellena "user" sin pedir credenciales; si no, deja "user" en null
+  // sin considerarlo un error (es el estado normal de un visitante nuevo)
+  async function checkSession() {
+    try {
+      const response = await getCurrentUser()
+      user.value = response.data
+    } catch {
+      user.value = null
+    }
+  }
+
+  return { user, isAuthenticated, login, logout, checkSession }
 })
