@@ -31,6 +31,7 @@
         class="methodology__card"
         :class="`methodology__card--${block.color}`"
       >
+        <div class="methodology__tape" aria-hidden="true"></div>
         <span v-if="block.highlight" class="methodology__tag">¡Importante!</span>
 
         <div class="methodology__header">
@@ -90,26 +91,38 @@ const BLOCKS = [
 
   &__heading {
     display: table;
-    margin: 2rem auto 5rem;
-    padding: 1.5rem 3rem;
+    margin: 1.5rem auto 3rem;
+    padding: 1rem 1.75rem;
     background-color: $color-accent-yellow;
     transform: rotate(-1deg);
     font-family: $font-doodle;
-    font-size: 3.25rem;
+    font-size: 2rem;
     color: $color-primary;
     text-align: center;
     @include doodle-frame;
+
+    @include respond-to(desktop) {
+      margin: 2rem auto 5rem;
+      padding: 1.5rem 3rem;
+      font-size: 3.25rem;
+    }
   }
 
   &__intro {
     position: relative;
-    max-width: 80rem;
-    margin: 0 auto 6rem;
+    max-width: 24rem;
+    margin: 0 auto 3rem;
     font-family: $font-body;
-    font-size: 1.25rem;
+    font-size: 1rem;
     line-height: 1.6;
     color: $color-text-dark;
     text-align: center;
+
+    @include respond-to(desktop) {
+      max-width: 80rem;
+      margin-bottom: 6rem;
+      font-size: 1.25rem;
+    }
   }
 
   &__intro-icon {
@@ -151,7 +164,7 @@ const BLOCKS = [
     position: relative;
     display: flex;
     flex-direction: column;
-    padding: 3rem 2rem 5rem;
+    padding: 2rem 1.5rem 3rem;
     transition: transform 0.2s ease;
     @include doodle-frame;
 
@@ -162,6 +175,7 @@ const BLOCKS = [
     @include respond-to(desktop) {
       grid-column: span 2;
       min-height: 16rem;
+      padding: 3rem 2rem 5rem;
 
       &:nth-child(4),
       &:nth-child(5) {
@@ -195,6 +209,19 @@ const BLOCKS = [
       background-color: $color-accent-purple-soft;
       transform: rotate(3.5deg);
     }
+  }
+
+  &__tape {
+    position: absolute;
+    top: -0.75rem;
+    left: 50%;
+    transform: translateX(-50%) rotate(-3deg);
+    width: 5rem;
+    height: 1.5rem;
+    background-color: $color-background-soft;
+    opacity: 0.85;
+    border: 1px solid $color-text-dark;
+    pointer-events: none;
   }
 
   &__tag {
@@ -249,6 +276,10 @@ const BLOCKS = [
     font-size: 1.4rem;
     line-height: 1.5;
     color: $color-text-dark;
+
+    @include respond-to(desktop) {
+      font-size: 1.4rem;
+    }
   }
 }
 </style>
