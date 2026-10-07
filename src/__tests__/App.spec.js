@@ -32,8 +32,8 @@ const NAVIGATION_CASES = [
   { name: 'home', heading: 'Enseñar con paciencia, aprender con confianza' },
   { name: 'workshops', heading: 'Talleres' },
   { name: 'reinforcement', heading: 'Refuerzo' },
-  { name: 'about', heading: 'Quiénes Somos' },
-  { name: 'what-we-do', heading: 'Qué Hacemos' },
+  { name: 'about', heading: 'Nuestra Historia' },
+  { name: 'what-we-do', heading: 'Nuestra Metodología' },
   { name: 'gallery', heading: 'Galería' },
 ]
 
