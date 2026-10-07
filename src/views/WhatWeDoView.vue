@@ -1,7 +1,7 @@
 <template>
-    <PageHeading title="Qué Hacemos" />
+    <MethodologyBlocks />
 </template>
 
 <script setup>
-import PageHeading from '@/components/PageHeading.vue'
+import MethodologyBlocks from '@/components/MethodologyBlocks.vue'
 </script>
