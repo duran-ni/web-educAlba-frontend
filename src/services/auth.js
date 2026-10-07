@@ -33,3 +33,14 @@ export function logout() {
 export function getCurrentUser() {
   return http.get('/auth/me', { skipAuthRedirect: true })
 }
+
+// Registra una nueva cuenta de familia junto con los datos del alumno/a.
+// La contraseña viaja codificada en Base64 (no en texto plano) en el cuerpo
+// de la peticion, igual que espera RegisterRequest en el backend; ahi se
+// decodifica y se cifra de verdad con bcrypt antes de guardarla.
+export function register(payload) {
+  return http.post('/auth/register', {
+    ...payload,
+    password: btoa(payload.password),
+  })
+}
