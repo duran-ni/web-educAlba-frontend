@@ -1,7 +1,7 @@
 <template>
-    <PageHeading title="Quiénes Somos" />
+    <AboutIntro />
 </template>
 
 <script setup>
-import PageHeading from '@/components/PageHeading.vue'
+import AboutIntro from '@/components/AboutIntro.vue'
 </script>
