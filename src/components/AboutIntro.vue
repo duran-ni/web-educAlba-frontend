@@ -22,13 +22,19 @@
 
   &__card {
     position: relative;
-    margin: 5rem auto 0;
-    width: 70%;
-    padding: 2rem 3.5rem;
-    background-color: $color-accent-pink;
+    margin: 2rem auto 0;
+    width: 100%;
+    padding: 1.5rem 1.75rem;
+    background-color: $color-background-soft;
     transform: rotate(-1deg);
     transition: transform 0.2s ease;
     @include doodle-frame;
+
+    @include respond-to(desktop) {
+      margin: 5rem auto 0;
+      width: 70%;
+      padding: 2rem 3.5rem;
+    }
 
     &:hover {
       transform: rotate(0deg);
@@ -36,11 +42,16 @@
   }
 
   &__title {
-    margin: 0 0 3rem;
+    margin: 0 0 1.5rem;
     font-family: $font-doodle;
-    font-size: 4rem;
+    font-size: 2.25rem;
     color: $color-primary;
     text-align: center;
+
+    @include respond-to(desktop) {
+      margin: 0 0 3rem;
+      font-size: 5rem;
+    }
   }
 
   &__text {
