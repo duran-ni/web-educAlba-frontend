@@ -9,12 +9,20 @@ const routes = [
   {
     path: '/',
     component: () => import('@/layouts/PublicLayout.vue'),
-        children: [
+    children: [
       { path: '', name: 'home', component: () => import('@/views/HomeView.vue') },
       { path: 'talleres', name: 'workshops', component: () => import('@/views/WorkshopsView.vue') },
-      { path: 'refuerzo', name: 'reinforcement', component: () => import('@/views/ReinforcementView.vue') },
+      {
+        path: 'refuerzo',
+        name: 'reinforcement',
+        component: () => import('@/views/ReinforcementView.vue'),
+      },
       { path: 'quienes-somos', name: 'about', component: () => import('@/views/AboutView.vue') },
-      { path: 'que-hacemos', name: 'what-we-do', component: () => import('@/views/WhatWeDoView.vue') },
+      {
+        path: 'que-hacemos',
+        name: 'what-we-do',
+        component: () => import('@/views/WhatWeDoView.vue'),
+      },
       { path: 'galeria', name: 'gallery', component: () => import('@/views/GalleryView.vue') },
       { path: 'contacto', name: 'contact', component: () => import('@/views/ContactView.vue') },
     ],
@@ -22,7 +30,10 @@ const routes = [
   {
     path: '/login',
     component: () => import('@/layouts/AuthLayout.vue'),
-    children: [{ path: '', name: 'login', component: () => import('@/views/LoginView.vue') }],
+    children: [
+      { path: '', name: 'login', component: () => import('@/views/LoginView.vue') },
+      { path: '/registro', name: 'register', component: () => import('@/views/RegisterView.vue') },
+    ],
   },
   {
     path: '/dashboard',
