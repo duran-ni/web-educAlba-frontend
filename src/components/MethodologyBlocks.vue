@@ -87,7 +87,11 @@ const BLOCKS = [
 
 <style lang="scss">
 .methodology {
-  padding: 3rem 0;
+  padding: 3rem 1rem;
+
+  @include respond-to(desktop) {
+    padding: 3rem 2rem;
+  }
 
   &__heading {
     display: table;
