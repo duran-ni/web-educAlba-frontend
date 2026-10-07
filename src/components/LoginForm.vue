@@ -98,12 +98,17 @@
     >
       {{ submitErrorMessage }}
     </p>
+
+    <p class="login-form__register-link">
+      ¿No tienes cuenta?
+      <RouterLink :to="{ name: 'register' }">Regístrate</RouterLink>
+    </p>
   </form>
 </template>
 
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { RouterLink, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { ROLES } from '@/config/roles'
 
@@ -351,6 +356,21 @@ async function handleSubmit() {
 
   &__message--error {
     color: $color-error;
+  }
+
+  &__register-link {
+    margin: 0;
+    text-align: center;
+    font-family: $font-body;
+    font-size: 0.9375rem;
+    color: $color-text-dark;
+
+    a {
+      font-family: $font-doodle;
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: $color-primary;
+    }
   }
 }
 </style>
