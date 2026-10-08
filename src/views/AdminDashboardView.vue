@@ -1,11 +1,19 @@
 <template>
   <section class="admin-dashboard-view">
-    <h1 class="admin-dashboard-view__title">Panel de Administración</h1>
+    <div class="admin-dashboard-view__header">
+      <h1 class="admin-dashboard-view__title">Panel de Administración</h1>
+      <button type="button" class="admin-dashboard-view__new-workshop" @click="openDialog">
+        <span class="material-symbols-outlined" aria-hidden="true">palette</span>
+        + Nuevo Taller
+      </button>
+    </div>
 
-    <p v-if="status === 'loading'" class="admin-dashboard-view__message">Cargando indicadores…</p>
+    <p v-if="summaryStatus === 'loading'" class="admin-dashboard-view__message">
+      Cargando indicadores…
+    </p>
 
     <p
-      v-else-if="status === 'error'"
+      v-else-if="summaryStatus === 'error'"
       class="admin-dashboard-view__message admin-dashboard-view__message--error"
     >
       No hemos podido cargar los indicadores. Inténtalo de nuevo más tarde.
@@ -28,34 +36,92 @@
         </p>
       </article>
     </div>
+
+    <AdminWorkshopsList :status="workshopsStatus" :workshops="workshops" />
+
+    <dialog ref="dialogRef" class="admin-dashboard-view__dialog" @close="handleDialogClose">
+      <WorkshopForm @created="handleWorkshopCreated" @cancel="closeDialog" />
+    </dialog>
   </section>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import { fetchDashboardSummary } from '@/services/dashboard'
+import { fetchAdminWorkshops } from '@/services/workshops'
+import AdminWorkshopsList from '@/components/AdminWorkshopsList.vue'
+import WorkshopForm from '@/components/WorkshopForm.vue'
 
 // loading | loaded | error
-const status = ref('loading')
+const summaryStatus = ref('loading')
 const summary = ref(null)
 
+// loading | loaded | error
+const workshopsStatus = ref('loading')
+const workshops = ref([])
+
+const dialogRef = ref(null)
+
 onMounted(async () => {
+  await Promise.all([loadSummary(), loadWorkshops()])
+})
+
+async function loadSummary() {
   try {
     const response = await fetchDashboardSummary()
     summary.value = response.data
-    status.value = 'loaded'
+    summaryStatus.value = 'loaded'
   } catch {
-    status.value = 'error'
+    summaryStatus.value = 'error'
   }
-})
+}
+
+async function loadWorkshops() {
+  try {
+    const response = await fetchAdminWorkshops()
+    workshops.value = response.data
+    workshopsStatus.value = 'loaded'
+  } catch {
+    workshopsStatus.value = 'error'
+  }
+}
+
+function openDialog() {
+  dialogRef.value.showModal()
+}
+
+function closeDialog() {
+  dialogRef.value.close()
+}
+
+// Al confirmar la creacion (evento "close" del <dialog>, disparado tanto al
+// pulsar "Cancelar" como al cerrar con la tecla Esc) ya no hace falta hacer nada
+// mas: el cierre en si no borra el taller ya creado
+function handleDialogClose() {}
+
+// Se antepone el taller recien creado al listado, sin volver a pedirlo
+// al backend: evita una peticion de red innecesaria para algo que ya tenemos
+function handleWorkshopCreated(newWorkshop) {
+  workshops.value = [newWorkshop, ...workshops.value]
+  closeDialog()
+}
 </script>
 
 <style lang="scss">
 .admin-dashboard-view {
   padding: 3rem 1.5rem;
 
-  &__title {
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1.5rem;
     margin: 3rem 0 2rem;
+  }
+
+  &__title {
+    margin: 0;
     font-family: $font-doodle;
     font-size: 2.25rem;
     color: $color-primary;
@@ -80,8 +146,8 @@ onMounted(async () => {
     display: grid;
     grid-template-columns: 1fr;
     justify-items: start;
-    gap: 4rem;
-    margin: 3.5rem;
+    gap: 3.5rem;
+    margin: 4.5rem;
   }
 
   &__kpi {
@@ -94,8 +160,8 @@ onMounted(async () => {
   }
 
   &__kpi--students {
-    margin-left: 3rem;
-    transform: rotate(3deg);
+    margin-left: 4rem;
+    transform: rotate(4deg);
   }
 
   &__kpi--workshops {
@@ -132,6 +198,41 @@ onMounted(async () => {
     font-size: 1.25rem;
     color: $color-primary;
     font-weight: 700;
+  }
+
+   &__new-workshop {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-right: 16rem;
+    transform: translateY(-3rem);
+    padding: 0.75rem 1.5rem;
+    border: 2px solid $color-text-dark;
+    border-radius: 999px;
+    background-color: $color-primary;
+    color: $color-background;
+    font-family: $font-heading;
+    font-weight: 600;
+    box-shadow: 4px 4px 0 0 $color-text-dark;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+
+    &:hover,
+    &:focus-visible {
+      opacity: 0.9;
+    }
+  }
+
+  &__dialog {
+    width: min(90vw, 40rem);
+    padding: 2rem;
+    border: 2px solid $color-text-dark;
+    border-radius: 1rem;
+    box-shadow: 4px 4px 0 0 $color-text-dark;
+
+    &::backdrop {
+      background-color: rgba($color-text-dark, 0.5);
+    }
   }
 }
 </style>
