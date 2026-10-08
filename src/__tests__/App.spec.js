@@ -55,18 +55,18 @@ describe('Public navigation', () => {
   })
 })
 
-describe('Header/footer variant on the login route', () => {
+describe('Header/footer variant on public views', () => {
   afterEach(async () => {
     await router.push('/')
   })
 
-  it('shows the reduced header and footer on /login', async () => {
+  it('shows the full header and footer on /login', async () => {
     await router.push({ name: 'login' })
     await router.isReady()
     const wrapper = mount(App, { global: { plugins: [router] } })
     await flushPromises()
-    expect(wrapper.find('.nav-menu').exists()).toBe(false)
-    expect(wrapper.find('.footer-contact').exists()).toBe(false)
+    expect(wrapper.find('.nav-menu').exists()).toBe(true)
+    expect(wrapper.find('.footer-contact').exists()).toBe(true)
   })
 
   it('shows the full header and footer on public views', async () => {
