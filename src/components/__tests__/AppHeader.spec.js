@@ -16,6 +16,7 @@ const router = createRouter({
     { path: '/galeria', name: 'gallery', component: { template: '<div />' } },
     { path: '/contacto', name: 'contact', component: { template: '<div />' } },
     { path: '/login', name: 'login', component: { template: '<div />' } },
+    { path: '/registro', name: 'register', component: { template: '<div />' } },
     { path: '/admin', name: 'admin', component: { template: '<div />' } },
     { path: '/admin/gestion', name: 'management', component: { template: '<div />' } },
     { path: '/dashboard', name: 'dashboard', component: { template: '<div />' } },
@@ -25,15 +26,16 @@ const router = createRouter({
 })
 
 describe('AppHeader.vue', () => {
-  it('renders the navigation menu and login button in the full variant', async () => {
+  it('renders the navigation menu, login button and register button in the full variant', async () => {
     await router.push('/')
     await router.isReady()
     const wrapper = mount(AppHeader, { global: { plugins: [router, createPinia()] } })
     expect(wrapper.find('.nav-menu').exists()).toBe(true)
     expect(wrapper.find('.login-button').exists()).toBe(true)
+    expect(wrapper.find('.register-button').exists()).toBe(true)
   })
 
-  it('hides the navigation menu and login button in the reduced variant', async () => {
+  it('hides the navigation menu, login button and register button in the reduced variant', async () => {
     await router.push('/')
     await router.isReady()
     const wrapper = mount(AppHeader, {
@@ -42,8 +44,10 @@ describe('AppHeader.vue', () => {
     })
     expect(wrapper.find('.nav-menu').exists()).toBe(false)
     expect(wrapper.find('.login-button').exists()).toBe(false)
+    expect(wrapper.find('.register-button').exists()).toBe(false)
   })
-   it('renders the admin navigation in the admin variant', async () => {
+
+  it('renders the admin navigation in the admin variant', async () => {
     await router.push('/')
     await router.isReady()
     const wrapper = mount(AppHeader, {
@@ -65,4 +69,3 @@ describe('AppHeader.vue', () => {
     expect(wrapper.find('.nav-toggle').attributes('aria-controls')).toBe('user-nav-list')
   })
 })
-
