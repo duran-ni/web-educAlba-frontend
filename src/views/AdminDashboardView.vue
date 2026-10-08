@@ -99,10 +99,13 @@ function closeDialog() {
 // mas: el cierre en si no borra el taller ya creado
 function handleDialogClose() {}
 
-// Se antepone el taller recien creado al listado, sin volver a pedirlo
-// al backend: evita una peticion de red innecesaria para algo que ya tenemos
+// Se inserta el taller recien creado y se reordena la lista por fecha/hora,
+// sin volver a pedirla al backend: evita una peticion de red innecesaria
+// para algo que ya tenemos
 function handleWorkshopCreated(newWorkshop) {
-  workshops.value = [newWorkshop, ...workshops.value]
+  workshops.value = [...workshops.value, newWorkshop].sort((a, b) =>
+    a.date === b.date ? a.time.localeCompare(b.time) : a.date.localeCompare(b.date)
+  )
   closeDialog()
 }
 </script>
@@ -200,7 +203,7 @@ function handleWorkshopCreated(newWorkshop) {
     font-weight: 700;
   }
 
-   &__new-workshop {
+  &__new-workshop {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
@@ -224,6 +227,7 @@ function handleWorkshopCreated(newWorkshop) {
   }
 
   &__dialog {
+    margin: auto;
     width: min(90vw, 40rem);
     padding: 2rem;
     border: 2px solid $color-text-dark;
