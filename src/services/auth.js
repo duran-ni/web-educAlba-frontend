@@ -8,12 +8,16 @@ import http from './http'
 // skipAuthRedirect: unas credenciales incorrectas ya devuelven un 401 que la
 // propia pantalla de login gestiona (ver LoginForm.vue); no hace falta que
 // el interceptor global intente redirigir tambien a "login" en ese caso
+// rememberMe: si se marca, se envia el parametro "remember-me" en la URL,
+// que Spring Security interpreta para emitir una cookie de sesion persistente
+// (ver SecurityConfiguration en el backend), ademas de la cookie JSESSIONID normal
 export function login(credentials) {
   return http.get('/auth/me', {
     auth: {
       username: credentials.email,
       password: credentials.password,
     },
+    params: credentials.rememberMe ? { 'remember-me': true } : undefined,
     skipAuthRedirect: true,
   })
 }
