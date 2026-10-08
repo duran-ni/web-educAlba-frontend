@@ -10,3 +10,13 @@ export function fetchNextWorkshop() {
 export function fetchWorkshops() {
   return http.get('/public/workshops')
 }
+
+// Consulta Todos los talleres (activos e inactivos), para el panel de administrador
+export function fetchAdminWorkshops() {
+  return http.get('/admin/workshops')
+}
+
+// Crea un nuevo taller desde el panel de administrador
+export function createWorkshop(workshop) {
+  return http.post('/admin/workshops', workshop)
+}
