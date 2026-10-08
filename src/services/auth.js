@@ -48,3 +48,19 @@ export function register(payload) {
     password: btoa(payload.password),
   })
 }
+
+// Pide al backend que envie un correo de recuperacion si ese email esta
+// registrado. El backend responde siempre igual (sin contenido), exista o
+// no el email, para no revelar que cuentas estan registradas en el sistema
+export function requestPasswordReset(email) {
+  return http.post('/auth/forgot-password', { email })
+}
+
+// Restablece la contraseña a partir del token recibido por correo. Igual
+// que en register(), la nueva contraseña viaja codificada en Base64
+export function resetPassword({ token, password }) {
+  return http.post('/auth/reset-password', {
+    token,
+    password: btoa(password),
+  })
+}
