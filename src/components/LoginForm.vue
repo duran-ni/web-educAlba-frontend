@@ -73,8 +73,9 @@
         <input v-model="rememberMe" type="checkbox" class="login-form__remember-input" />
         Recuérdame
       </label>
-      <!-- "Olvide mi contrasena" pertenece a la futura historia US33 (Recuperar contrasena), todavia sin implementar -->
-      <span class="login-form__forgot">¿Olvidé mi contraseña?</span>
+      <RouterLink class="login-form__forgot" :to="{ name: 'forgot-password' }">
+        ¿Olvidé mi contraseña?
+      </RouterLink>
     </div>
 
     <button class="login-form__submit" type="submit" :disabled="status === 'submitting'">
@@ -141,7 +142,11 @@ async function handleSubmit() {
   status.value = 'submitting'
 
   try {
-    await authStore.login({ email: email.value, password: password.value, rememberMe: rememberMe.value })
+    await authStore.login({
+      email: email.value,
+      password: password.value,
+      rememberMe: rememberMe.value,
+    })
     status.value = 'idle'
     redirectAfterLogin()
   } catch {
@@ -310,10 +315,12 @@ async function handleSubmit() {
 
   &__forgot {
     color: $color-text-dark;
-    opacity: 0.6;
-    text-decoration: underline wavy;
-    text-decoration-color: $color-text-dark;
-    cursor: not-allowed;
+    text-decoration: underline;
+
+    &:hover,
+    &:focus-visible {
+      color: $color-primary;
+    }
   }
 
   &__submit {
