@@ -141,7 +141,7 @@ async function handleSubmit() {
   status.value = 'submitting'
 
   try {
-    await authStore.login({ email: email.value, password: password.value })
+    await authStore.login({ email: email.value, password: password.value, rememberMe: rememberMe.value })
     status.value = 'idle'
     redirectAfterLogin()
   } catch {
