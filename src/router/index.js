@@ -27,6 +27,16 @@ const routes = [
       { path: 'contacto', name: 'contact', component: () => import('@/views/ContactView.vue') },
       { path: 'login', name: 'login', component: () => import('@/views/LoginView.vue') },
       { path: '/registro', name: 'register', component: () => import('@/views/RegisterView.vue') },
+      {
+        path: '/recuperar-contrasena',
+        name: 'forgot-password',
+        component: () => import('@/views/ForgotPasswordView.vue'),
+      },
+      {
+        path: '/restablecer-contrasena',
+        name: 'reset-password',
+        component: () => import('@/views/ResetPasswordView.vue'),
+      },
     ],
   },
   {
