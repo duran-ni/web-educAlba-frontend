@@ -73,9 +73,10 @@ const formattedTime = computed(() => formatWorkshopTime(props.workshop.time))
   @include doodle-frame;
 
   @include respond-to(tablet) {
-    max-width: 35rem;
-    justify-self: center;
-  }
+  width: 100%;
+  max-width: 35rem;
+  margin-inline: auto;
+}
 
   &:nth-child(odd) {
     transform: rotate(1deg);
@@ -118,7 +119,7 @@ const formattedTime = computed(() => formatWorkshopTime(props.workshop.time))
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    margin-top: 0.5rem;
+    margin-top: auto;
     padding-top: 0.75rem;
     border-top: 2px dashed $color-text-dark;
   }
