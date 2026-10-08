@@ -11,6 +11,7 @@
       <NavMenu :is-open="isMenuOpen" @navigate="closeMenu" />
 
       <div class="app-header__actions">
+        <RegisterButton />
         <LoginButton />
         <NavToggle :is-open="isMenuOpen" @toggle="toggleMenu" />
       </div>
@@ -36,6 +37,7 @@ import { RouterLink } from 'vue-router'
 import AppLogo from './AppLogo.vue'
 import NavMenu from './NavMenu.vue'
 import LoginButton from './LoginButton.vue'
+import RegisterButton from './RegisterButton.vue'
 import NavToggle from './NavToggle.vue'
 import AdminNav from './AdminNav.vue'
 import UserNav from './UserNav.vue'
