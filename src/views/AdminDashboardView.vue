@@ -40,8 +40,10 @@
     <AdminWorkshopsList
       :status="workshopsStatus"
       :workshops="workshops"
+      :enrollments="enrollments"
       @delete="handleWorkshopDeleted"
       @toggle-active="handleWorkshopToggleActive"
+      @delete-enrollment="handleEnrollmentDeleted"
     />
 
     <dialog ref="dialogRef" class="admin-dashboard-view__dialog" @close="handleDialogClose">
@@ -54,6 +56,7 @@
 import { ref, onMounted } from 'vue'
 import { fetchDashboardSummary } from '@/services/dashboard'
 import { fetchAdminWorkshops, deleteWorkshop, updateWorkshop } from '@/services/workshops'
+import { fetchEnrollments, deleteEnrollment } from '@/services/enrollments'
 import { useDashboardSummaryStream } from '@/composables/useDashboardSummaryStream'
 import AdminWorkshopsList from '@/components/AdminWorkshopsList.vue'
 import WorkshopForm from '@/components/WorkshopForm.vue'
@@ -66,10 +69,14 @@ const summary = ref(null)
 const workshopsStatus = ref('loading')
 const workshops = ref([])
 
+// loading | loaded | error
+const enrollmentsStatus = ref('loading')
+const enrollments = ref([])
+
 const dialogRef = ref(null)
 
 onMounted(async () => {
-  await Promise.all([loadSummary(), loadWorkshops()])
+  await Promise.all([loadSummary(), loadWorkshops(), loadEnrollments()])
 })
 
 // Se suscribe al stream en tiempo real: cualquier cambio que afecte al
@@ -94,6 +101,16 @@ async function loadWorkshops() {
     workshopsStatus.value = 'loaded'
   } catch {
     workshopsStatus.value = 'error'
+  }
+}
+
+async function loadEnrollments() {
+  try {
+    const response = await fetchEnrollments()
+    enrollments.value = response.data
+    enrollmentsStatus.value = 'loaded'
+  } catch {
+    enrollmentsStatus.value = 'error'
   }
 }
 
@@ -152,6 +169,19 @@ async function handleWorkshopToggleActive(workshop) {
     loadSummary()
   } catch {
     window.alert('No se ha podido cambiar el estado del taller. Inténtalo de nuevo.')
+  }
+}
+
+// Elimina la inscripcion en el backend y, solo si la peticion tiene exito,
+// la quita tambien del listado en memoria; ademas refresca el KPI de
+// alumnos inscritos, igual que al crear/eliminar un taller
+async function handleEnrollmentDeleted(id) {
+  try {
+    await deleteEnrollment(id)
+    enrollments.value = enrollments.value.filter((enrollment) => enrollment.id !== id)
+    loadSummary()
+  } catch {
+    window.alert('No se ha podido eliminar la inscripción. Inténtalo de nuevo.')
   }
 }
 </script>
