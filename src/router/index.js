@@ -64,11 +64,6 @@ const routes = [
     children: [
       { path: '', name: 'admin', component: () => import('@/views/AdminDashboardView.vue') },
       {
-        path: 'gestion',
-        name: 'management',
-        component: () => import('@/views/ManagementView.vue'),
-      },
-      {
         path: 'alumnos',
         name: 'students',
         component: () => import('@/views/AdminStudentsView.vue'),
