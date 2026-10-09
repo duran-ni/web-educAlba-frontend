@@ -37,7 +37,11 @@
       </article>
     </div>
 
-    <AdminWorkshopsList :status="workshopsStatus" :workshops="workshops" />
+    <AdminWorkshopsList
+      :status="workshopsStatus"
+      :workshops="workshops"
+      @delete="handleWorkshopDeleted"
+    />
 
     <dialog ref="dialogRef" class="admin-dashboard-view__dialog" @close="handleDialogClose">
       <WorkshopForm @created="handleWorkshopCreated" @cancel="closeDialog" />
@@ -48,7 +52,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { fetchDashboardSummary } from '@/services/dashboard'
-import { fetchAdminWorkshops } from '@/services/workshops'
+import { fetchAdminWorkshops, deleteWorkshop } from '@/services/workshops'
 import AdminWorkshopsList from '@/components/AdminWorkshopsList.vue'
 import WorkshopForm from '@/components/WorkshopForm.vue'
 
@@ -107,6 +111,24 @@ function handleWorkshopCreated(newWorkshop) {
     a.date === b.date ? a.time.localeCompare(b.time) : a.date.localeCompare(b.date)
   )
   closeDialog()
+}
+
+// Elimina el taller en el backend y, solo si la peticion tiene exito, lo
+// quita tambien del listado en memoria, sin volver a pedirlo entero al
+// backend
+async function handleWorkshopDeleted(id) {
+  try {
+    await deleteWorkshop(id)
+    workshops.value = workshops.value.filter((workshop) => workshop.id !== id)
+  } catch (error) {
+    if (error.response?.status === 409) {
+      window.alert(
+        'No se puede eliminar este taller porque tiene alumnos inscritos. Desactívalo en su lugar.'
+      )
+    } else {
+      window.alert('No se ha podido eliminar el taller. Inténtalo de nuevo.')
+    }
+  }
 }
 </script>
 
