@@ -26,12 +26,14 @@
         </div>
 
         <div class="admin-workshops-list__item-actions">
-          <span
+          <button
+            type="button"
             class="admin-workshops-list__status"
             :class="{ 'admin-workshops-list__status--inactive': !workshop.active }"
+            @click="handleToggleActiveClick(workshop)"
           >
             {{ workshop.active ? 'Activo' : 'Inactivo' }}
-          </span>
+          </button>
 
           <button
             type="button"
@@ -61,7 +63,7 @@ defineProps({
   },
 })
 
-const emit = defineEmits(['delete'])
+const emit = defineEmits(['delete', 'toggle-active'])
 
 // Pide confirmacion antes de avisar al componente padre, para evitar que
 // un clic accidental borre un taller sin darse cuenta
@@ -73,6 +75,22 @@ function handleDeleteClick(workshop) {
   if (confirmed) {
     emit('delete', workshop.id)
   }
+}
+
+// Pide confirmacion solo al desactivar (deja de verse en la web publica);
+// activar no tiene efecto "destructivo", asi que no hace falta confirmar
+function handleToggleActiveClick(workshop) {
+  if (workshop.active) {
+    const confirmed = window.confirm(
+      `¿Seguro que quieres desactivar el taller "${workshop.name}"? Dejará de mostrarse en la web pública.`
+    )
+
+    if (!confirmed) {
+      return
+    }
+  }
+
+  emit('toggle-active', workshop)
 }
 </script>
 
@@ -151,11 +169,29 @@ function handleDeleteClick(workshop) {
     font-size: 0.75rem;
     font-weight: 700;
     color: $color-green-dark;
+    border: none;
+    cursor: pointer;
+    font: inherit;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
+
+    &:hover,
+    &:focus-visible {
+      background-color: $color-green-dark;
+      color: $color-background;
+    }
   }
 
   &__status--inactive {
     background-color: $color-background-alt;
     color: $color-text-dark;
+
+    &:hover,
+    &:focus-visible {
+      background-color: $color-text-dark;
+      color: $color-background;
+    }
   }
 
   &__delete {
