@@ -53,6 +53,7 @@
 import { ref, onMounted } from 'vue'
 import { fetchDashboardSummary } from '@/services/dashboard'
 import { fetchAdminWorkshops, deleteWorkshop } from '@/services/workshops'
+import { useDashboardSummaryStream } from '@/composables/useDashboardSummaryStream'
 import AdminWorkshopsList from '@/components/AdminWorkshopsList.vue'
 import WorkshopForm from '@/components/WorkshopForm.vue'
 
@@ -69,6 +70,11 @@ const dialogRef = ref(null)
 onMounted(async () => {
   await Promise.all([loadSummary(), loadWorkshops()])
 })
+
+// Se suscribe al stream en tiempo real: cualquier cambio que afecte al
+// resumen (desde este panel o desde cualquier otro sitio, como un alumno
+// inscribiendose en la vista publica) vuelve a llamar a loadSummary()
+useDashboardSummaryStream(loadSummary)
 
 async function loadSummary() {
   try {
