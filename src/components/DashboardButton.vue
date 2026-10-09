@@ -15,7 +15,7 @@ const authStore = useAuthStore()
 // Lleva de vuelta al panel que corresponde segun el rol de quien ha iniciado
 // sesion, para no perder el acceso a su area al navegar por las vistas
 // publicas (Talleres, Refuerzo...)
-const isAdmin = computed(() => authStore.user?.roles.includes(ROLES.ADMIN))
+const isAdmin = computed(() => authStore.user?.roles?.includes(ROLES.ADMIN) ?? false)
 
 const dashboardRoute = computed(() => (isAdmin.value ? { name: 'admin' } : { name: 'dashboard' }))
 const dashboardLabel = computed(() => (isAdmin.value ? 'Dashboard Admin' : 'Mi Dashboard'))
