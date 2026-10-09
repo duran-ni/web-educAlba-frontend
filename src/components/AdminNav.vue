@@ -28,6 +28,7 @@ const links = [
   { label: 'Talleres', to: { name: 'workshops' } },
   { label: 'Refuerzo', to: { name: 'reinforcement' } },
   { label: 'Gestión', to: { name: 'management' } },
+  { label: 'Alumnos', to: { name: 'students' } },
 ]
 
 // Cierra la sesion del administrador y vuelve a la pagina de inicio publica
