@@ -41,6 +41,7 @@
       :status="workshopsStatus"
       :workshops="workshops"
       @delete="handleWorkshopDeleted"
+      @toggle-active="handleWorkshopToggleActive"
     />
 
     <dialog ref="dialogRef" class="admin-dashboard-view__dialog" @close="handleDialogClose">
@@ -52,7 +53,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { fetchDashboardSummary } from '@/services/dashboard'
-import { fetchAdminWorkshops, deleteWorkshop } from '@/services/workshops'
+import { fetchAdminWorkshops, deleteWorkshop, updateWorkshop } from '@/services/workshops'
 import { useDashboardSummaryStream } from '@/composables/useDashboardSummaryStream'
 import AdminWorkshopsList from '@/components/AdminWorkshopsList.vue'
 import WorkshopForm from '@/components/WorkshopForm.vue'
@@ -136,6 +137,21 @@ async function handleWorkshopDeleted(id) {
     } else {
       window.alert('No se ha podido eliminar el taller. Inténtalo de nuevo.')
     }
+  }
+}
+
+// Activa/desactiva el taller en el backend (PUT con el taller completo,
+// solo cambia "active") y, solo si la peticion tiene exito, actualiza
+// tambien el listado en memoria, sin volver a pedirlo entero al backend
+async function handleWorkshopToggleActive(workshop) {
+  try {
+    const response = await updateWorkshop(workshop.id, { ...workshop, active: !workshop.active })
+    workshops.value = workshops.value.map((item) =>
+      item.id === workshop.id ? response.data : item
+    )
+    loadSummary()
+  } catch {
+    window.alert('No se ha podido cambiar el estado del taller. Inténtalo de nuevo.')
   }
 }
 </script>
