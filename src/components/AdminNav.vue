@@ -22,12 +22,12 @@ import { useAuthStore } from '@/stores/auth'
 const router = useRouter()
 const authStore = useAuthStore()
 
-// Los 4 accesos del panel de administrador
+// Los accesos del panel de administrador
 const links = [
   { label: 'Inicio', to: { name: 'home' } },
+  { label: 'Dashboard', to: { name: 'admin' } },
   { label: 'Talleres', to: { name: 'workshops' } },
   { label: 'Refuerzo', to: { name: 'reinforcement' } },
-  { label: 'Gestión', to: { name: 'management' } },
   { label: 'Alumnos', to: { name: 'students' } },
 ]
 
