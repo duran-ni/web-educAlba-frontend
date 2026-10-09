@@ -111,6 +111,7 @@ function handleWorkshopCreated(newWorkshop) {
     a.date === b.date ? a.time.localeCompare(b.time) : a.date.localeCompare(b.date)
   )
   closeDialog()
+  loadSummary()
 }
 
 // Elimina el taller en el backend y, solo si la peticion tiene exito, lo
@@ -120,6 +121,7 @@ async function handleWorkshopDeleted(id) {
   try {
     await deleteWorkshop(id)
     workshops.value = workshops.value.filter((workshop) => workshop.id !== id)
+    loadSummary()
   } catch (error) {
     if (error.response?.status === 409) {
       window.alert(
