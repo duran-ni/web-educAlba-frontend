@@ -20,3 +20,8 @@ export function fetchAdminWorkshops() {
 export function createWorkshop(workshop) {
   return http.post('/admin/workshops', workshop)
 }
+
+// Elimina un taller del panel de administracion
+export function deleteWorkshop(id) {
+  return http.delete(`/admin/workshops/${id}`)
+}
