@@ -68,6 +68,11 @@ const routes = [
         name: 'management',
         component: () => import('@/views/ManagementView.vue'),
       },
+      {
+        path: 'alumnos',
+        name: 'students',
+        component: () => import('@/views/AdminStudentsView.vue'),
+      },
     ],
   },
   {
