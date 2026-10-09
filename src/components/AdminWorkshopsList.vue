@@ -25,12 +25,22 @@
           </p>
         </div>
 
-        <span
-          class="admin-workshops-list__status"
-          :class="{ 'admin-workshops-list__status--inactive': !workshop.active }"
-        >
-          {{ workshop.active ? 'Activo' : 'Inactivo' }}
-        </span>
+        <div class="admin-workshops-list__item-actions">
+          <span
+            class="admin-workshops-list__status"
+            :class="{ 'admin-workshops-list__status--inactive': !workshop.active }"
+          >
+            {{ workshop.active ? 'Activo' : 'Inactivo' }}
+          </span>
+
+          <button
+            type="button"
+            class="admin-workshops-list__delete"
+            @click="handleDeleteClick(workshop)"
+          >
+            Eliminar
+          </button>
+        </div>
       </li>
     </ul>
   </section>
@@ -50,6 +60,20 @@ defineProps({
     required: true,
   },
 })
+
+const emit = defineEmits(['delete'])
+
+// Pide confirmacion antes de avisar al componente padre, para evitar que
+// un clic accidental borre un taller sin darse cuenta
+function handleDeleteClick(workshop) {
+  const confirmed = window.confirm(
+    `¿Seguro que quieres eliminar el taller "${workshop.name}"? Esta acción no se puede deshacer.`
+  )
+
+  if (confirmed) {
+    emit('delete', workshop.id)
+  }
+}
 </script>
 
 <style lang="scss">
@@ -112,6 +136,12 @@ defineProps({
     color: $color-text-dark;
   }
 
+  &__item-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
   &__status {
     flex-shrink: 0;
     padding: 0.25rem 0.75rem;
@@ -126,6 +156,28 @@ defineProps({
   &__status--inactive {
     background-color: $color-background-alt;
     color: $color-text-dark;
+  }
+
+  &__delete {
+    flex-shrink: 0;
+    padding: 0.25rem 0.75rem;
+    border: 2px solid $color-error;
+    border-radius: 999px;
+    background-color: $color-background;
+    color: $color-error;
+    font-family: $font-heading;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
+
+    &:hover,
+    &:focus-visible {
+      background-color: $color-error;
+      color: $color-background;
+    }
   }
 }
 </style>
