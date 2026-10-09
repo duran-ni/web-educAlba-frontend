@@ -4,13 +4,13 @@ test.describe('Router navigation', () => {
   test('shows the home view at "/"', async ({ page }) => {
     await page.goto('/')
 
-    await expect(page.getByRole('heading', { name: 'Inicio' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: '¡Únete a la clase!' })).toBeVisible()
   })
 
   test('shows the login view at "/login"', async ({ page }) => {
     await page.goto('/login')
 
-    await expect(page.getByRole('heading', { name: 'Login' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: '¡Hola!' })).toBeVisible()
   })
 
   test('redirects to login when accessing a protected route unauthenticated', async ({ page }) => {
