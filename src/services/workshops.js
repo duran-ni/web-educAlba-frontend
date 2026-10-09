@@ -21,6 +21,13 @@ export function createWorkshop(workshop) {
   return http.post('/admin/workshops', workshop)
 }
 
+// Actualiza un taller existente (incluye el cambio de activo/inactivo).
+// El backend sustituye el taller entero, asi que hay que enviar siempre
+// todos sus campos, no solo el que ha cambiado
+export function updateWorkshop(id, workshop) {
+  return http.put(`/admin/workshops/${id}`, workshop)
+}
+
 // Elimina un taller del panel de administracion
 export function deleteWorkshop(id) {
   return http.delete(`/admin/workshops/${id}`)
