@@ -3,7 +3,7 @@ import { shallowMount } from '@vue/test-utils'
 
 import AdminLayout from '../AdminLayout.vue'
 import AppHeader from '@/components/header/AppHeader.vue'
-import AppFooter from '@/components/AppFooter.vue'
+import AppFooter from '@/components/footer/AppFooter.vue'
 
 describe('AdminLayout.vue', () => {
   it('renders the header with the admin variant and a reduced footer', () => {

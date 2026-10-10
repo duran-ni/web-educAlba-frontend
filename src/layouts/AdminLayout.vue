@@ -9,5 +9,5 @@
 <script setup>
 import { RouterView } from 'vue-router'
 import AppHeader from '@/components/header/AppHeader.vue'
-import AppFooter from '@/components/AppFooter.vue'
+import AppFooter from '@/components/footer/AppFooter.vue'
 </script>

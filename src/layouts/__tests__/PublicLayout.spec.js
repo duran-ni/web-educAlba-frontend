@@ -3,7 +3,7 @@ import { shallowMount } from '@vue/test-utils'
 
 import PublicLayout from '../PublicLayout.vue'
 import AppHeader from '@/components/header/AppHeader.vue'
-import AppFooter from '@/components/AppFooter.vue'
+import AppFooter from '@/components/footer/AppFooter.vue'
 
 describe('PublicLayout.vue', () => {
   it('renders the header and footer with the full variant', () => {

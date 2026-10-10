@@ -3,7 +3,7 @@ import { shallowMount } from '@vue/test-utils'
 
 import UserLayout from '../UserLayout.vue'
 import AppHeader from '@/components/header/AppHeader.vue'
-import AppFooter from '@/components/AppFooter.vue'
+import AppFooter from '@/components/footer/AppFooter.vue'
 
 describe('UserLayout.vue', () => {
   it('renders the header with the user variant and a reduced footer', () => {
