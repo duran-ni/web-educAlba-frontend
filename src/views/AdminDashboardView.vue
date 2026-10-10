@@ -44,10 +44,17 @@
       @delete="handleWorkshopDeleted"
       @toggle-active="handleWorkshopToggleActive"
       @delete-enrollment="handleEnrollmentDeleted"
+      @edit="openEditDialog"
     />
 
     <dialog ref="dialogRef" class="admin-dashboard-view__dialog" @close="handleDialogClose">
-      <WorkshopForm @created="handleWorkshopCreated" @cancel="closeDialog" />
+      <WorkshopForm
+        :key="editingWorkshop?.id ?? 'new'"
+        :workshop="editingWorkshop"
+        @created="handleWorkshopCreated"
+        @updated="handleWorkshopUpdated"
+        @cancel="closeDialog"
+      />
     </dialog>
   </section>
 </template>
@@ -74,6 +81,7 @@ const enrollmentsStatus = ref('loading')
 const enrollments = ref([])
 
 const dialogRef = ref(null)
+const editingWorkshop = ref(null)
 
 onMounted(async () => {
   await Promise.all([loadSummary(), loadWorkshops(), loadEnrollments()])
@@ -115,6 +123,14 @@ async function loadEnrollments() {
 }
 
 function openDialog() {
+  editingWorkshop.value = null
+  dialogRef.value.showModal()
+}
+
+// Abre el mismo dialog que "+ Nuevo Taller", pero guardando qué taller se
+// quiere editar: el formulario, al recibirlo por prop, precarga sus datos
+function openEditDialog(workshop) {
+  editingWorkshop.value = workshop
   dialogRef.value.showModal()
 }
 
@@ -122,10 +138,12 @@ function closeDialog() {
   dialogRef.value.close()
 }
 
-// Al confirmar la creacion (evento "close" del <dialog>, disparado tanto al
-// pulsar "Cancelar" como al cerrar con la tecla Esc) ya no hace falta hacer nada
-// mas: el cierre en si no borra el taller ya creado
-function handleDialogClose() {}
+// Al cerrar el dialog (tanto si se guarda como si se cancela o se pulsa
+// Esc) se limpia el taller en edición, para que la proxima vez que se abra
+// "+ Nuevo Taller" no arrastre datos de una edición anterior
+function handleDialogClose() {
+  editingWorkshop.value = null
+}
 
 // Se inserta el taller recien creado y se reordena la lista por fecha/hora,
 // sin volver a pedirla al backend: evita una peticion de red innecesaria
@@ -134,6 +152,16 @@ function handleWorkshopCreated(newWorkshop) {
   workshops.value = [...workshops.value, newWorkshop].sort((a, b) =>
     a.date === b.date ? a.time.localeCompare(b.time) : a.date.localeCompare(b.date)
   )
+  closeDialog()
+  loadSummary()
+}
+
+// Sustituye el taller editado en el listado por su version actualizada y
+// reordena por fecha/hora, por si la edicion ha cambiado la fecha o la hora
+function handleWorkshopUpdated(updatedWorkshop) {
+  workshops.value = workshops.value
+    .map((workshop) => (workshop.id === updatedWorkshop.id ? updatedWorkshop : workshop))
+    .sort((a, b) => (a.date === b.date ? a.time.localeCompare(b.time) : a.date.localeCompare(b.date)))
   closeDialog()
   loadSummary()
 }
