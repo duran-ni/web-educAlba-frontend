@@ -25,12 +25,20 @@ describe('UserNav.vue', () => {
     const wrapper = mount(UserNav, { global: { plugins: [router, createPinia()] } })
     const links = wrapper.findAll('.user-nav__link')
     expect(links).toHaveLength(4)
-    expect(links.map((link) => link.text())).toEqual(['Inicio', 'Mis Talleres', 'Mi Perfil', 'Salir'])
+    expect(links.map((link) => link.text())).toEqual([
+      'Mi Panel',
+      'Mis Talleres',
+      'Mi Perfil',
+      'Salir',
+    ])
   })
 
   it('applies the open modifier class when isOpen is true', async () => {
     await router.isReady()
-    const wrapper = mount(UserNav, { props: { isOpen: true }, global: { plugins: [router, createPinia()] } })
+    const wrapper = mount(UserNav, {
+      props: { isOpen: true },
+      global: { plugins: [router, createPinia()] },
+    })
     expect(wrapper.find('.user-nav__list').classes()).toContain('user-nav__list--open')
   })
 
