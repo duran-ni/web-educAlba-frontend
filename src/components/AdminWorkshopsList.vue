@@ -22,7 +22,16 @@
             <p class="admin-workshops-list__item-name">{{ workshop.name }}</p>
             <p class="admin-workshops-list__item-details">
               {{ formatWorkshopDate(workshop.date) }} · {{ formatWorkshopTime(workshop.time) }}
+              <span v-if="workshop.recommendedAge" class="admin-workshops-list__item-age">
+                → {{ workshop.recommendedAge }}
+              </span>
               <span v-if="workshop.room"> · {{ workshop.room }}</span>
+            </p>
+
+            <hr class="admin-workshops-list__divider" />
+
+            <p v-if="workshop.description" class="admin-workshops-list__item-description">
+              {{ workshop.description }}
             </p>
           </div>
 
@@ -181,7 +190,7 @@ function handleDeleteEnrollmentClick(enrollment) {
 
   &__title {
     margin: 0 0 3rem;
-    margin-left: 12rem;
+    margin-left: 0rem;
     font-family: $font-doodle;
     font-size: 3.5rem;
     color: $color-error;
@@ -198,18 +207,18 @@ function handleDeleteEnrollmentClick(enrollment) {
 
   &__items {
     list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 2.5rem;
-    max-width: 32rem;
-    margin-left: 4rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(30rem, 35rem));
+    gap: 3.5rem;
+    margin-left: 10rem;
+    margin-right: 4rem;
   }
 
   &__item {
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    padding: 1rem 1.25rem;
+    padding: 1.75rem 2.25rem;
     background-color: $color-background-soft;
     @include doodle-frame;
   }
@@ -239,6 +248,25 @@ function handleDeleteEnrollmentClick(enrollment) {
   &__item-details {
     margin: 0;
     font-size: 0.95rem;
+    color: $color-text-dark;
+  }
+
+  &__item-age {
+    color: $color-primary;
+    font-weight: 600;
+  }
+
+  &__divider {
+    width: 100%;
+    margin: 0.75rem 0;
+    border: none;
+    border-top: 2px dashed $color-text-dark;
+  }
+
+  &__item-description {
+    margin: 0.25rem 0 0;
+    font-size: 0.95rem;
+    font-family: cursive;
     color: $color-text-dark;
   }
 
@@ -285,7 +313,7 @@ function handleDeleteEnrollmentClick(enrollment) {
 
   &__enrollments-toggle {
     flex-shrink: 0;
-    padding: 0.40rem 0.75rem;
+    padding: 0.4rem 0.75rem;
     border: 2px solid $color-primary;
     border-radius: 999px;
     background-color: $color-background;
@@ -307,7 +335,7 @@ function handleDeleteEnrollmentClick(enrollment) {
 
   &__delete {
     flex-shrink: 0;
-    padding: 0.40rem 1rem;
+    padding: 0.4rem 1rem;
     border: 2px solid $color-error;
     border-radius: 999px;
     background-color: $color-background;
