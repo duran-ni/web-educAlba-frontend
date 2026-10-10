@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 
 import http from '../http'
-import { fetchDashboardSummary, fetchMyProfile } from '../dashboard'
+import { fetchDashboardSummary, fetchMyProfile, fetchMyWorkshops } from '../dashboard'
 
 vi.mock('../http', () => ({
   default: { get: vi.fn() },
@@ -18,5 +18,11 @@ describe('dashboard service', () => {
     fetchMyProfile()
 
     expect(http.get).toHaveBeenCalledWith('/dashboard/me')
+  })
+
+  it("requests the logged in user's enrolled workshops", () => {
+    fetchMyWorkshops()
+
+    expect(http.get).toHaveBeenCalledWith('/dashboard/my-workshops')
   })
 })
