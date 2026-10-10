@@ -11,3 +11,9 @@ export function fetchDashboardSummary() {
 export function fetchMyProfile() {
   return http.get('/dashboard/me')
 }
+
+// Consulta los talleres en los que esta inscrito el alumno vinculado al
+// usuario que ha iniciado sesion, con su progreso
+export function fetchMyWorkshops() {
+  return http.get('/dashboard/my-workshops')
+}
