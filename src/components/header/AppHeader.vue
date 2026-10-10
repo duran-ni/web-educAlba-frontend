@@ -20,11 +20,9 @@
     <template v-else-if="variant === 'admin'">
       <AdminNav />
     </template>
-
     <template v-else-if="variant === 'user'">
-      <UserNav :is-open="isMenuOpen" @navigate="closeMenu" />
-
       <div class="app-header__actions">
+        <UserNav :is-open="isMenuOpen" @navigate="closeMenu" />
         <NavToggle :is-open="isMenuOpen" controls="user-nav-list" @toggle="toggleMenu" />
       </div>
     </template>
@@ -54,7 +52,6 @@ defineProps({
 const isMenuOpen = ref(false)
 
 const authStore = useAuthStore()
-
 
 function toggleMenu() {
   isMenuOpen.value = !isMenuOpen.value
