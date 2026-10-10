@@ -62,11 +62,11 @@ const routes = [
     component: () => import('@/layouts/AdminLayout.vue'),
     meta: { requiresAuth: true },
     children: [
-      { path: '', name: 'admin', component: () => import('@/views/AdminDashboardView.vue') },
+      { path: '', name: 'admin', component: () => import('@/views/admin/AdminDashboardView.vue') },
       {
         path: 'alumnos',
         name: 'students',
-        component: () => import('@/views/AdminStudentsView.vue'),
+        component: () => import('@/views/admin/AdminStudentsView.vue'),
       },
     ],
   },
