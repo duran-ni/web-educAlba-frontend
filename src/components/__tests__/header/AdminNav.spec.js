@@ -3,7 +3,7 @@ import { mount } from '@vue/test-utils'
 import { createRouter, createWebHistory } from 'vue-router'
 import { createPinia } from 'pinia'
 
-import AdminNav from '../AdminNav.vue'
+import AdminNav from '../../header/AdminNav.vue'
 
 const router = createRouter({
   history: createWebHistory(),

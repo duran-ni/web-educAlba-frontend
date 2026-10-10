@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { createRouter, createWebHistory } from 'vue-router'
 
-import LoginButton from '../LoginButton.vue'
+import LoginButton from '../../header/LoginButton.vue'
 
 const router = createRouter({
   history: createWebHistory(),

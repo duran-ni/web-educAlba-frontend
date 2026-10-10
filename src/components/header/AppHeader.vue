@@ -35,7 +35,7 @@
 import { ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import AppLogo from './AppLogo.vue'
+import AppLogo from '../AppLogo.vue'
 import NavMenu from './NavMenu.vue'
 import LoginButton from './LoginButton.vue'
 import RegisterButton from './RegisterButton.vue'

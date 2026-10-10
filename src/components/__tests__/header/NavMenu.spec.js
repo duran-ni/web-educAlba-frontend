@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { createRouter, createWebHistory } from 'vue-router'
 
-import NavMenu from '../NavMenu.vue'
+import NavMenu from '../../header/NavMenu.vue'
 
 // Router mínimo de prueba, con las mismas 7 rutas públicas que usa el menú real
 const router = createRouter({

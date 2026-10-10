@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 
-import NavToggle from '../NavToggle.vue'
+import NavToggle from '../../header/NavToggle.vue'
 
 describe('NavToggle.vue', () => {
   it('emits "toggle" when clicked', async () => {

@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { shallowMount } from '@vue/test-utils'
 
 import PublicLayout from '../PublicLayout.vue'
-import AppHeader from '@/components/AppHeader.vue'
+import AppHeader from '@/components/header/AppHeader.vue'
 import AppFooter from '@/components/AppFooter.vue'
 
 describe('PublicLayout.vue', () => {
