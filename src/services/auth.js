@@ -6,7 +6,7 @@ import http from './http'
 // siguientes ya no necesitan volver a enviar la contraseña, viajan con esa
 // cookie automaticamente (gracias a "withCredentials: true" en http.js).
 // skipAuthRedirect: unas credenciales incorrectas ya devuelven un 401 que la
-// propia pantalla de login gestiona (ver LoginForm.vue); no hace falta que
+// propia pantalla de login gestiona (ver auth/LoginForm.vue); no hace falta que
 // el interceptor global intente redirigir tambien a "login" en ese caso
 // rememberMe: si se marca, se envia el parametro "remember-me" en la URL,
 // que Spring Security interpreta para emitir una cookie de sesion persistente
