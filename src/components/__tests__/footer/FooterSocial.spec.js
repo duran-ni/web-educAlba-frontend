@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 
-import FooterSocial from '../FooterSocial.vue'
+import FooterSocial from '../../footer/FooterSocial.vue'
 
 describe('FooterSocial.vue', () => {
   it('renders a link for each social network', () => {

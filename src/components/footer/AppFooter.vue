@@ -14,7 +14,7 @@
 </template>
 
 <script setup>
-import AppLogo from './AppLogo.vue'
+import AppLogo from '../AppLogo.vue'
 import FooterContact from './FooterContact.vue'
 import FooterSocial from './FooterSocial.vue'
 import FooterLegal from './FooterLegal.vue'

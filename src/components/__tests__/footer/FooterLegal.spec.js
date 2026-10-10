@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 
-import FooterLegal from '../FooterLegal.vue'
+import FooterLegal from '../../footer/FooterLegal.vue'
 
 describe('FooterLegal.vue', () => {
   it('shows the current year in the copyright text', () => {

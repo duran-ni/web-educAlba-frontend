@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 
-import FooterContact from '../FooterContact.vue'
+import FooterContact from '../../footer/FooterContact.vue'
 
 describe('FooterContact.vue', () => {
   it('renders a mailto link for the contact email', () => {
