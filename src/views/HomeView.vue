@@ -10,10 +10,10 @@
 </template>
 
 <script setup>
-import HeroWelcome from '@/components/HeroWelcome.vue'
-import QuickInterestForm from '@/components/QuickInterestForm.vue'
-import NextWorkshopCard from '@/components/NextWorkshopCard.vue'
-import QuickContactCta from '@/components/QuickContactCta.vue'
+import HeroWelcome from '@/components/home/HeroWelcome.vue'
+import QuickInterestForm from '@/components/home/QuickInterestForm.vue'
+import NextWorkshopCard from '@/components/home/NextWorkshopCard.vue'
+import QuickContactCta from '@/components/home/QuickContactCta.vue'
 </script>
 
 <style lang="scss">

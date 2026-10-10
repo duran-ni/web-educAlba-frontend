@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 
-import QuickInterestForm from '../QuickInterestForm.vue'
+import QuickInterestForm from '../../home/QuickInterestForm.vue'
 import { submitInterest } from '@/services/interestSubmissions'
 
 vi.mock('@/services/interestSubmissions', () => ({

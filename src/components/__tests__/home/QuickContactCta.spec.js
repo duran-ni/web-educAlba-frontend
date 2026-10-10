@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 
-import QuickContactCta from '../QuickContactCta.vue'
+import QuickContactCta from '../../home/QuickContactCta.vue'
 
 describe('QuickContactCta.vue', () => {
   it('renders the CTA heading', () => {

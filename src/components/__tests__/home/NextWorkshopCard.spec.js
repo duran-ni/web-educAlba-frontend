@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 
-import NextWorkshopCard from '../NextWorkshopCard.vue'
+import NextWorkshopCard from '../../home/NextWorkshopCard.vue'
 import { fetchNextWorkshop } from '@/services/workshops'
 
 vi.mock('@/services/workshops', () => ({

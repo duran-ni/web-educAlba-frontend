@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 
-import HeroWelcome from '../HeroWelcome.vue'
+import HeroWelcome from '../../home/HeroWelcome.vue'
 
 describe('HeroWelcome.vue', () => {
   it('renders the welcome tagline', () => {
