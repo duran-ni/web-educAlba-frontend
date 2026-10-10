@@ -36,10 +36,11 @@ const emit = defineEmits(['navigate'])
 const router = useRouter()
 const authStore = useAuthStore()
 
-// Opciones del área privada del alumno/familia.
-// Pendiente de confirmar con el cliente el listado definitivo.
+// Opciones del área privada del alumno/familia. "Mi Panel" en vez de
+// "Inicio" (que ya usa la navegación pública) para no confundir a quien
+// vuelve aqui tras visitar paginas publicas como Talleres o Contacto
 const links = [
-  { label: 'Inicio', to: { name: 'dashboard' } },
+  { label: 'Mi Panel', to: { name: 'dashboard' } },
   { label: 'Mis Talleres', to: { name: 'my-workshops' } },
   { label: 'Mi Perfil', to: { name: 'my-profile' } },
 ]
@@ -68,6 +69,15 @@ async function handleLogout() {
 
     &--open {
       display: flex;
+    }
+
+    @include respond-to(tablet) {
+      display: flex;
+      flex-direction: row;
+      position: static;
+      gap: 1.5rem;
+      padding: 0;
+      background-color: transparent;
     }
   }
 
