@@ -44,16 +44,16 @@ const routes = [
     component: () => import('@/layouts/UserLayout.vue'),
     meta: { requiresAuth: true },
     children: [
-      { path: '', name: 'dashboard', component: () => import('@/views/UserDashboardView.vue') },
+      { path: '', name: 'dashboard', component: () => import('@/views/user/UserDashboardView.vue') },
       {
         path: 'mis-talleres',
         name: 'my-workshops',
-        component: () => import('@/views/MyWorkshopsView.vue'),
+        component: () => import('@/views/user/MyWorkshopsView.vue'),
       },
       {
         path: 'mi-perfil',
         name: 'my-profile',
-        component: () => import('@/views/MyProfileView.vue'),
+        component: () => import('@/views/user/MyProfileView.vue'),
       },
     ],
   },
