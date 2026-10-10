@@ -4,6 +4,8 @@
 </template>
 
 <script setup>
-import AboutIntro from '@/components/AboutIntro.vue'
-import Timeline from '@/components/Timeline.vue';
+
+import AboutIntro from '@/components/about/AboutIntro.vue'
+import Timeline from '@/components/about/Timeline.vue';
+
 </script>
