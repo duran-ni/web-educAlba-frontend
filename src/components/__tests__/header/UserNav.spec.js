@@ -28,7 +28,7 @@ describe('UserNav.vue', () => {
     const links = wrapper.findAll('.user-nav__link')
     expect(links).toHaveLength(7)
     expect(links.map((link) => link.text())).toEqual([
-      'Mi Panel',
+      'Mi Perfil',
       'Inicio',
       'Talleres',
       'Refuerzo',
