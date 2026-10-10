@@ -56,6 +56,14 @@
 
             <button
               type="button"
+              class="admin-workshops-list__edit"
+              @click="handleEditClick(workshop)"
+            >
+              Editar
+            </button>
+
+            <button
+              type="button"
               class="admin-workshops-list__delete"
               @click="handleDeleteClick(workshop)"
             >
@@ -115,7 +123,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['delete', 'toggle-active', 'delete-enrollment'])
+const emit = defineEmits(['delete', 'toggle-active', 'delete-enrollment', 'edit'])
 
 // Guarda los ids de los talleres cuyo listado de inscritos esta desplegado;
 // un Set permite tener varios talleres abiertos a la vez sin duplicados
@@ -169,6 +177,13 @@ function handleToggleActiveClick(workshop) {
   }
 
   emit('toggle-active', workshop)
+}
+
+// Avisa al componente padre de que se quiere editar este taller; a
+// diferencia de eliminar o desactivar, no hace falta confirmación porque
+// no es una accion destructiva: solo abre el formulario precargado
+function handleEditClick(workshop) {
+  emit('edit', workshop)
 }
 
 // Pide confirmacion antes de eliminar la inscripcion de un alumno concreto,
@@ -314,6 +329,28 @@ function handleDeleteEnrollmentClick(enrollment) {
   &__enrollments-toggle {
     flex-shrink: 0;
     padding: 0.4rem 0.75rem;
+    border: 2px solid $color-primary;
+    border-radius: 999px;
+    background-color: $color-background;
+    color: $color-primary;
+    font-family: $font-heading;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
+
+    &:hover,
+    &:focus-visible {
+      background-color: $color-primary;
+      color: $color-background;
+    }
+  }
+
+  &__edit {
+    flex-shrink: 0;
+    padding: 0.40rem 1rem;
     border: 2px solid $color-primary;
     border-radius: 999px;
     background-color: $color-background;
