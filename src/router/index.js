@@ -11,22 +11,42 @@ const routes = [
     component: () => import('@/layouts/PublicLayout.vue'),
     children: [
       { path: '', name: 'home', component: () => import('@/views/public/HomeView.vue') },
-      { path: 'talleres', name: 'workshops', component: () => import('@/views/public/WorkshopsView.vue') },
+      {
+        path: 'talleres',
+        name: 'workshops',
+        component: () => import('@/views/public/WorkshopsView.vue'),
+      },
       {
         path: 'refuerzo',
         name: 'reinforcement',
         component: () => import('@/views/public/ReinforcementView.vue'),
       },
-      { path: 'quienes-somos', name: 'about', component: () => import('@/views/public/AboutView.vue') },
+      {
+        path: 'quienes-somos',
+        name: 'about',
+        component: () => import('@/views/public/AboutView.vue'),
+      },
       {
         path: 'que-hacemos',
         name: 'what-we-do',
         component: () => import('@/views/public/WhatWeDoView.vue'),
       },
-      { path: 'galeria', name: 'gallery', component: () => import('@/views/public/GalleryView.vue') },
-      { path: 'contacto', name: 'contact', component: () => import('@/views/public/ContactView.vue') },
+      {
+        path: 'galeria',
+        name: 'gallery',
+        component: () => import('@/views/public/GalleryView.vue'),
+      },
+      {
+        path: 'contacto',
+        name: 'contact',
+        component: () => import('@/views/public/ContactView.vue'),
+      },
       { path: 'login', name: 'login', component: () => import('@/views/auth/LoginView.vue') },
-      { path: '/registro', name: 'register', component: () => import('@/views/auth/RegisterView.vue') },
+      {
+        path: '/registro',
+        name: 'register',
+        component: () => import('@/views/auth/RegisterView.vue'),
+      },
       {
         path: '/recuperar-contrasena',
         name: 'forgot-password',
@@ -44,16 +64,10 @@ const routes = [
     component: () => import('@/layouts/UserLayout.vue'),
     meta: { requiresAuth: true },
     children: [
-      { path: '', name: 'dashboard', component: () => import('@/views/user/UserDashboardView.vue') },
       {
-        path: 'mis-talleres',
-        name: 'my-workshops',
-        component: () => import('@/views/user/MyWorkshopsView.vue'),
-      },
-      {
-        path: 'mi-perfil',
-        name: 'my-profile',
-        component: () => import('@/views/user/MyProfileView.vue'),
+        path: '',
+        name: 'dashboard',
+        component: () => import('@/views/user/UserDashboardView.vue'),
       },
     ],
   },
