@@ -51,7 +51,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { fetchWorkshops } from '@/services/workshops'
-import { formatWorkshopTime } from '../utils/formatWorkshopTime'
+import { formatWorkshopTime } from '../../utils/formatWorkshopTime'
 
 const WEEKDAY_LABELS = ['L', 'M', 'X', 'J', 'V', 'S', 'D']
 

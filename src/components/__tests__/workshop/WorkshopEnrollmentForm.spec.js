@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 
-import WorkshopEnrollmentForm from '../WorkshopEnrollmentForm.vue'
+import WorkshopEnrollmentForm from '../../workshop/WorkshopEnrollmentForm.vue'
 import { fetchWorkshops } from '@/services/workshops'
 import { submitEnrollment } from '@/services/enrollments'
 

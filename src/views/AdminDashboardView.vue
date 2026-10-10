@@ -65,8 +65,8 @@ import { fetchDashboardSummary } from '@/services/dashboard'
 import { fetchAdminWorkshops, deleteWorkshop, updateWorkshop } from '@/services/workshops'
 import { fetchEnrollments, deleteEnrollment } from '@/services/enrollments'
 import { useDashboardSummaryStream } from '@/composables/useDashboardSummaryStream'
-import AdminWorkshopsList from '@/components/AdminWorkshopsList.vue'
-import WorkshopForm from '@/components/WorkshopForm.vue'
+import AdminWorkshopsList from '@/components/workshop/AdminWorkshopsList.vue'
+import WorkshopForm from '@/components/workshop/WorkshopForm.vue'
 
 // loading | loaded | error
 const summaryStatus = ref('loading')

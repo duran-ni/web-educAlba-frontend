@@ -36,9 +36,9 @@
 </template>
 
 <script setup>
-import WorkshopsCalendar from '@/components/WorkshopsCalendar.vue'
-import WorkshopsList from '@/components/WorkshopsList.vue'
-import WorkshopEnrollmentForm from '@/components/WorkshopEnrollmentForm.vue';
+import WorkshopsCalendar from '@/components/workshop/WorkshopsCalendar.vue'
+import WorkshopsList from '@/components/workshop/WorkshopsList.vue'
+import WorkshopEnrollmentForm from '@/components/workshop/WorkshopEnrollmentForm.vue';
 </script>
 
 <style lang="scss">

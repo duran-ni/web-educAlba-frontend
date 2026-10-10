@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 
-import WorkshopCard from '../WorkshopCard.vue'
+import WorkshopCard from '../../workshop/WorkshopCard.vue'
 
 describe('WorkshopCard.vue', () => {
   const workshop = {
