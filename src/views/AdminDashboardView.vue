@@ -208,7 +208,7 @@ async function handleEnrollmentDeleted(id) {
     display: inline-block;
 
     @include respond-to(tablet) {
-      font-size: 3.25rem;
+      font-size: 3.5rem;
     }
   }
 
@@ -223,10 +223,10 @@ async function handleEnrollmentDeleted(id) {
 
   &__kpis {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, auto);
     justify-items: start;
-    gap: 3.5rem;
-    margin: 4.5rem;
+    gap: 2.5rem;
+    margin: 5.5rem;
   }
 
   &__kpi {
@@ -239,12 +239,12 @@ async function handleEnrollmentDeleted(id) {
   }
 
   &__kpi--students {
-    margin-left: 4rem;
+    margin-left: 7rem;
     transform: rotate(4deg);
   }
 
   &__kpi--workshops {
-    margin-left: 9rem;
+    margin-left: 5rem;
     background-color: $color-accent-green-soft;
     transform: rotate(-4deg);
   }
