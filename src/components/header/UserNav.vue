@@ -36,10 +36,16 @@ const emit = defineEmits(['navigate'])
 const router = useRouter()
 const authStore = useAuthStore()
 
-// Unica opcion del area privada del alumno/familia: todo vive ya en "Mi
-// Panel" (saludo + talleres inscritos), no hay vistas separadas que enlazar
+// Opciones del area privada, mas los accesos directos a las paginas publicas
+// principales, para que el alumno/familia pueda consultarlas sin tener que
+// cerrar sesion primero
 const links = [
   { label: 'Mi Panel', to: { name: 'dashboard' } },
+  { label: 'Inicio', to: { name: 'home' } },
+  { label: 'Talleres', to: { name: 'workshops' } },
+  { label: 'Refuerzo', to: { name: 'reinforcement' } },
+  { label: 'Galería', to: { name: 'gallery' } },
+  { label: 'Contacto', to: { name: 'contact' } },
 ]
 
 // Cierra la sesion del alumno/familia, cierra el menu movil y vuelve a Inicio
