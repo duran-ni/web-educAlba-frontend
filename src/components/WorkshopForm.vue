@@ -1,7 +1,7 @@
 <template>
   <form class="workshop-form" novalidate @submit.prevent="handleSubmit">
     <div class="workshop-form__heading">
-      <h2 class="workshop-form__title">Nuevo taller</h2>
+      <h2 class="workshop-form__title">{{ isEditing ? 'Editar taller' : 'Nuevo taller' }}</h2>
     </div>
 
     <div class="workshop-form__field">
@@ -102,7 +102,7 @@
         Cancelar
       </button>
       <button class="workshop-form__submit" type="submit" :disabled="status === 'submitting'">
-        {{ status === 'submitting' ? 'Guardando…' : 'Guardar taller' }}
+        {{ submitButtonLabel }}
       </button>
     </div>
 
@@ -117,18 +117,32 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { createWorkshop } from '@/services/workshops'
+import { ref, computed } from 'vue'
+import { createWorkshop, updateWorkshop } from '@/services/workshops'
 
-const emit = defineEmits(['created', 'cancel'])
+// Si se recibe un taller por prop, el formulario entra en modo edición:
+// precarga sus datos y, al guardar, actualiza en vez de crear. El
+// componente padre es responsable de volver a crear este formulario
+// (con :key) cada vez que cambia el taller a editar, para que los
+// campos se recarguen limpios
+const props = defineProps({
+  workshop: {
+    type: Object,
+    default: null,
+  },
+})
 
-const name = ref('')
-const description = ref('')
-const date = ref('')
-const time = ref('')
-const recommendedAge = ref('')
-const room = ref('')
-const active = ref(true)
+const emit = defineEmits(['created', 'updated', 'cancel'])
+
+const isEditing = computed(() => props.workshop !== null)
+
+const name = ref(props.workshop?.name ?? '')
+const description = ref(props.workshop?.description ?? '')
+const date = ref(props.workshop?.date ?? '')
+const time = ref(props.workshop?.time ?? '')
+const recommendedAge = ref(props.workshop?.recommendedAge ?? '')
+const room = ref(props.workshop?.room ?? '')
+const active = ref(props.workshop?.active ?? true)
 
 const nameError = ref('')
 const dateError = ref('')
@@ -136,6 +150,14 @@ const timeError = ref('')
 
 const status = ref('idle')
 const submitErrorMessage = ref('')
+
+const submitButtonLabel = computed(() => {
+  if (status.value === 'submitting') {
+    return 'Guardando…'
+  }
+
+  return isEditing.value ? 'Guardar cambios' : 'Guardar taller'
+})
 
 function validate() {
   nameError.value = name.value ? '' : 'Escribe el nombre del taller'
@@ -152,22 +174,31 @@ async function handleSubmit() {
 
   status.value = 'submitting'
 
-  try {
-    const response = await createWorkshop({
-      name: name.value,
-      description: description.value,
-      date: date.value,
-      time: time.value,
-      recommendedAge: recommendedAge.value,
-      room: room.value,
-      active: active.value,
-    })
+  const payload = {
+    name: name.value,
+    description: description.value,
+    date: date.value,
+    time: time.value,
+    recommendedAge: recommendedAge.value,
+    room: room.value,
+    active: active.value,
+  }
 
-    status.value = 'idle'
-    emit('created', response.data)
+  try {
+    if (isEditing.value) {
+      const response = await updateWorkshop(props.workshop.id, payload)
+      status.value = 'idle'
+      emit('updated', response.data)
+    } else {
+      const response = await createWorkshop(payload)
+      status.value = 'idle'
+      emit('created', response.data)
+    }
   } catch {
     status.value = 'error'
-    submitErrorMessage.value = 'No hemos podido guardar el taller. Inténtalo de nuevo en unos minutos.'
+    submitErrorMessage.value = isEditing.value
+      ? 'No hemos podido guardar los cambios. Inténtalo de nuevo en unos minutos.'
+      : 'No hemos podido guardar el taller. Inténtalo de nuevo en unos minutos.'
   }
 }
 </script>
