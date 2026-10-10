@@ -36,13 +36,10 @@ const emit = defineEmits(['navigate'])
 const router = useRouter()
 const authStore = useAuthStore()
 
-// Opciones del área privada del alumno/familia. "Mi Panel" en vez de
-// "Inicio" (que ya usa la navegación pública) para no confundir a quien
-// vuelve aqui tras visitar paginas publicas como Talleres o Contacto
+// Unica opcion del area privada del alumno/familia: todo vive ya en "Mi
+// Panel" (saludo + talleres inscritos), no hay vistas separadas que enlazar
 const links = [
   { label: 'Mi Panel', to: { name: 'dashboard' } },
-  { label: 'Mis Talleres', to: { name: 'my-workshops' } },
-  { label: 'Mi Perfil', to: { name: 'my-profile' } },
 ]
 
 // Cierra la sesion del alumno/familia, cierra el menu movil y vuelve a Inicio
