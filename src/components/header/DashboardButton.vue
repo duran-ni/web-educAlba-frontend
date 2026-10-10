@@ -18,7 +18,7 @@ const authStore = useAuthStore()
 const isAdmin = computed(() => authStore.user?.roles?.includes(ROLES.ADMIN) ?? false)
 
 const dashboardRoute = computed(() => (isAdmin.value ? { name: 'admin' } : { name: 'dashboard' }))
-const dashboardLabel = computed(() => (isAdmin.value ? 'Dashboard Admin' : 'Mi Dashboard'))
+const dashboardLabel = computed(() => (isAdmin.value ? 'Dashboard Admin' : 'Mi Perfil'))
 </script>
 
 <style lang="scss">
