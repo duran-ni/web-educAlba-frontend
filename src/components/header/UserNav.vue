@@ -40,7 +40,7 @@ const authStore = useAuthStore()
 // principales, para que el alumno/familia pueda consultarlas sin tener que
 // cerrar sesion primero
 const links = [
-  { label: 'Mi Panel', to: { name: 'dashboard' } },
+  { label: 'Mi Perfil', to: { name: 'dashboard' } },
   { label: 'Inicio', to: { name: 'home' } },
   { label: 'Talleres', to: { name: 'workshops' } },
   { label: 'Refuerzo', to: { name: 'reinforcement' } },
