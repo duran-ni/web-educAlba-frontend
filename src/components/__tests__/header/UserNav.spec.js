@@ -10,8 +10,6 @@ const router = createRouter({
   routes: [
     { path: '/', name: 'home', component: { template: '<div />' } },
     { path: '/dashboard', name: 'dashboard', component: { template: '<div />' } },
-    { path: '/dashboard/mis-talleres', name: 'my-workshops', component: { template: '<div />' } },
-    { path: '/dashboard/mi-perfil', name: 'my-profile', component: { template: '<div />' } },
   ],
 })
 
@@ -20,17 +18,12 @@ describe('UserNav.vue', () => {
     router.push('/dashboard')
   })
 
-  it('renders the 4 private area links', async () => {
+  it('renders the 2 private area links', async () => {
     await router.isReady()
     const wrapper = mount(UserNav, { global: { plugins: [router, createPinia()] } })
     const links = wrapper.findAll('.user-nav__link')
-    expect(links).toHaveLength(4)
-    expect(links.map((link) => link.text())).toEqual([
-      'Mi Panel',
-      'Mis Talleres',
-      'Mi Perfil',
-      'Salir',
-    ])
+    expect(links).toHaveLength(2)
+    expect(links.map((link) => link.text())).toEqual(['Mi Panel', 'Salir'])
   })
 
   it('applies the open modifier class when isOpen is true', async () => {
