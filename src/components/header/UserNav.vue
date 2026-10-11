@@ -42,8 +42,8 @@ const authStore = useAuthStore()
 const links = [
   { label: 'Mi Perfil', to: { name: 'dashboard' } },
   { label: 'Inicio', to: { name: 'home' } },
-  { label: 'Talleres', to: { name: 'workshops' } },
   { label: 'Refuerzo', to: { name: 'reinforcement' } },
+  { label: 'Talleres', to: { name: 'workshops' } },
   { label: 'Galería', to: { name: 'gallery' } },
   { label: 'Contacto', to: { name: 'contact' } },
 ]
