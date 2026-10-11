@@ -29,7 +29,10 @@ describe('Auth Store', () => {
 
     await store.login({ email: 'ana@educalba.com', password: 'ClaveSegura123' })
 
-    expect(loginRequest).toHaveBeenCalledWith({ email: 'ana@educalba.com', password: 'ClaveSegura123' })
+    expect(loginRequest).toHaveBeenCalledWith({
+      email: 'ana@educalba.com',
+      password: 'ClaveSegura123',
+    })
     expect(store.user).toEqual({ id: 1, email: 'ana@educalba.com' })
     expect(store.isAuthenticated).toBe(true)
   })
@@ -50,7 +53,7 @@ describe('Auth Store', () => {
     const store = useAuthStore()
     store.user = { id: 1, email: 'ana@educalba.com' }
 
-    await store.logout()
+    await expect(store.logout()).rejects.toThrow('Network error')
 
     expect(store.user).toBeNull()
   })
