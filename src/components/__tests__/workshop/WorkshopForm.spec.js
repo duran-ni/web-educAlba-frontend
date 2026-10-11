@@ -22,8 +22,12 @@ const EXISTING_WORKSHOP = {
 
 async function fillValidForm(wrapper) {
   await wrapper.get('#workshop-name').setValue('Teatro')
+  await wrapper.get('#workshop-description').setValue('Un taller para los más pequeños.')
   await wrapper.get('#workshop-date').setValue('2026-11-02')
   await wrapper.get('#workshop-time').setValue('16:00')
+  await wrapper.get('#workshop-age').setValue('6-10')
+  await wrapper.get('#workshop-room').setValue('Sala A')
+  await wrapper.get('.workshop-form__active-input').setValue(false)
 }
 
 describe('WorkshopForm.vue', () => {
@@ -64,12 +68,12 @@ describe('WorkshopForm.vue', () => {
 
     expect(createWorkshop).toHaveBeenCalledWith({
       name: 'Teatro',
-      description: '',
+      description: 'Un taller para los más pequeños.',
       date: '2026-11-02',
       time: '16:00',
-      recommendedAge: '',
-      room: '',
-      active: true,
+      recommendedAge: '6-10',
+      room: 'Sala A',
+      active: false,
     })
     expect(wrapper.emitted('created')).toEqual([[created]])
   })
