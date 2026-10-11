@@ -10,3 +10,13 @@ export function fetchStudents() {
 export function createStudent(student) {
   return http.post('/admin/students', student)
 }
+
+// Actualiza los datos de un alumno ya existente
+export function updateStudent(id, student) {
+  return http.put(`/admin/students/${id}`, student)
+}
+
+// Da de baja (elimina) a un alumno
+export function deleteStudent(id) {
+  return http.delete(`/admin/students/${id}`)
+}
