@@ -8,4 +8,10 @@ describe('formatWorkshopDate', () => {
 
     expect(result).toBe('sábado, 24 de octubre')
   })
+
+  it('returns an empty string when there is no date', () => {
+    expect(formatWorkshopDate(null)).toBe('')
+    expect(formatWorkshopDate(undefined)).toBe('')
+    expect(formatWorkshopDate('')).toBe('')
+  })
 })
