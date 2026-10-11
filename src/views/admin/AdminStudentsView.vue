@@ -64,6 +64,9 @@
             <th scope="col" class="admin-students-view__cell admin-students-view__cell--head">
               Talleres a los que asiste
             </th>
+            <th scope="col" class="admin-students-view__cell admin-students-view__cell--head">
+              Acciones
+            </th>
           </tr>
         </thead>
 
@@ -82,20 +85,45 @@
             <td class="admin-students-view__cell">
               {{ workshopsForStudent(student.id).join(', ') || '—' }}
             </td>
+            <td class="admin-students-view__cell admin-students-view__cell--actions">
+              <button
+                type="button"
+                class="admin-students-view__edit"
+                :aria-label="`Editar a ${student.firstName} ${student.lastName}`"
+                @click="openEditDialog(student)"
+              >
+                Editar
+              </button>
+              <button
+                type="button"
+                class="admin-students-view__delete"
+                :aria-label="`Eliminar a ${student.firstName} ${student.lastName}`"
+                @click="handleDeleteClick(student)"
+              >
+                Eliminar
+              </button>
+            </td>
           </tr>
         </tbody>
       </table>
     </div>
 
     <dialog ref="dialogRef" class="admin-students-view__dialog" @close="handleDialogClose">
-      <StudentForm @created="handleStudentCreated" @cancel="closeDialog" />
+      <StudentForm
+        :key="editingStudent?.id ?? 'new'"
+        :student="editingStudent"
+        :enrollment="editingStudent ? enrollmentForStudent(editingStudent.id) : null"
+        @created="handleStudentSaved"
+        @updated="handleStudentSaved"
+        @cancel="closeDialog"
+      />
     </dialog>
   </section>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { fetchStudents } from '@/services/students'
+import { fetchStudents, deleteStudent } from '@/services/students'
 import { fetchEnrollments } from '@/services/enrollments'
 import StudentForm from '@/components/student/StudentForm.vue'
 
@@ -106,6 +134,7 @@ const enrollments = ref([])
 const searchTerm = ref('')
 
 const dialogRef = ref(null)
+const editingStudent = ref(null)
 
 onMounted(loadData)
 
@@ -155,7 +184,22 @@ function workshopsForStudent(studentId) {
     .map((enrollment) => enrollment.workshopName)
 }
 
+// Devuelve la inscripción (si existe) del alumno dado, para precargarla en
+// StudentForm al editar. Un alumno de este panel, como mucho, tiene una
+// inscripción a la vez (ver StudentForm), así que basta con la primera
+function enrollmentForStudent(studentId) {
+  return enrollments.value.find((enrollment) => enrollment.studentId === studentId) ?? null
+}
+
 function openDialog() {
+  editingStudent.value = null
+  dialogRef.value.showModal()
+}
+
+// Abre el mismo dialog que "+ Nuevo Alumno", pero guardando qué alumno se
+// quiere editar: el formulario, al recibirlo por prop, precarga sus datos
+function openEditDialog(student) {
+  editingStudent.value = student
   dialogRef.value.showModal()
 }
 
@@ -163,18 +207,45 @@ function closeDialog() {
   dialogRef.value.close()
 }
 
+// Al cerrar el dialog (tanto si se guarda como si se cancela o se pulsa
+// Esc) se limpia el alumno en edición, para que la próxima vez que se abra
+// "+ Nuevo Alumno" no arrastre datos de una edición anterior
 function handleDialogClose() {
-  // No hay campos que limpiar entre aperturas: al no tener modo edición,
-  // StudentForm siempre nace vacío
+  editingStudent.value = null
 }
 
-// Como la inscripción a un taller se crea aparte (ver StudentForm), se
-// vuelve a pedir todo al backend en vez de insertar a mano en memoria:
-// así la tabla queda siempre consistente, incluyendo la columna de
-// "Talleres a los que asiste" si se apuntó a uno al darlo de alta
-function handleStudentCreated() {
+// Sirve tanto para alta como para edición: en ambos casos lo más sencillo
+// y fiable es volver a pedir todo al backend, porque un alta puede incluir
+// una inscripción a un taller que también afecta a la columna de
+// "Talleres a los que asiste"
+function handleStudentSaved() {
   closeDialog()
   loadData()
+}
+
+// Pide confirmación antes de avisar al backend, para evitar que un clic
+// accidental dé de baja a un alumno sin darse cuenta
+async function handleDeleteClick(student) {
+  const confirmed = window.confirm(
+    `¿Seguro que quieres eliminar a "${student.firstName} ${student.lastName}"? Esta acción no se puede deshacer.`
+  )
+
+  if (!confirmed) {
+    return
+  }
+
+  try {
+    await deleteStudent(student.id)
+    students.value = students.value.filter((item) => item.id !== student.id)
+  } catch (error) {
+    if (error.response?.status === 409) {
+      window.alert(
+        'No se puede eliminar este alumno porque tiene inscripciones a talleres. Elimina antes sus inscripciones desde el panel de Talleres.'
+      )
+    } else {
+      window.alert('No se ha podido eliminar el alumno. Inténtalo de nuevo.')
+    }
+  }
 }
 </script>
 
@@ -305,7 +376,7 @@ function handleStudentCreated() {
   }
 
   &__row {
-    border-bottom: 4px solid $color-background-alt;
+    border-bottom: 2px solid $color-background-alt;
 
     &:last-child {
       border-bottom: none;
@@ -327,6 +398,37 @@ function handleStudentCreated() {
     color: $color-primary;
     text-transform: uppercase;
     letter-spacing: 0.03em;
+  }
+
+  &__cell--actions {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  &__edit,
+  &__delete {
+    padding: 0.4rem 0.9rem;
+    border: 2px solid $color-text-dark;
+    border-radius: 999px;
+    background: none;
+    font-family: $font-heading;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+
+    &:hover,
+    &:focus-visible {
+      opacity: 0.75;
+    }
+  }
+
+  &__edit {
+    color: $color-primary;
+  }
+
+  &__delete {
+    color: $color-error;
   }
 
   &__dialog {
