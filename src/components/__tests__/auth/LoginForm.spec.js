@@ -15,6 +15,7 @@ const router = createRouter({
   routes: [
     { path: '/login', name: 'login', component: { template: '<div />' } },
     { path: '/registro', name: 'register', component: { template: '<div />' } },
+    { path: '/recuperar-contrasena', name: 'forgot-password', component: { template: '<div />' } },
     { path: '/dashboard', name: 'dashboard', component: { template: '<div />' } },
     { path: '/admin', name: 'admin', component: { template: '<div />' } },
   ],
