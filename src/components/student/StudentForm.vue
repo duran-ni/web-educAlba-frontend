@@ -1,7 +1,7 @@
 <template>
   <form class="student-form" novalidate @submit.prevent="handleSubmit">
     <div class="student-form__heading">
-      <h2 class="student-form__title">Nuevo alumno</h2>
+      <h2 class="student-form__title">{{ isEditing ? 'Editar alumno' : 'Nuevo alumno' }}</h2>
     </div>
 
     <div class="student-form__row">
@@ -113,11 +113,28 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { createStudent } from '@/services/students'
-import { createEnrollment } from '@/services/enrollments'
+import { createStudent, updateStudent } from '@/services/students'
+import { createEnrollment, deleteEnrollment } from '@/services/enrollments'
 import { fetchWorkshops } from '@/services/workshops'
 
-const emit = defineEmits(['created', 'cancel'])
+// Si se recibe un alumno por prop, el formulario entra en modo edición.
+// "enrollment" es la inscripción a taller que ya tuviera ese alumno (o
+// null si no tenía ninguna); sirve para precargar la casilla y el taller,
+// y para saber qué cambió al guardar
+const props = defineProps({
+  student: {
+    type: Object,
+    default: null,
+  },
+  enrollment: {
+    type: Object,
+    default: null,
+  },
+})
+
+const emit = defineEmits(['created', 'updated', 'cancel'])
+
+const isEditing = computed(() => props.student !== null)
 
 // Mismas etapas que contempla el backend (enum EducationalStage), ya usadas
 // en RegisterForm.vue
@@ -127,15 +144,17 @@ const EDUCATIONAL_STAGES = [
   { value: 'ESO', label: 'E.S.O. (1º a 4º)' },
 ]
 
-const firstName = ref('')
-const lastName = ref('')
-const educationalStage = ref('')
+const firstName = ref(props.student?.firstName ?? '')
+const lastName = ref(props.student?.lastName ?? '')
+const educationalStage = ref(props.student?.educationalStage ?? '')
 
 // Este panel es solo para altas formales (Refuerzo); por eso el servicio
-// ya no se elige, es siempre el mismo. A mayores, se puede marcar que el
-// alumno también asiste a un taller concreto
-const attendsWorkshop = ref(false)
-const workshopId = ref('')
+// no se elige, es siempre el mismo. A mayores, se puede marcar que el
+// alumno también asiste a un taller concreto — tanto al darlo de alta
+// como, ahora, al editarlo. Si ya tenía una inscripción, el formulario
+// nace con la casilla marcada y ese taller ya seleccionado
+const attendsWorkshop = ref(Boolean(props.enrollment))
+const workshopId = ref(props.enrollment?.workshopId ?? '')
 
 const firstNameError = ref('')
 const lastNameError = ref('')
@@ -159,9 +178,13 @@ onMounted(async () => {
   }
 })
 
-const submitButtonLabel = computed(() =>
-  status.value === 'submitting' ? 'Guardando…' : 'Guardar alumno'
-)
+const submitButtonLabel = computed(() => {
+  if (status.value === 'submitting') {
+    return 'Guardando…'
+  }
+
+  return isEditing.value ? 'Guardar cambios' : 'Guardar alumno'
+})
 
 function validate() {
   firstNameError.value = firstName.value ? '' : 'Escribe el nombre del alumno/a'
@@ -188,10 +211,18 @@ async function handleSubmit() {
     firstName: firstName.value,
     lastName: lastName.value,
     educationalStage: educationalStage.value,
-    serviceOfInterest: 'Clases de Refuerzo',
+    serviceOfInterest: isEditing.value ? props.student.serviceOfInterest : 'Clases de Refuerzo',
   }
 
   try {
+    if (isEditing.value) {
+      const response = await updateStudent(props.student.id, payload)
+      await reconcileWorkshopEnrollment(props.student.id)
+      status.value = 'idle'
+      emit('updated', response.data)
+      return
+    }
+
     const studentResponse = await createStudent(payload)
 
     if (attendsWorkshop.value) {
@@ -202,7 +233,9 @@ async function handleSubmit() {
     emit('created', studentResponse.data)
   } catch {
     status.value = 'error'
-    submitErrorMessage.value = 'No hemos podido guardar el alumno. Inténtalo de nuevo en unos minutos.'
+    submitErrorMessage.value = isEditing.value
+      ? 'No hemos podido guardar los cambios. Inténtalo de nuevo en unos minutos.'
+      : 'No hemos podido guardar el alumno. Inténtalo de nuevo en unos minutos.'
   }
 }
 
@@ -210,16 +243,64 @@ async function handleSubmit() {
 // inscripción al taller, se avisa aparte en vez de tratarlo como un fallo
 // del alta completa (el alumno no debe perderse por este segundo paso)
 async function enrollInWorkshop(studentId) {
-  try {
-    await createEnrollment({
+  await safelyUpdateEnrollment(() =>
+    createEnrollment({
       studentId,
       workshopId: Number(workshopId.value),
       enrollmentDate: new Date().toISOString().slice(0, 10),
       progress: '',
     })
+  )
+}
+
+// Solo se usa al editar: compara la inscripción con la que entró el
+// formulario (props.enrollment) con lo que se ha dejado marcado, y hace
+// solo la llamada necesaria — crear, borrar, o sustituir la inscripción —
+// en vez de tocar siempre algo
+async function reconcileWorkshopEnrollment(studentId) {
+  const original = props.enrollment
+  const wantsWorkshop = attendsWorkshop.value
+  const selectedWorkshopId = wantsWorkshop ? Number(workshopId.value) : null
+
+  // No tenía taller y sigue sin marcarlo: nada que hacer
+  if (!original && !wantsWorkshop) {
+    return
+  }
+
+  // Tenía taller y lo ha desmarcado: se da de baja la inscripción
+  if (original && !wantsWorkshop) {
+    await safelyUpdateEnrollment(() => deleteEnrollment(original.id))
+    return
+  }
+
+  // No tenía taller y ahora lo marca: se crea la inscripción
+  if (!original && wantsWorkshop) {
+    await enrollInWorkshop(studentId)
+    return
+  }
+
+  // Tenía taller y lo ha cambiado por otro distinto: se sustituye
+  if (original && wantsWorkshop && original.workshopId !== selectedWorkshopId) {
+    await safelyUpdateEnrollment(async () => {
+      await deleteEnrollment(original.id)
+      await createEnrollment({
+        studentId,
+        workshopId: selectedWorkshopId,
+        enrollmentDate: new Date().toISOString().slice(0, 10),
+        progress: '',
+      })
+    })
+  }
+
+  // Si el taller marcado es el mismo que ya tenía, no hay nada que cambiar
+}
+
+async function safelyUpdateEnrollment(action) {
+  try {
+    await action()
   } catch {
     window.alert(
-      'El alumno se ha guardado, pero no hemos podido apuntarlo al taller. Puedes apuntarlo después desde el panel de Talleres.'
+      'Los datos del alumno se han guardado, pero no hemos podido actualizar su inscripción al taller. Puedes gestionarla desde el panel de Talleres.'
     )
   }
 }
