@@ -46,7 +46,9 @@ describe('WorkshopEnrollmentForm.vue', () => {
     const wrapper = mount(WorkshopEnrollmentForm)
     await flushPromises()
 
-    expect(wrapper.text()).toContain('No hemos podido cargar los talleres. Inténtalo de nuevo más tarde.')
+    expect(wrapper.text()).toContain(
+      'No hemos podido cargar los talleres. Inténtalo de nuevo más tarde.'
+    )
   })
 
   it('blocks the submission and shows an error for each empty required field', async () => {
@@ -63,13 +65,13 @@ describe('WorkshopEnrollmentForm.vue', () => {
     expect(wrapper.text()).toContain('Selecciona al menos un taller')
   })
 
-  it('blocks the submission and shows an error when the age is zero or less', async () => {
+  it('blocks the submission and shows an error when the age is negative', async () => {
     fetchWorkshops.mockResolvedValueOnce({ status: 200, data: SAMPLE_WORKSHOPS })
     const wrapper = mount(WorkshopEnrollmentForm)
     await flushPromises()
 
     await wrapper.find('#enrollment-student-name').setValue('Ana')
-    await wrapper.find('#enrollment-age').setValue('0')
+    await wrapper.find('#enrollment-age').setValue('-5')
     await wrapper.find('#enrollment-phone').setValue('612345678')
     await wrapper.find('input[type="checkbox"]').setValue(true)
     await wrapper.find('form').trigger('submit.prevent')
