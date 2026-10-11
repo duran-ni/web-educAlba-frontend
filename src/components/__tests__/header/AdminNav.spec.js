@@ -1,9 +1,14 @@
-import { describe, it, expect, beforeEach } from 'vitest'
-import { mount } from '@vue/test-utils'
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
+import { mount, flushPromises } from '@vue/test-utils'
 import { createRouter, createWebHistory } from 'vue-router'
 import { createPinia } from 'pinia'
 
 import AdminNav from '../../header/AdminNav.vue'
+import { logout } from '@/services/auth'
+
+vi.mock('@/services/auth', () => ({
+  logout: vi.fn(),
+}))
 
 const router = createRouter({
   history: createWebHistory(),
@@ -19,6 +24,10 @@ const router = createRouter({
 describe('AdminNav.vue', () => {
   beforeEach(() => {
     router.push('/')
+  })
+
+  afterEach(() => {
+    vi.clearAllMocks()
   })
 
   it('renders the 6 admin navigation links', async () => {
@@ -43,5 +52,18 @@ describe('AdminNav.vue', () => {
     const activeLinks = wrapper.findAll('.admin-nav__link--active')
     expect(activeLinks).toHaveLength(1)
     expect(activeLinks[0].text()).toBe('Dashboard')
+  })
+
+  it('logs out and redirects to the public home page when "Salir" is clicked', async () => {
+    logout.mockResolvedValueOnce({})
+    await router.push({ name: 'admin' })
+    await router.isReady()
+    const wrapper = mount(AdminNav, { global: { plugins: [router, createPinia()] } })
+
+    await wrapper.get('.admin-nav__logout').trigger('click')
+    await flushPromises()
+
+    expect(logout).toHaveBeenCalled()
+    expect(router.currentRoute.value.name).toBe('home')
   })
 })
