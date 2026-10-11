@@ -1,9 +1,14 @@
-import { describe, it, expect, beforeEach } from 'vitest'
-import { mount } from '@vue/test-utils'
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
+import { mount, flushPromises } from '@vue/test-utils'
 import { createRouter, createWebHistory } from 'vue-router'
 import { createPinia } from 'pinia'
 
 import UserNav from '../../header/UserNav.vue'
+import { logout } from '@/services/auth'
+
+vi.mock('@/services/auth', () => ({
+  logout: vi.fn(),
+}))
 
 const router = createRouter({
   history: createWebHistory(),
@@ -20,6 +25,10 @@ const router = createRouter({
 describe('UserNav.vue', () => {
   beforeEach(() => {
     router.push('/dashboard')
+  })
+
+  afterEach(() => {
+    vi.clearAllMocks()
   })
 
   it('renders the 7 private area links', async () => {
@@ -52,5 +61,18 @@ describe('UserNav.vue', () => {
     const wrapper = mount(UserNav, { global: { plugins: [router, createPinia()] } })
     await wrapper.get('.user-nav__link').trigger('click')
     expect(wrapper.emitted('navigate')).toHaveLength(1)
+  })
+
+  it('logs out, closes the menu and redirects to the public home page when "Salir" is clicked', async () => {
+    logout.mockResolvedValueOnce({})
+    await router.isReady()
+    const wrapper = mount(UserNav, { global: { plugins: [router, createPinia()] } })
+
+    await wrapper.get('.user-nav__logout').trigger('click')
+    await flushPromises()
+
+    expect(wrapper.emitted('navigate')).toHaveLength(1)
+    expect(logout).toHaveBeenCalled()
+    expect(router.currentRoute.value.name).toBe('home')
   })
 })
