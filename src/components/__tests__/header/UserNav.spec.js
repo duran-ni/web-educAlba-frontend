@@ -30,8 +30,8 @@ describe('UserNav.vue', () => {
     expect(links.map((link) => link.text())).toEqual([
       'Mi Perfil',
       'Inicio',
-      'Talleres',
       'Refuerzo',
+      'Talleres',
       'Galería',
       'Contacto',
       'Salir',
