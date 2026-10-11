@@ -26,8 +26,8 @@ const authStore = useAuthStore()
 const links = [
   { label: 'Inicio', to: { name: 'home' } },
   { label: 'Dashboard', to: { name: 'admin' } },
-  { label: 'Talleres', to: { name: 'workshops' } },
   { label: 'Refuerzo', to: { name: 'reinforcement' } },
+  { label: 'Talleres', to: { name: 'workshops' } },
   { label: 'Alumnos', to: { name: 'students' } },
 ]
 
