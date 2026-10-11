@@ -33,6 +33,22 @@ describe('WorkshopEnrollmentForm.vue', () => {
     expect(wrapper.text()).toContain('Robotics')
   })
 
+  it('shows a message when there are no workshops available', async () => {
+    fetchWorkshops.mockResolvedValueOnce({ status: 200, data: [] })
+    const wrapper = mount(WorkshopEnrollmentForm)
+    await flushPromises()
+
+    expect(wrapper.text()).toContain('No hay talleres disponibles actualmente.')
+  })
+
+  it('shows an error message when the workshops fail to load', async () => {
+    fetchWorkshops.mockRejectedValueOnce(new Error('network error'))
+    const wrapper = mount(WorkshopEnrollmentForm)
+    await flushPromises()
+
+    expect(wrapper.text()).toContain('No hemos podido cargar los talleres. Inténtalo de nuevo más tarde.')
+  })
+
   it('blocks the submission and shows an error for each empty required field', async () => {
     fetchWorkshops.mockResolvedValueOnce({ status: 200, data: SAMPLE_WORKSHOPS })
     const wrapper = mount(WorkshopEnrollmentForm)
@@ -45,6 +61,21 @@ describe('WorkshopEnrollmentForm.vue', () => {
     expect(wrapper.text()).toContain('Escribe la edad')
     expect(wrapper.text()).toContain('Escribe un teléfono de contacto')
     expect(wrapper.text()).toContain('Selecciona al menos un taller')
+  })
+
+  it('blocks the submission and shows an error when the age is zero or less', async () => {
+    fetchWorkshops.mockResolvedValueOnce({ status: 200, data: SAMPLE_WORKSHOPS })
+    const wrapper = mount(WorkshopEnrollmentForm)
+    await flushPromises()
+
+    await wrapper.find('#enrollment-student-name').setValue('Ana')
+    await wrapper.find('#enrollment-age').setValue('0')
+    await wrapper.find('#enrollment-phone').setValue('612345678')
+    await wrapper.find('input[type="checkbox"]').setValue(true)
+    await wrapper.find('form').trigger('submit.prevent')
+
+    expect(submitEnrollment).not.toHaveBeenCalled()
+    expect(wrapper.text()).toContain('La edad debe ser un número mayor que 0')
   })
 
   it('blocks the submission and shows an error when the phone format is invalid', async () => {
