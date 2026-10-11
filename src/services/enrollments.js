@@ -11,6 +11,12 @@ export function fetchEnrollments() {
     return http.get('/admin/enrollments')
 }
 
+// Apunta a un alumno ya dado de alta a un taller concreto, desde el panel
+// de administración (p. ej. al registrarlo con "Alta de alumno")
+export function createEnrollment(enrollment) {
+    return http.post('/admin/enrollments', enrollment)
+}
+
 // Elimina la inscripción de un alumno en un taller concreto
 export function deleteEnrollment(id) {
     return http.delete(`/admin/enrollments/${id}`)
