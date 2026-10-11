@@ -41,6 +41,14 @@ describe('router navigation guard', () => {
     expect(router.currentRoute.value.name).toBe('students')
   })
 
+  it('allows access to the admin dashboard once the user is authenticated', async () => {
+    const authStore = useAuthStore()
+    authStore.user = { email: 'admin@educalba.com', roles: ['ADMINISTRADOR'] }
+
+    await router.push({ name: 'admin' })
+    expect(router.currentRoute.value.name).toBe('admin')
+  })
+
   it('does not require authentication for the registration and password-recovery routes', async () => {
     await router.push({ name: 'register' })
     expect(router.currentRoute.value.name).toBe('register')
@@ -50,6 +58,11 @@ describe('router navigation guard', () => {
 
     await router.push({ name: 'reset-password' })
     expect(router.currentRoute.value.name).toBe('reset-password')
+  })
+
+  it('does not require authentication to view the contact page', async () => {
+    await router.push({ name: 'contact' })
+    expect(router.currentRoute.value.name).toBe('contact')
   })
 
   it('falls back to the not-found view for an unknown URL', async () => {
