@@ -13,23 +13,46 @@ describe('WorkshopsList.vue', () => {
     vi.clearAllMocks()
   })
 
-  const workshop = {
-    id: 1,
-    name: 'Manos a la obra',
-    description: 'Un taller sensorial pensado para los más pequeños.',
-    date: '2026-10-24',
-    recommendedAge: '1-2 años',
-    room: null,
-    active: true,
-  }
+  it('shows a loading message while the workshops are being fetched', () => {
+    fetchWorkshops.mockReturnValueOnce(new Promise(() => {}))
 
-  it('shows a card for each active workshop', async () => {
-    fetchWorkshops.mockResolvedValueOnce({ status: 200, data: [workshop] })
+    const wrapper = mount(WorkshopsList)
+
+    expect(wrapper.text()).toContain('Cargando talleres…')
+  })
+
+  it('shows a card for each active workshop once they are loaded', async () => {
+    fetchWorkshops.mockResolvedValueOnce({
+      status: 200,
+      data: [
+        {
+          id: 1,
+          name: 'Manos a la obra',
+          description: 'Un taller sensorial pensado para los más pequeños.',
+          date: '2026-10-24',
+          time: '11:00:00',
+          recommendedAge: '1-2 años',
+          room: null,
+          active: true,
+        },
+        {
+          id: 2,
+          name: 'Cuentacuentos',
+          description: 'Historias para despertar la imaginación.',
+          date: '2026-11-02',
+          time: '17:30:00',
+          recommendedAge: '3-5 años',
+          room: null,
+          active: true,
+        },
+      ],
+    })
 
     const wrapper = mount(WorkshopsList)
     await flushPromises()
 
     expect(wrapper.text()).toContain('Manos a la obra')
+    expect(wrapper.text()).toContain('Cuentacuentos')
   })
 
   it('shows an empty state when there are no active workshops', async () => {
