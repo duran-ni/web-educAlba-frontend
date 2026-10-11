@@ -35,8 +35,8 @@ describe('NavMenu.vue', () => {
     const labels = links.map((link) => link.text())
     expect(labels).toEqual([
       'Inicio',
-      'Talleres',
       'Refuerzo',
+      'Talleres',
       'Quiénes Somos',
       'Qué Hacemos',
       'Galería',
