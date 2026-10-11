@@ -29,8 +29,8 @@ describe('AdminNav.vue', () => {
     expect(links.map((link) => link.text())).toEqual([
       'Inicio',
       'Dashboard',
-      'Talleres',
       'Refuerzo',
+      'Talleres',
       'Alumnos',
       'Salir',
     ])
