@@ -1,19 +1,19 @@
 <template>
   <section class="admin-students-view">
     <div class="admin-students-view__header">
-      <h1 class="admin-students-view__title">Alumnos</h1>
+      <div class="admin-students-view__header-top">
+        <h1 class="admin-students-view__title">Alumnos</h1>
+        <button type="button" class="admin-students-view__new-student" @click="openDialog">
+          <span class="material-symbols-outlined" aria-hidden="true">person_add</span>
+          + Nuevo Alumno
+        </button>
+      </div>
 
-      <img
-        src="@/assets/alumnos.jpeg"
-        alt=""
-        class="admin-students-view__header-image"
-      />
+      <img src="@/assets/alumnos.jpeg" alt="" class="admin-students-view__header-image" />
     </div>
 
     <div class="admin-students-view__search-field">
-      <label class="admin-students-view__search-label" for="student-search">
-        Buscar alumno
-      </label>
+      <label class="admin-students-view__search-label" for="student-search"> Buscar alumno </label>
       <input
         id="student-search"
         v-model="searchTerm"
@@ -86,6 +86,10 @@
         </tbody>
       </table>
     </div>
+
+    <dialog ref="dialogRef" class="admin-students-view__dialog" @close="handleDialogClose">
+      <StudentForm @created="handleStudentCreated" @cancel="closeDialog" />
+    </dialog>
   </section>
 </template>
 
@@ -93,12 +97,15 @@
 import { ref, computed, onMounted } from 'vue'
 import { fetchStudents } from '@/services/students'
 import { fetchEnrollments } from '@/services/enrollments'
+import StudentForm from '@/components/student/StudentForm.vue'
 
 // loading | loaded | error
 const status = ref('loading')
 const students = ref([])
 const enrollments = ref([])
 const searchTerm = ref('')
+
+const dialogRef = ref(null)
 
 onMounted(loadData)
 
@@ -121,7 +128,9 @@ async function loadData() {
 // Solo se muestran los alumnos con alta formal (clases de Refuerzo); los
 // que únicamente se han apuntado a un taller puntual quedan como PENDING
 // y se gestionan desde el panel de Talleres, no desde esta vista
-const activeStudents = computed(() => students.value.filter((student) => student.status === 'ACTIVE'))
+const activeStudents = computed(() =>
+  students.value.filter((student) => student.status === 'ACTIVE')
+)
 
 // Filtra, del lado del frontend, los alumnos activos cuyo nombre completo
 // contiene el texto buscado (sin distinguir mayúsculas/minúsculas); si no
@@ -145,6 +154,28 @@ function workshopsForStudent(studentId) {
     .filter((enrollment) => enrollment.studentId === studentId)
     .map((enrollment) => enrollment.workshopName)
 }
+
+function openDialog() {
+  dialogRef.value.showModal()
+}
+
+function closeDialog() {
+  dialogRef.value.close()
+}
+
+function handleDialogClose() {
+  // No hay campos que limpiar entre aperturas: al no tener modo edición,
+  // StudentForm siempre nace vacío
+}
+
+// Como la inscripción a un taller se crea aparte (ver StudentForm), se
+// vuelve a pedir todo al backend en vez de insertar a mano en memoria:
+// así la tabla queda siempre consistente, incluyendo la columna de
+// "Talleres a los que asiste" si se apuntó a uno al darlo de alta
+function handleStudentCreated() {
+  closeDialog()
+  loadData()
+}
 </script>
 
 <style lang="scss">
@@ -159,13 +190,41 @@ function workshopsForStudent(studentId) {
     margin-bottom: 2rem;
   }
 
+  &__header-top {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  &__new-student {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border: 2px solid $color-text-dark;
+    border-radius: 999px;
+    background-color: $color-primary;
+    color: $color-background;
+    font-family: $font-heading;
+    font-weight: 600;
+    box-shadow: 4px 4px 0 0 $color-text-dark;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+
+    &:hover,
+    &:focus-visible {
+      opacity: 0.9;
+    }
+  }
+
   &__header-image {
     width: 32rem;
     height: 16rem;
     flex-shrink: 0;
     object-fit: cover;
     border-radius: 999px;
-    transform: rotate(5deg)translateY(2rem) translateX(-4rem);
+    transform: rotate(5deg) translateY(2rem) translateX(-4rem);
     @include doodle-frame;
   }
 
@@ -246,7 +305,7 @@ function workshopsForStudent(studentId) {
   }
 
   &__row {
-    border-bottom: 1px solid $color-background-alt;
+    border-bottom: 4px solid $color-background-alt;
 
     &:last-child {
       border-bottom: none;
@@ -268,6 +327,19 @@ function workshopsForStudent(studentId) {
     color: $color-primary;
     text-transform: uppercase;
     letter-spacing: 0.03em;
+  }
+
+  &__dialog {
+    margin: auto;
+    width: min(90vw, 40rem);
+    padding: 2rem;
+    border: 2px solid $color-text-dark;
+    border-radius: 1rem;
+    box-shadow: 4px 4px 0 0 $color-text-dark;
+
+    &::backdrop {
+      background-color: rgba($color-text-dark, 0.5);
+    }
   }
 }
 </style>
