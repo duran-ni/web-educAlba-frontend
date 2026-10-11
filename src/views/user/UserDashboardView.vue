@@ -11,7 +11,9 @@
 
     <div v-else class="user-dashboard-view__greeting">
       <h1 class="user-dashboard-view__title">¡Hola, {{ profile.firstName }}!</h1>
-      <p class="user-dashboard-view__subtitle">Tu cuaderno de aventuras y descubrimientos de hoy.</p>
+      <p class="user-dashboard-view__subtitle">
+        Tu cuaderno de aventuras y descubrimientos de hoy.
+      </p>
     </div>
 
     <div class="user-dashboard-view__workshops">
@@ -29,7 +31,11 @@
       </p>
 
       <p v-else-if="workshopsStatus === 'empty'" class="user-dashboard-view__message">
-        Todavía no estás inscrito en ningún taller.
+        ¡No estás apuntado a ningún taller! Mira los que tenemos disponibles en la sección
+        <RouterLink :to="{ name: 'workshops' }" class="user-dashboard-view__link"
+          >Talleres</RouterLink
+        >
+        y si te gusta alguno consulta a tus padres si te puedes apuntar.
       </p>
 
       <div v-else class="user-dashboard-view__workshops-grid">
@@ -46,6 +52,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { fetchMyProfile, fetchMyWorkshops } from '@/services/dashboard'
+import { RouterLink } from 'vue-router'
 import MyWorkshopCard from '@/components/workshop/MyWorkshopCard.vue'
 
 // loading | loaded | error
@@ -87,6 +94,13 @@ async function loadWorkshops() {
 
   &__message {
     color: $color-text-dark;
+    font-family: $font-doodle;
+    font-size: 1.125rem;
+  }
+
+  &__link {
+    color: $color-primary;
+    font-weight: 600;
   }
 
   &__message--error {
