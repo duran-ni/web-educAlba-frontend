@@ -85,7 +85,7 @@ describe('WorkshopForm.vue', () => {
 
     expect(updateWorkshop).toHaveBeenCalledWith(
       EXISTING_WORKSHOP.id,
-      expect.objectContaining({ name: 'Robótica avanzada' }),
+      expect.objectContaining({ name: 'Robótica avanzada' })
     )
     expect(wrapper.emitted('updated')).toEqual([[updated]])
   })
@@ -99,7 +99,7 @@ describe('WorkshopForm.vue', () => {
     await flushPromises()
 
     expect(wrapper.find('[role="alert"]').text()).toBe(
-      'No hemos podido guardar el taller. Inténtalo de nuevo en unos minutos.',
+      'No hemos podido guardar el taller. Inténtalo de nuevo en unos minutos.'
     )
   })
 
@@ -111,8 +111,28 @@ describe('WorkshopForm.vue', () => {
     await flushPromises()
 
     expect(wrapper.find('[role="alert"]').text()).toBe(
-      'No hemos podido guardar los cambios. Inténtalo de nuevo en unos minutos.',
+      'No hemos podido guardar los cambios. Inténtalo de nuevo en unos minutos.'
     )
+  })
+
+  it('shows "Guardando…" and disables both buttons while the request is in flight', async () => {
+    let resolveCreate
+    createWorkshop.mockReturnValueOnce(
+      new Promise((resolve) => {
+        resolveCreate = resolve
+      })
+    )
+    const wrapper = mount(WorkshopForm)
+    await fillValidForm(wrapper)
+
+    await wrapper.find('form').trigger('submit.prevent')
+
+    expect(wrapper.get('.workshop-form__submit').text()).toBe('Guardando…')
+    expect(wrapper.get('.workshop-form__submit').attributes('disabled')).toBeDefined()
+    expect(wrapper.get('.workshop-form__cancel').attributes('disabled')).toBeDefined()
+
+    resolveCreate({ data: { id: 1 } })
+    await flushPromises()
   })
 
   it('emits "cancel" when "Cancelar" is clicked', async () => {
