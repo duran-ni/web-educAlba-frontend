@@ -1,10 +1,6 @@
 <template>
   <nav class="admin-nav" aria-label="Navegación del panel de administración">
-    <ul
-      id="admin-nav-list"
-      class="admin-nav__list"
-      :class="{ 'admin-nav__list--open': isOpen }"
-    >
+    <ul id="admin-nav-list" class="admin-nav__list" :class="{ 'admin-nav__list--open': isOpen }">
       <li v-for="link in links" :key="link.to.name" class="admin-nav__item">
         <RouterLink
           :to="link.to"
@@ -70,6 +66,7 @@ async function handleLogout() {
     right: 0;
     padding: 1rem 1.5rem;
     background-color: $color-background;
+    z-index: 10;
 
     &--open {
       display: flex;
