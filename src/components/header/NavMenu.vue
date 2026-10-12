@@ -1,10 +1,6 @@
 <template>
   <nav class="nav-menu">
-    <ul
-      id="main-nav"
-      class="nav-menu__list"
-      :class="{ 'nav-menu__list--open': isOpen }"
-    >
+    <ul id="main-nav" class="nav-menu__list" :class="{ 'nav-menu__list--open': isOpen }">
       <li v-for="link in links" :key="link.to.name" class="nav-menu__item">
         <RouterLink
           :to="link.to"
@@ -54,6 +50,7 @@ const links = [
     right: 0;
     padding: 1rem 1.5rem;
     background-color: $color-background;
+    z-index: 10;
 
     &--open {
       display: flex;
