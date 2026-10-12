@@ -64,14 +64,19 @@ const initialSubject = computed(() => {
 // localice bien (con comas entre calle, codigo postal, localidad, provincia y
 // pais). No se muestra en pantalla: solo se usa para construir las URLs del
 // mapa. El texto que ve la persona sigue siendo CONTACT.address, tal cual.
-const MAP_SEARCH_ADDRESS = 'Urbanización Cooperativa Pablo Iglesias, 2, 33920 Riaño, Langreo, Asturias, España'
+const MAP_SEARCH_ADDRESS =
+  'Urbanización Cooperativa Pablo Iglesias, 2, 33920 Riaño, Langreo, Asturias, España'
 
 // URL del mapa embebido de Google Maps, generada a partir de la direccion
 // formateada para busquedas (MAP_SEARCH_ADDRESS)
-const mapEmbedUrl = computed(() => `https://www.google.com/maps?q=${encodeURIComponent(MAP_SEARCH_ADDRESS)}&output=embed`)
+const mapEmbedUrl = computed(
+  () => `https://www.google.com/maps?q=${encodeURIComponent(MAP_SEARCH_ADDRESS)}&output=embed`
+)
 
 // URL real de Google Maps (no la de "embed") para abrir la ubicacion en una pestana nueva al hacer clic
-const mapLinkUrl = computed(() => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(MAP_SEARCH_ADDRESS)}`)
+const mapLinkUrl = computed(
+  () => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(MAP_SEARCH_ADDRESS)}`
+)
 </script>
 
 <style lang="scss">
@@ -157,7 +162,12 @@ const mapLinkUrl = computed(() => `https://www.google.com/maps/search/?api=1&que
   border: 2px dashed $color-text-dark;
   border-radius: 1rem;
   background-color: $color-background-soft;
-  transform: translateX(7rem);
+
+  // El desplazamiento solo aplica
+  // cuando el layout pasa a 2 columnas en escritorio
+  @include respond-to(desktop) {
+    transform: translateX(7rem);
+  }
 
   &__title {
     margin: 0 0 1rem;
