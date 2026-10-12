@@ -153,8 +153,14 @@ async function handleSubmit() {
   flex-direction: column;
   gap: 1rem;
   background-color: $color-accent-yellow-soft;
-  transform: translateX(-5rem) rotate(-3deg);
   @include doodle-frame;
+
+  // El desplazamiento "pegado con celo" solo tiene sentido cuando el
+  // formulario convive con el mapa en la rejilla de 2 columnas
+  // (ver .contact-view__grid en ContactView.vue, breakpoint desktop)
+  @include respond-to(desktop) {
+    transform: translateX(-5rem) rotate(-3deg);
+  }
 
   &__tape {
     position: absolute;
