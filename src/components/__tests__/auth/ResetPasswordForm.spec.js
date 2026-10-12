@@ -52,7 +52,7 @@ describe('ResetPasswordForm.vue', () => {
     expect(resetPassword).not.toHaveBeenCalled()
     expect(wrapper.find('#reset-password-password-error').text()).toBe('Escribe una contraseña')
     expect(wrapper.find('#reset-password-confirm-password-error').text()).toBe(
-      'Confirma tu contraseña',
+      'Confirma tu contraseña'
     )
   })
 
@@ -65,7 +65,7 @@ describe('ResetPasswordForm.vue', () => {
 
     expect(resetPassword).not.toHaveBeenCalled()
     expect(wrapper.find('#reset-password-password-error').text()).toBe(
-      'La contraseña debe tener al menos 8 caracteres',
+      'La contraseña debe tener al menos 8 caracteres'
     )
   })
 
@@ -78,7 +78,7 @@ describe('ResetPasswordForm.vue', () => {
 
     expect(resetPassword).not.toHaveBeenCalled()
     expect(wrapper.find('#reset-password-confirm-password-error').text()).toBe(
-      'Las contraseñas no coinciden',
+      'Las contraseñas no coinciden'
     )
   })
 
@@ -113,6 +113,19 @@ describe('ResetPasswordForm.vue', () => {
     expect(wrapper.text()).toContain('El enlace de restablecimiento ha caducado')
   })
 
+  it('shows the default invalid-link message when the backend sends no message with the 400', async () => {
+    resetPassword.mockRejectedValueOnce({ response: { status: 400 } })
+    const wrapper = await mountFormWithToken()
+
+    await wrapper.get('#reset-password-password').setValue('Clave1234')
+    await wrapper.get('#reset-password-confirm-password').setValue('Clave1234')
+    await wrapper.find('form').trigger('submit.prevent')
+    await flushPromises()
+
+    expect(wrapper.find('.reset-password-form--info').exists()).toBe(true)
+    expect(wrapper.text()).toContain('El enlace de restablecimiento no es válido.')
+  })
+
   it('shows a generic error message for any other failure', async () => {
     resetPassword.mockRejectedValueOnce(new Error('network error'))
     const wrapper = await mountFormWithToken()
@@ -123,7 +136,7 @@ describe('ResetPasswordForm.vue', () => {
     await flushPromises()
 
     expect(wrapper.find('[role="alert"]').text()).toBe(
-      'No hemos podido actualizar tu contraseña. Inténtalo de nuevo en unos minutos.',
+      'No hemos podido actualizar tu contraseña. Inténtalo de nuevo en unos minutos.'
     )
   })
 })
