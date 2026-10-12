@@ -62,6 +62,40 @@ describe('WorkshopsCalendar.vue', () => {
     expect(findDayButton(wrapper, 10).classes()).not.toContain('workshops-calendar__day--marked')
   })
 
+  it('groups two workshops that fall on the same day', async () => {
+    fetchWorkshops.mockResolvedValue({
+      status: 200,
+      data: [
+        {
+          id: 1,
+          name: 'Manos a la obra',
+          description: 'Un taller sensorial.',
+          date: '2026-10-24',
+          time: '11:00:00',
+          active: true,
+        },
+        {
+          id: 2,
+          name: 'Cuentacuentos',
+          description: 'Un taller de narración.',
+          date: '2026-10-24',
+          time: '17:00:00',
+          active: true,
+        },
+      ],
+    })
+
+    const wrapper = mount(WorkshopsCalendar)
+    await flushPromises()
+
+    const day24 = findDayButton(wrapper, 24)
+    await day24.trigger('mouseenter')
+
+    expect(wrapper.text()).toContain('Manos a la obra')
+    expect(wrapper.text()).toContain('Cuentacuentos')
+    expect(wrapper.findAll('.workshops-calendar__detail-item')).toHaveLength(2)
+  })
+
   it('does not mark a workshop that falls outside the current month', async () => {
     fetchWorkshops.mockResolvedValue({
       status: 200,
@@ -121,7 +155,9 @@ describe('WorkshopsCalendar.vue', () => {
     await day10.trigger('mouseenter')
 
     expect(wrapper.find('.workshops-calendar__detail').exists()).toBe(false)
-    expect(wrapper.text()).toContain('Pulsa o pasa el cursor sobre un día marcado para ver el taller.')
+    expect(wrapper.text()).toContain(
+      'Pulsa o pasa el cursor sobre un día marcado para ver el taller.'
+    )
   })
 
   it('keeps the workshop detail visible after a click, even once the cursor leaves', async () => {
