@@ -1,9 +1,11 @@
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
+import { nextTick } from 'vue'
 import { createRouter, createWebHistory } from 'vue-router'
-import { createPinia } from 'pinia'
+import { createPinia, setActivePinia } from 'pinia'
 
 import AppHeader from '../../header/AppHeader.vue'
+import { useAuthStore } from '@/stores/auth'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -24,6 +26,15 @@ const router = createRouter({
     { path: '/dashboard/mi-perfil', name: 'my-profile', component: { template: '<div />' } },
   ],
 })
+
+function mountHeader(props) {
+  const pinia = createPinia()
+  setActivePinia(pinia)
+  return {
+    wrapper: mount(AppHeader, { props, global: { plugins: [router, pinia] } }),
+    store: useAuthStore(),
+  }
+}
 
 describe('AppHeader.vue', () => {
   it('renders the navigation menu, login button and register button in the full variant', async () => {
@@ -67,5 +78,45 @@ describe('AppHeader.vue', () => {
     })
     expect(wrapper.find('.user-nav').exists()).toBe(true)
     expect(wrapper.find('.nav-toggle').attributes('aria-controls')).toBe('user-nav-list')
+  })
+
+  it('renders the dashboard button instead of the login and register buttons for an authenticated user', async () => {
+    await router.push('/')
+    await router.isReady()
+    const { wrapper, store } = mountHeader()
+    store.user = { email: 'familia@educalba.com', roles: ['ALUMNO_FAMILIA'] }
+    await nextTick()
+
+    expect(wrapper.find('.dashboard-button').exists()).toBe(true)
+    expect(wrapper.find('.login-button').exists()).toBe(false)
+    expect(wrapper.find('.register-button').exists()).toBe(false)
+  })
+
+  it('opens the navigation menu when the toggle button is clicked, and closes it when clicked again', async () => {
+    await router.push('/')
+    await router.isReady()
+    const { wrapper } = mountHeader()
+
+    const toggle = wrapper.get('.nav-toggle')
+    const menuList = wrapper.get('.nav-menu__list')
+    expect(menuList.classes()).not.toContain('nav-menu__list--open')
+
+    await toggle.trigger('click')
+    expect(menuList.classes()).toContain('nav-menu__list--open')
+
+    await toggle.trigger('click')
+    expect(menuList.classes()).not.toContain('nav-menu__list--open')
+  })
+
+  it('closes the open navigation menu when a navigation link is clicked', async () => {
+    await router.push('/')
+    await router.isReady()
+    const { wrapper } = mountHeader()
+
+    await wrapper.get('.nav-toggle').trigger('click')
+    expect(wrapper.get('.nav-menu__list').classes()).toContain('nav-menu__list--open')
+
+    await wrapper.get('.nav-menu__link').trigger('click')
+    expect(wrapper.get('.nav-menu__list').classes()).not.toContain('nav-menu__list--open')
   })
 })
