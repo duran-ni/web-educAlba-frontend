@@ -171,6 +171,48 @@ describe('AdminDashboardView.vue', () => {
     expect(fetchDashboardSummary).toHaveBeenCalledTimes(2)
   })
 
+  it('sorts by time when the newly created workshop shares its date with an existing one', async () => {
+    const wrapper = await mountLoaded()
+    fetchDashboardSummary.mockResolvedValueOnce({
+      data: { totalEnrolledStudents: 12, totalActiveWorkshops: 4 },
+    })
+    const sameDayWorkshop = {
+      id: 3,
+      name: 'Teatro',
+      date: '2026-10-24',
+      time: '09:00',
+      active: true,
+    }
+
+    wrapper.findComponent(WorkshopForm).vm.$emit('created', sameDayWorkshop)
+    await flushPromises()
+
+    expect(
+      wrapper
+        .findComponent(AdminWorkshopsList)
+        .props('workshops')
+        .map((workshop) => workshop.id)
+    ).toEqual([2, 3, 1])
+  })
+
+  it('sorts by time when the updated workshop shares its date with another workshop', async () => {
+    const wrapper = await mountLoaded()
+    fetchDashboardSummary.mockResolvedValueOnce({
+      data: { totalEnrolledStudents: 12, totalActiveWorkshops: 3 },
+    })
+    const updatedWorkshop = { ...WORKSHOP_A, date: '2026-10-20', time: '08:00' }
+
+    wrapper.findComponent(WorkshopForm).vm.$emit('updated', updatedWorkshop)
+    await flushPromises()
+
+    expect(
+      wrapper
+        .findComponent(AdminWorkshopsList)
+        .props('workshops')
+        .map((workshop) => workshop.id)
+    ).toEqual([1, 2])
+  })
+
   it('removes a workshop and refreshes the summary when AdminWorkshopsList emits "delete"', async () => {
     deleteWorkshop.mockResolvedValueOnce({})
     const wrapper = await mountLoaded()
