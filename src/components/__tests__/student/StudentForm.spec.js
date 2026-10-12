@@ -128,7 +128,9 @@ describe('StudentForm.vue', () => {
       await wrapper.find('form').trigger('submit')
       await flushPromises()
 
-      expect(wrapper.text()).toContain('No hemos podido guardar el alumno. Inténtalo de nuevo en unos minutos.')
+      expect(wrapper.text()).toContain(
+        'No hemos podido guardar el alumno. Inténtalo de nuevo en unos minutos.'
+      )
     })
   })
 
@@ -161,7 +163,9 @@ describe('StudentForm.vue', () => {
       await flushPromises()
 
       expect(updateStudent).toHaveBeenCalledWith(1, expect.objectContaining({ firstName: 'Lucía' }))
-      expect(createEnrollment).toHaveBeenCalledWith(expect.objectContaining({ studentId: 1, workshopId: 5 }))
+      expect(createEnrollment).toHaveBeenCalledWith(
+        expect.objectContaining({ studentId: 1, workshopId: 5 })
+      )
       expect(deleteEnrollment).not.toHaveBeenCalled()
       expect(wrapper.emitted('updated')).toBeTruthy()
     })
@@ -234,7 +238,57 @@ describe('StudentForm.vue', () => {
       await wrapper.find('form').trigger('submit')
       await flushPromises()
 
-      expect(wrapper.text()).toContain('No hemos podido guardar los cambios. Inténtalo de nuevo en unos minutos.')
+      expect(wrapper.text()).toContain(
+        'No hemos podido guardar los cambios. Inténtalo de nuevo en unos minutos.'
+      )
     })
+
+    it('does not call the enrollment services when editing a student with no workshop and the box stays unchecked', async () => {
+      fetchWorkshops.mockResolvedValueOnce({ data: [] })
+      updateStudent.mockResolvedValueOnce({ data: { ...STUDENT } })
+
+      const wrapper = mount(StudentForm, { props: { student: STUDENT, enrollment: null } })
+      await flushPromises()
+
+      await wrapper.find('form').trigger('submit')
+      await flushPromises()
+
+      expect(createEnrollment).not.toHaveBeenCalled()
+      expect(deleteEnrollment).not.toHaveBeenCalled()
+      expect(wrapper.emitted('updated')).toBeTruthy()
+    })
+  })
+
+  it('saves the student but shows an alert when enrolling them in the workshop fails', async () => {
+    fetchWorkshops.mockResolvedValueOnce({ data: [{ id: 5, name: 'Manos a la obra' }] })
+    createStudent.mockResolvedValueOnce({ data: { id: 1, firstName: 'Lucía' } })
+    createEnrollment.mockRejectedValueOnce(new Error('network error'))
+    vi.spyOn(window, 'alert').mockImplementation(() => {})
+
+    const wrapper = mount(StudentForm)
+    await flushPromises()
+
+    await wrapper.find('#student-first-name').setValue('Lucía')
+    await wrapper.find('#student-last-name').setValue('García Pérez')
+    await wrapper.find('#student-stage').setValue('PRIMARIA')
+    await wrapper.find('.student-form__checkbox').setValue(true)
+    await wrapper.find('#student-workshop').setValue('5')
+    await wrapper.find('form').trigger('submit')
+    await flushPromises()
+
+    expect(window.alert).toHaveBeenCalledWith(
+      'Los datos del alumno se han guardado, pero no hemos podido actualizar su inscripción al taller. Puedes gestionarla desde el panel de Talleres.'
+    )
+    expect(wrapper.emitted('created')).toBeTruthy()
+  })
+
+  it('emits "cancel" when "Cancelar" is clicked', async () => {
+    fetchWorkshops.mockResolvedValueOnce({ data: [] })
+    const wrapper = mount(StudentForm)
+    await flushPromises()
+
+    await wrapper.get('.student-form__cancel').trigger('click')
+
+    expect(wrapper.emitted('cancel')).toHaveLength(1)
   })
 })
