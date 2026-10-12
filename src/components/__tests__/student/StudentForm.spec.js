@@ -291,4 +291,15 @@ describe('StudentForm.vue', () => {
 
     expect(wrapper.emitted('cancel')).toHaveLength(1)
   })
+
+  it('shows an error message inside the workshop field when the workshops fail to load', async () => {
+    fetchWorkshops.mockRejectedValueOnce(new Error('network error'))
+
+    const wrapper = mount(StudentForm)
+    await flushPromises()
+
+    await wrapper.find('.student-form__checkbox').setValue(true)
+
+    expect(wrapper.text()).toContain('No hemos podido cargar los talleres disponibles.')
+  })
 })
