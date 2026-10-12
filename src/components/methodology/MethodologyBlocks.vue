@@ -168,6 +168,11 @@ const BLOCKS = [
     position: relative;
     display: flex;
     flex-direction: column;
+    // Evita que la tarjeta se desborde de su columna de la rejilla: por
+    // defecto, un elemento de grid no se encoge por debajo del ancho mínimo
+    // que necesita su contenido (min-width: auto); lo forzamos a 0 para que
+    // respete siempre el ancho de su columna.
+    min-width: 0;
     padding: 2rem 1.5rem 3rem;
     transition: transform 0.2s ease;
     @include doodle-frame;
