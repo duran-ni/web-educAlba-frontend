@@ -292,10 +292,14 @@ const BLOCKS = [
   &__title {
     margin: 0;
     font-family: $font-doodle;
-    font-size: 2.5rem;
+    font-size: 1.75rem;
     font-weight: 700;
     font-style: italic;
     color: $color-text-dark;
+
+    @include respond-to(desktop) {
+      font-size: 2.5rem;
+    }
   }
 
   &__text {
