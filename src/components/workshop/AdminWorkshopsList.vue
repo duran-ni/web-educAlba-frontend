@@ -223,10 +223,16 @@ function handleDeleteEnrollmentClick(enrollment) {
   &__items {
     list-style: none;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(30rem, 35rem));
-    gap: 3.5rem;
-    margin-left: 10rem;
-    margin-right: 4rem;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    margin: 0;
+
+    @include respond-to(desktop) {
+      grid-template-columns: repeat(auto-fit, minmax(30rem, 35rem));
+      gap: 3.5rem;
+      margin-left: 10rem;
+      margin-right: 4rem;
+    }
   }
 
   &__item {
@@ -350,7 +356,7 @@ function handleDeleteEnrollmentClick(enrollment) {
 
   &__edit {
     flex-shrink: 0;
-    padding: 0.40rem 1rem;
+    padding: 0.4rem 1rem;
     border: 2px solid $color-primary;
     border-radius: 999px;
     background-color: $color-background;
