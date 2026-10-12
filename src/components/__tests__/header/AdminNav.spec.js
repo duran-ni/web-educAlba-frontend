@@ -45,6 +45,15 @@ describe('AdminNav.vue', () => {
     ])
   })
 
+  it('applies the open modifier class when isOpen is true', async () => {
+    await router.isReady()
+    const wrapper = mount(AdminNav, {
+      props: { isOpen: true },
+      global: { plugins: [router, createPinia()] },
+    })
+    expect(wrapper.find('.admin-nav__list').classes()).toContain('admin-nav__list--open')
+  })
+
   it('marks the link matching the current route as active', async () => {
     await router.push({ name: 'admin' })
     await router.isReady()
@@ -54,7 +63,14 @@ describe('AdminNav.vue', () => {
     expect(activeLinks[0].text()).toBe('Dashboard')
   })
 
-  it('logs out and redirects to the public home page when "Salir" is clicked', async () => {
+  it('emits "navigate" when a link is clicked', async () => {
+    await router.isReady()
+    const wrapper = mount(AdminNav, { global: { plugins: [router, createPinia()] } })
+    await wrapper.get('.admin-nav__link').trigger('click')
+    expect(wrapper.emitted('navigate')).toHaveLength(1)
+  })
+
+  it('logs out, closes the menu and redirects to the public home page when "Salir" is clicked', async () => {
     logout.mockResolvedValueOnce({})
     await router.push({ name: 'admin' })
     await router.isReady()
@@ -63,6 +79,7 @@ describe('AdminNav.vue', () => {
     await wrapper.get('.admin-nav__logout').trigger('click')
     await flushPromises()
 
+    expect(wrapper.emitted('navigate')).toHaveLength(1)
     expect(logout).toHaveBeenCalled()
     expect(router.currentRoute.value.name).toBe('home')
   })
