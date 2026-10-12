@@ -187,31 +187,50 @@ const BLOCKS = [
       }
     }
 
+    // La rotación "pegada a mano" de cada tarjeta solo se aplica a partir de
+    // tablet: en móvil las tarjetas ocupan casi todo el ancho de la pantalla,
+    // y rotarlas hace que sobresalgan por los lados (ver .methodology__grid,
+    // que en móvil es de 1 columna a todo lo ancho)
     &--pink {
       background-color: $color-accent-pink;
       border-style: dashed;
-      transform: rotate(3deg);
+
+      @include respond-to(tablet) {
+        transform: rotate(3deg);
+      }
     }
 
     &--green {
       background-color: $color-accent-green-soft;
-      transform: rotate(-2deg);
+
+      @include respond-to(tablet) {
+        transform: rotate(-2deg);
+      }
     }
 
     &--yellow {
       background-color: $color-accent-yellow-soft;
       border-style: dashed;
-      transform: rotate(4deg);
+
+      @include respond-to(tablet) {
+        transform: rotate(4deg);
+      }
     }
 
     &--blue {
       background-color: $color-background-soft;
-      transform: rotate(-2.5deg);
+
+      @include respond-to(tablet) {
+        transform: rotate(-2.5deg);
+      }
     }
 
     &--purple {
       background-color: $color-accent-purple-soft;
-      transform: rotate(3.5deg);
+
+      @include respond-to(tablet) {
+        transform: rotate(3.5deg);
+      }
     }
   }
 
