@@ -161,7 +161,9 @@ function handleWorkshopCreated(newWorkshop) {
 function handleWorkshopUpdated(updatedWorkshop) {
   workshops.value = workshops.value
     .map((workshop) => (workshop.id === updatedWorkshop.id ? updatedWorkshop : workshop))
-    .sort((a, b) => (a.date === b.date ? a.time.localeCompare(b.time) : a.date.localeCompare(b.date)))
+    .sort((a, b) =>
+      a.date === b.date ? a.time.localeCompare(b.time) : a.date.localeCompare(b.date)
+    )
   closeDialog()
   loadSummary()
 }
@@ -251,10 +253,16 @@ async function handleEnrollmentDeleted(id) {
 
   &__kpis {
     display: grid;
-    grid-template-columns: repeat(2, auto);
-    justify-items: start;
+    grid-template-columns: 1fr;
+    justify-items: center;
     gap: 2.5rem;
-    margin: 5.5rem;
+    margin: 2rem 0;
+
+    @include respond-to(tablet) {
+      grid-template-columns: repeat(2, auto);
+      justify-items: start;
+      margin: 5.5rem;
+    }
   }
 
   &__kpi {
@@ -267,14 +275,19 @@ async function handleEnrollmentDeleted(id) {
   }
 
   &__kpi--students {
-    margin-left: 7rem;
-    transform: rotate(4deg);
+    @include respond-to(tablet) {
+      margin-left: 7rem;
+      transform: rotate(4deg);
+    }
   }
 
   &__kpi--workshops {
-    margin-left: 5rem;
     background-color: $color-accent-green-soft;
-    transform: rotate(-4deg);
+
+    @include respond-to(tablet) {
+      margin-left: 5rem;
+      transform: rotate(-4deg);
+    }
   }
 
   &__kpi-line {
@@ -311,8 +324,6 @@ async function handleEnrollmentDeleted(id) {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    margin-right: 16rem;
-    transform: translateY(-3rem);
     padding: 0.75rem 1.5rem;
     border: 2px solid $color-text-dark;
     border-radius: 999px;
@@ -323,6 +334,11 @@ async function handleEnrollmentDeleted(id) {
     box-shadow: 4px 4px 0 0 $color-text-dark;
     cursor: pointer;
     transition: opacity 0.2s ease;
+
+    @include respond-to(tablet) {
+      margin-right: 16rem;
+      transform: translateY(-3rem);
+    }
 
     &:hover,
     &:focus-visible {
