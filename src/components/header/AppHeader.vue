@@ -16,9 +16,11 @@
         <NavToggle :is-open="isMenuOpen" @toggle="toggleMenu" />
       </div>
     </template>
-
     <template v-else-if="variant === 'admin'">
-      <AdminNav />
+      <div class="app-header__actions">
+        <AdminNav :is-open="isMenuOpen" @navigate="closeMenu" />
+        <NavToggle :is-open="isMenuOpen" controls="admin-nav-list" @toggle="toggleMenu" />
+      </div>
     </template>
     <template v-else-if="variant === 'user'">
       <div class="app-header__actions">
