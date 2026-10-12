@@ -45,7 +45,7 @@ function mountView() {
 
 async function mountLoaded(
   students = [STUDENT_LUCIA, STUDENT_MARCOS],
-  enrollments = [ENROLLMENT_LUCIA],
+  enrollments = [ENROLLMENT_LUCIA]
 ) {
   fetchStudents.mockResolvedValueOnce({ data: students })
   fetchEnrollments.mockResolvedValueOnce({ data: enrollments })
@@ -79,7 +79,7 @@ describe('AdminStudentsView.vue', () => {
     await flushPromises()
 
     expect(wrapper.text()).toContain(
-      'No hemos podido cargar los alumnos. Inténtalo de nuevo más tarde.',
+      'No hemos podido cargar los alumnos. Inténtalo de nuevo más tarde.'
     )
   })
 
@@ -159,6 +159,15 @@ describe('AdminStudentsView.vue', () => {
     expect(wrapper.findComponent(StudentForm).props('enrollment')).toEqual(ENROLLMENT_LUCIA)
   })
 
+  it('opens the dialog with a null enrollment for a student with no workshop', async () => {
+    const wrapper = await mountLoaded()
+
+    await wrapper.findAll('.admin-students-view__edit')[1].trigger('click')
+
+    expect(wrapper.findComponent(StudentForm).props('student')).toEqual(STUDENT_MARCOS)
+    expect(wrapper.findComponent(StudentForm).props('enrollment')).toBeNull()
+  })
+
   it('clears the editing student when the dialog fires its native close event', async () => {
     const wrapper = await mountLoaded()
     await wrapper.get('.admin-students-view__edit').trigger('click')
@@ -221,7 +230,7 @@ describe('AdminStudentsView.vue', () => {
     await flushPromises()
 
     expect(window.confirm).toHaveBeenCalledWith(
-      '¿Seguro que quieres eliminar a "Lucía García López"? Esta acción no se puede deshacer.',
+      '¿Seguro que quieres eliminar a "Lucía García López"? Esta acción no se puede deshacer.'
     )
     expect(deleteStudent).toHaveBeenCalledWith(STUDENT_LUCIA.id)
     expect(wrapper.findAll('tbody tr')).toHaveLength(1)
@@ -235,7 +244,7 @@ describe('AdminStudentsView.vue', () => {
     await flushPromises()
 
     expect(window.alert).toHaveBeenCalledWith(
-      'No se puede eliminar este alumno porque tiene inscripciones a talleres. Elimina antes sus inscripciones desde el panel de Talleres.',
+      'No se puede eliminar este alumno porque tiene inscripciones a talleres. Elimina antes sus inscripciones desde el panel de Talleres.'
     )
   })
 
@@ -247,7 +256,7 @@ describe('AdminStudentsView.vue', () => {
     await flushPromises()
 
     expect(window.alert).toHaveBeenCalledWith(
-      'No se ha podido eliminar el alumno. Inténtalo de nuevo.',
+      'No se ha podido eliminar el alumno. Inténtalo de nuevo.'
     )
   })
 })
