@@ -255,10 +255,17 @@ async function handleDeleteClick(student) {
 
   &__header {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
     justify-content: flex-start;
-    gap: 30rem;
+    gap: 1.5rem;
     margin-bottom: 2rem;
+
+    @include respond-to(desktop) {
+      flex-direction: row;
+      align-items: center;
+      gap: 30rem;
+    }
   }
 
   &__header-top {
@@ -290,23 +297,34 @@ async function handleDeleteClick(student) {
   }
 
   &__header-image {
-    width: 32rem;
-    height: 16rem;
-    flex-shrink: 0;
+    width: 100%;
+    max-width: 20rem;
+    height: auto;
+    aspect-ratio: 2 / 1;
     object-fit: cover;
     border-radius: 999px;
-    transform: rotate(5deg) translateY(2rem) translateX(-4rem);
     @include doodle-frame;
+
+    @include respond-to(desktop) {
+      width: 32rem;
+      height: 16rem;
+      flex-shrink: 0;
+      transform: rotate(5deg) translateY(2rem) translateX(-4rem);
+    }
   }
 
   &__title {
-    margin: 0 0 3rem 5.5rem;
+    margin: 0 0 3rem;
     font-family: $font-doodle;
     font-size: 2.25rem;
     color: $color-primary;
 
     @include respond-to(tablet) {
       font-size: 4.25rem;
+    }
+
+    @include respond-to(desktop) {
+      margin-left: 5.5rem;
     }
   }
 
