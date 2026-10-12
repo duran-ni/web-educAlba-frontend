@@ -58,7 +58,7 @@ describe('AppHeader.vue', () => {
     expect(wrapper.find('.register-button').exists()).toBe(false)
   })
 
-  it('renders the admin navigation in the admin variant', async () => {
+  it('renders the admin navigation and its toggle in the admin variant', async () => {
     await router.push('/')
     await router.isReady()
     const wrapper = mount(AppHeader, {
@@ -67,6 +67,7 @@ describe('AppHeader.vue', () => {
     })
     expect(wrapper.find('.admin-nav').exists()).toBe(true)
     expect(wrapper.find('.nav-menu').exists()).toBe(false)
+    expect(wrapper.find('.nav-toggle').attributes('aria-controls')).toBe('admin-nav-list')
   })
 
   it('renders the user navigation and its toggle in the user variant', async () => {
