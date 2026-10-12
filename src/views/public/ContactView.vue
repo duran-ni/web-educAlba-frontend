@@ -96,8 +96,12 @@ const mapLinkUrl = computed(
     display: inline-block;
     margin: 3rem 0 0;
     font-family: $font-doodle;
-    font-size: 4rem;
+    font-size: 2.5rem;
     color: $color-primary;
+
+    @include respond-to(tablet) {
+      font-size: 4rem;
+    }
   }
 
   &__highlight {
