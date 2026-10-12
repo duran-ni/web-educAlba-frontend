@@ -69,6 +69,7 @@ async function handleLogout() {
     right: 0;
     padding: 1rem 1.5rem;
     background-color: $color-background;
+    z-index: 10;
 
     &--open {
       display: flex;
