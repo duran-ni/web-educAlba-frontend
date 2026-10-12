@@ -88,7 +88,7 @@ describe('AdminDashboardView.vue', () => {
     await flushPromises()
 
     expect(wrapper.text()).toContain(
-      'No hemos podido cargar los indicadores. Inténtalo de nuevo más tarde.',
+      'No hemos podido cargar los indicadores. Inténtalo de nuevo más tarde.'
     )
   })
 
@@ -143,7 +143,10 @@ describe('AdminDashboardView.vue', () => {
 
     expect(HTMLDialogElement.prototype.close).toHaveBeenCalled()
     expect(
-      wrapper.findComponent(AdminWorkshopsList).props('workshops').map((workshop) => workshop.id),
+      wrapper
+        .findComponent(AdminWorkshopsList)
+        .props('workshops')
+        .map((workshop) => workshop.id)
     ).toEqual([3, 2, 1])
     expect(fetchDashboardSummary).toHaveBeenCalledTimes(2)
   })
@@ -160,7 +163,10 @@ describe('AdminDashboardView.vue', () => {
 
     expect(HTMLDialogElement.prototype.close).toHaveBeenCalled()
     expect(
-      wrapper.findComponent(AdminWorkshopsList).props('workshops').map((workshop) => workshop.id),
+      wrapper
+        .findComponent(AdminWorkshopsList)
+        .props('workshops')
+        .map((workshop) => workshop.id)
     ).toEqual([1, 2])
     expect(fetchDashboardSummary).toHaveBeenCalledTimes(2)
   })
@@ -177,7 +183,10 @@ describe('AdminDashboardView.vue', () => {
 
     expect(deleteWorkshop).toHaveBeenCalledWith(WORKSHOP_A.id)
     expect(
-      wrapper.findComponent(AdminWorkshopsList).props('workshops').map((workshop) => workshop.id),
+      wrapper
+        .findComponent(AdminWorkshopsList)
+        .props('workshops')
+        .map((workshop) => workshop.id)
     ).toEqual([2])
     expect(fetchDashboardSummary).toHaveBeenCalledTimes(2)
   })
@@ -190,7 +199,7 @@ describe('AdminDashboardView.vue', () => {
     await flushPromises()
 
     expect(window.alert).toHaveBeenCalledWith(
-      'No se puede eliminar este taller porque tiene alumnos inscritos. Desactívalo en su lugar.',
+      'No se puede eliminar este taller porque tiene alumnos inscritos. Desactívalo en su lugar.'
     )
   })
 
@@ -202,7 +211,7 @@ describe('AdminDashboardView.vue', () => {
     await flushPromises()
 
     expect(window.alert).toHaveBeenCalledWith(
-      'No se ha podido eliminar el taller. Inténtalo de nuevo.',
+      'No se ha podido eliminar el taller. Inténtalo de nuevo.'
     )
   })
 
@@ -225,7 +234,7 @@ describe('AdminDashboardView.vue', () => {
     expect(updated.active).toBe(false)
   })
 
-  it('shows an alert when toggling a workshop\'s active state fails', async () => {
+  it("shows an alert when toggling a workshop's active state fails", async () => {
     updateWorkshop.mockRejectedValueOnce(new Error('network error'))
     const wrapper = await mountLoaded()
 
@@ -233,13 +242,22 @@ describe('AdminDashboardView.vue', () => {
     await flushPromises()
 
     expect(window.alert).toHaveBeenCalledWith(
-      'No se ha podido cambiar el estado del taller. Inténtalo de nuevo.',
+      'No se ha podido cambiar el estado del taller. Inténtalo de nuevo.'
     )
   })
 
   it('removes an enrollment and refreshes the summary when AdminWorkshopsList emits "delete-enrollment"', async () => {
+    fetchDashboardSummary.mockResolvedValueOnce({
+      data: { totalEnrolledStudents: 12, totalActiveWorkshops: 3 },
+    })
+    fetchAdminWorkshops.mockResolvedValueOnce({ data: [WORKSHOP_B, WORKSHOP_A] })
+    fetchEnrollments.mockResolvedValueOnce({
+      data: [{ id: 99, workshopId: WORKSHOP_A.id, studentFullName: 'Lucía García López' }],
+    })
+    const wrapper = mountView()
+    await flushPromises()
+
     deleteEnrollment.mockResolvedValueOnce({})
-    const wrapper = await mountLoaded()
     fetchDashboardSummary.mockResolvedValueOnce({
       data: { totalEnrolledStudents: 11, totalActiveWorkshops: 3 },
     })
@@ -248,6 +266,7 @@ describe('AdminDashboardView.vue', () => {
     await flushPromises()
 
     expect(deleteEnrollment).toHaveBeenCalledWith(99)
+    expect(wrapper.findComponent(AdminWorkshopsList).props('enrollments')).toEqual([])
     expect(fetchDashboardSummary).toHaveBeenCalledTimes(2)
   })
 
@@ -259,7 +278,34 @@ describe('AdminDashboardView.vue', () => {
     await flushPromises()
 
     expect(window.alert).toHaveBeenCalledWith(
-      'No se ha podido eliminar la inscripción. Inténtalo de nuevo.',
+      'No se ha podido eliminar la inscripción. Inténtalo de nuevo.'
     )
+  })
+
+  it('passes the error status to AdminWorkshopsList when the workshops request fails', async () => {
+    fetchDashboardSummary.mockResolvedValueOnce({
+      data: { totalEnrolledStudents: 0, totalActiveWorkshops: 0 },
+    })
+    fetchAdminWorkshops.mockRejectedValueOnce(new Error('network error'))
+    fetchEnrollments.mockResolvedValueOnce({ data: [] })
+
+    const wrapper = mountView()
+    await flushPromises()
+
+    expect(wrapper.findComponent(AdminWorkshopsList).props('status')).toBe('error')
+  })
+
+  it('does not break the rest of the view when the enrollments request fails', async () => {
+    fetchDashboardSummary.mockResolvedValueOnce({
+      data: { totalEnrolledStudents: 12, totalActiveWorkshops: 3 },
+    })
+    fetchAdminWorkshops.mockResolvedValueOnce({ data: [WORKSHOP_A] })
+    fetchEnrollments.mockRejectedValueOnce(new Error('network error'))
+
+    const wrapper = mountView()
+    await flushPromises()
+
+    expect(wrapper.findComponent(AdminWorkshopsList).props('workshops')).toEqual([WORKSHOP_A])
+    expect(wrapper.findComponent(AdminWorkshopsList).props('enrollments')).toEqual([])
   })
 })
