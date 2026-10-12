@@ -92,6 +92,18 @@ describe('LoginForm.vue', () => {
     expect(router.currentRoute.value.name).toBe('admin')
   })
 
+  it('redirects to the dashboard when the logged-in user has no roles at all', async () => {
+    login.mockResolvedValueOnce({ data: { email: 'familia@educalba.com' } })
+    const wrapper = mountForm()
+
+    await wrapper.get('#login-email').setValue('familia@educalba.com')
+    await wrapper.get('#login-password').setValue('Clave1234')
+    await wrapper.find('form').trigger('submit.prevent')
+    await flushPromises()
+
+    expect(router.currentRoute.value.name).toBe('dashboard')
+  })
+
   it('shows an error message when the credentials are rejected', async () => {
     login.mockRejectedValueOnce(new Error('Unauthorized'))
     const wrapper = mountForm()
