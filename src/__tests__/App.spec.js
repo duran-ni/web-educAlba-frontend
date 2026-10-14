@@ -5,12 +5,17 @@ import { createPinia, setActivePinia } from 'pinia'
 import App from '../App.vue'
 import router from '../router'
 import { fetchNextWorkshop, fetchWorkshops } from '@/services/workshops'
+import { fetchGalleryFolders } from '@/services/gallery'
 
-// Simulamos el servicio de talleres para que las pruebas de navegación
-// no dependan de un backend real ni de la velocidad de la red
+// Simulamos los servicios de talleres y galeria para que las pruebas de
+// navegación no dependan de un backend real ni de la velocidad de la red
 vi.mock('@/services/workshops', () => ({
   fetchNextWorkshop: vi.fn(),
   fetchWorkshops: vi.fn(),
+}))
+
+vi.mock('@/services/gallery', () => ({
+  fetchGalleryFolders: vi.fn(),
 }))
 
 // El guard de navegacion del router consulta ahora la store de autenticacion
@@ -21,6 +26,7 @@ beforeEach(() => {
   setActivePinia(createPinia())
   fetchNextWorkshop.mockResolvedValue({ status: 204, data: null })
   fetchWorkshops.mockResolvedValue({ status: 200, data: [] })
+  fetchGalleryFolders.mockResolvedValue({ status: 200, data: [] })
 })
 
 afterEach(() => {
