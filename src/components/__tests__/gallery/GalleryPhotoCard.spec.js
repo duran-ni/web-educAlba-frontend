@@ -4,7 +4,7 @@ import { mount } from '@vue/test-utils'
 import GalleryPhotoCard from '../../gallery/GalleryPhotoCard.vue'
 
 describe('GalleryPhotoCard.vue', () => {
-  it('shows the photo and its caption', () => {
+  it('shows the photo using its caption as alt text, without a visible caption', () => {
     const photo = {
       id: 1,
       imageUrl: 'https://res.cloudinary.com/demo/one.jpg',
@@ -16,7 +16,7 @@ describe('GalleryPhotoCard.vue', () => {
 
     expect(wrapper.find('img').attributes('src')).toBe(photo.imageUrl)
     expect(wrapper.find('img').attributes('alt')).toBe('Día de puertas abiertas')
-    expect(wrapper.text()).toContain('Día de puertas abiertas')
+    expect(wrapper.find('figcaption').exists()).toBe(false)
   })
 
   it('falls back to a generic alt text when there is no caption', () => {
