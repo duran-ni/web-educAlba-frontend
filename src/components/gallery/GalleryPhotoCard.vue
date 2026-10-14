@@ -1,9 +1,6 @@
 <template>
   <figure class="gallery-photo-card">
     <img class="gallery-photo-card__image" :src="photo.imageUrl" :alt="altText" loading="lazy" />
-    <figcaption v-if="photo.caption" class="gallery-photo-card__caption">
-      {{ photo.caption }}
-    </figcaption>
   </figure>
 </template>
 
@@ -18,18 +15,14 @@ const props = defineProps({
   },
 })
 
-// Si el administrador no ha escrito un pie de foto, usamos un texto
-// alternativo genérico para que el lector de pantalla no se quede sin
-// descripción de la imagen (accesibilidad)
+// El caption ya no se muestra en pantalla, pero se sigue usando como texto
+// alternativo de la imagen para que no se pierda la descripcion de accesibilidad
 const altText = computed(() => props.photo.caption || 'Foto de la galería de Academia EducAlba')
 </script>
 
 <style lang="scss">
 .gallery-photo-card {
   margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
   padding: 1rem;
   background-color: $color-background-highlight;
   @include doodle-frame;
@@ -56,14 +49,6 @@ const altText = computed(() => props.photo.caption || 'Foto de la galería de Ac
     @include respond-to(desktop) {
       height: 18rem;
     }
-  }
-
-  &__caption {
-    margin: 0;
-    text-align: center;
-    font-family: $font-heading;
-    font-size: 0.9rem;
-    color: $color-primary;
   }
 }
 </style>
