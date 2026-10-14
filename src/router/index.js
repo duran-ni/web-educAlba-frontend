@@ -37,6 +37,11 @@ const routes = [
         component: () => import('@/views/public/GalleryView.vue'),
       },
       {
+        path: 'galeria/:folderId',
+        name: 'gallery-folder',
+        component: () => import('@/views/public/GalleryFolderView.vue'),
+      },
+      {
         path: 'contacto',
         name: 'contact',
         component: () => import('@/views/public/ContactView.vue'),
