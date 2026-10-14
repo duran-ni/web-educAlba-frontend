@@ -35,6 +35,11 @@ const NAVIGATION_CASES = [
   { name: 'about', heading: 'Nuestra Historia' },
   { name: 'what-we-do', heading: 'Nuestra Metodología' },
   { name: 'gallery', heading: 'Galería' },
+  {
+    name: 'gallery-folder',
+    params: { folderId: 1 },
+    heading: 'No hemos podido cargar esta carpeta',
+  },
 ]
 
 describe('Public navigation', () => {
@@ -42,17 +47,20 @@ describe('Public navigation', () => {
     await router.push('/')
   })
 
-  it.each(NAVIGATION_CASES)('navigating to $name shows the $heading view', async ({ name, heading }) => {
-    await router.push({ name })
-    await router.isReady()
+  it.each(NAVIGATION_CASES)(
+    'navigating to $name shows the $heading view',
+    async ({ name, params, heading }) => {
+      await router.push({ name, params })
+      await router.isReady()
 
-    const wrapper = mount(App, {
-      global: { plugins: [router] },
-    })
-    await flushPromises()
+      const wrapper = mount(App, {
+        global: { plugins: [router] },
+      })
+      await flushPromises()
 
-    expect(wrapper.find('main').text()).toContain(heading)
-  })
+      expect(wrapper.find('main').text()).toContain(heading)
+    },
+  )
 })
 
 describe('Header/footer variant on public views', () => {
