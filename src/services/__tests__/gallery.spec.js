@@ -10,6 +10,7 @@ import {
   deleteGalleryFolder,
   fetchAdminGalleryPhotos,
   uploadGalleryPhoto,
+  updateGalleryPhotoCaption,
   deleteGalleryPhoto,
 } from '../gallery'
 
@@ -94,6 +95,12 @@ describe('gallery service', () => {
 
     const formData = http.post.mock.calls[0][1]
     expect(formData.has('caption')).toBe(false)
+  })
+
+  it("updates a photo's caption", () => {
+    updateGalleryPhotoCaption(10, 'Nuevo pie de foto')
+
+    expect(http.put).toHaveBeenCalledWith('/admin/gallery/10', { caption: 'Nuevo pie de foto' })
   })
 
   it('deletes a gallery photo', () => {
