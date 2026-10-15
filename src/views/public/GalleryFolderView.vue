@@ -37,7 +37,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
-import { fetchGalleryFolders } from '@/services/gallery'
+import { fetchGalleryFolder } from '@/services/gallery'
 import GalleryPhotoCard from '@/components/gallery/GalleryPhotoCard.vue'
 
 const route = useRoute()
@@ -47,17 +47,11 @@ const folder = ref(null)
 
 onMounted(async () => {
   try {
-    const response = await fetchGalleryFolders()
     const folderId = Number(route.params.folderId)
-    const foundFolder = response.data.find((candidate) => candidate.id === folderId)
+    const response = await fetchGalleryFolder(folderId)
 
-    if (!foundFolder) {
-      status.value = 'error'
-      return
-    }
-
-    folder.value = foundFolder
-    status.value = foundFolder.photos.length > 0 ? 'found' : 'empty'
+    folder.value = response.data
+    status.value = response.data.photos.length > 0 ? 'found' : 'empty'
   } catch {
     status.value = 'error'
   }
