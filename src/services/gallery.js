@@ -60,6 +60,11 @@ export function uploadGalleryPhoto({ image, caption, folderId }) {
   })
 }
 
+// Actualiza el pie de foto de una fotografía ya subida
+export function updateGalleryPhotoCaption(id, caption) {
+  return http.put(`/admin/gallery/${id}`, { caption })
+}
+
 // Elimina una foto de la galería
 export function deleteGalleryPhoto(id) {
   return http.delete(`/admin/gallery/${id}`)
