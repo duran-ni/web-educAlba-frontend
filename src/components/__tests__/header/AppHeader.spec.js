@@ -21,6 +21,7 @@ const router = createRouter({
     { path: '/registro', name: 'register', component: { template: '<div />' } },
     { path: '/admin', name: 'admin', component: { template: '<div />' } },
     { path: '/admin/alumnos', name: 'students', component: { template: '<div />' } },
+    { path: '/admin/galeria', name: 'admin-gallery', component: { template: '<div />' } },
     { path: '/dashboard', name: 'dashboard', component: { template: '<div />' } },
     { path: '/dashboard/mis-talleres', name: 'my-workshops', component: { template: '<div />' } },
     { path: '/dashboard/mi-perfil', name: 'my-profile', component: { template: '<div />' } },
