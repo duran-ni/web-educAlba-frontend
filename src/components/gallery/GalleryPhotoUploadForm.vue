@@ -1,18 +1,26 @@
 <template>
   <form class="gallery-photo-upload-form" novalidate @submit.prevent="handleSubmit">
-    <h2 class="gallery-photo-upload-form__title">Subir foto a "{{ folderName }}"</h2>
+    <h2 class="gallery-photo-upload-form__title">Subir fotos a "{{ folderName }}"</h2>
 
     <div class="gallery-photo-upload-form__field">
-      <label class="gallery-photo-upload-form__label" for="gallery-photo-image">Fotografía</label>
+      <label class="gallery-photo-upload-form__label" for="gallery-photo-image">
+        Fotografías (puedes seleccionar varias a la vez)
+      </label>
       <input
         id="gallery-photo-image"
         class="gallery-photo-upload-form__input"
         type="file"
         accept="image/*"
+        multiple
         :aria-invalid="Boolean(imageError)"
         :aria-describedby="imageError ? 'gallery-photo-image-error' : undefined"
         @change="handleFileChange"
       />
+      <p v-if="images.length > 0" class="gallery-photo-upload-form__field-hint">
+        {{ images.length }} foto{{ images.length === 1 ? '' : 's' }} seleccionada{{
+          images.length === 1 ? '' : 's'
+        }}
+      </p>
       <p
         v-if="imageError"
         id="gallery-photo-image-error"
@@ -22,7 +30,7 @@
       </p>
     </div>
 
-    <div class="gallery-photo-upload-form__field">
+    <div v-if="images.length === 1" class="gallery-photo-upload-form__field">
       <label class="gallery-photo-upload-form__label" for="gallery-photo-caption">
         Pie de foto (opcional)
       </label>
@@ -34,6 +42,11 @@
         placeholder="Ej. Clase de robótica"
       />
     </div>
+
+    <p v-else-if="images.length > 1" class="gallery-photo-upload-form__field-hint">
+      Al subir varias fotos a la vez no se les añade pie de foto; podrás editarlo después,
+      foto a foto, desde la gestión de esta carpeta.
+    </p>
 
     <div class="gallery-photo-upload-form__actions">
       <button
@@ -49,7 +62,7 @@
         type="submit"
         :disabled="status === 'submitting'"
       >
-        {{ status === 'submitting' ? 'Subiendo…' : 'Subir foto' }}
+        {{ status === 'submitting' ? 'Subiendo…' : 'Subir foto' + (images.length > 1 ? 's' : '') }}
       </button>
     </div>
 
@@ -58,7 +71,8 @@
       class="gallery-photo-upload-form__message gallery-photo-upload-form__message--error"
       role="alert"
     >
-      No hemos podido subir la foto. Inténtalo de nuevo en unos minutos.
+      No hemos podido subir todas las fotos. Las que se subieron correctamente ya aparecen en la
+      carpeta; vuelve a intentarlo con el resto.
     </p>
   </form>
 </template>
@@ -78,24 +92,26 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['uploaded', 'cancel'])
+// photo-uploaded se emite una vez por cada foto que se sube correctamente
+// (para reflejarla en el panel al instante), y all-uploaded solo cuando
+// el lote completo termina sin ningún error
+const emit = defineEmits(['photo-uploaded', 'all-uploaded', 'cancel'])
 
-const image = ref(null)
+const images = ref([])
 const caption = ref('')
 const imageError = ref('')
 
 // idle | submitting | error
 const status = ref('idle')
 
-// El navegador entrega el fichero elegido en event.target.files (un
-// FileList, aunque aqui solo se permite seleccionar uno): se guarda el
-// primero (o null si el usuario borra la seleccion)
+// El navegador entrega los ficheros elegidos en event.target.files (un
+// FileList); se convierte a array normal para poder recorrerlo fácilmente
 function handleFileChange(event) {
-  image.value = event.target.files[0] ?? null
+  images.value = Array.from(event.target.files)
 }
 
 function validate() {
-  imageError.value = image.value ? '' : 'Selecciona una fotografía'
+  imageError.value = images.value.length > 0 ? '' : 'Selecciona al menos una fotografía'
   return !imageError.value
 }
 
@@ -106,17 +122,29 @@ async function handleSubmit() {
 
   status.value = 'submitting'
 
-  try {
-    const response = await uploadGalleryPhoto({
-      image: image.value,
-      caption: caption.value,
-      folderId: props.folderId,
-    })
-    status.value = 'idle'
-    emit('uploaded', response.data)
-  } catch {
-    status.value = 'error'
+  // El pie de foto solo tiene sentido cuando se sube una única fotografía;
+  // al subir varias a la vez, cada una se edita después por separado
+  const sharedCaption = images.value.length === 1 ? caption.value : ''
+
+  // Se suben una a una, en orden: si una falla, las anteriores ya subidas
+  // se avisan igualmente al padre (photo-uploaded) para no perder ese
+  // progreso, y se detiene el resto del lote
+  for (const image of images.value) {
+    try {
+      const response = await uploadGalleryPhoto({
+        image,
+        caption: sharedCaption,
+        folderId: props.folderId,
+      })
+      emit('photo-uploaded', response.data)
+    } catch {
+      status.value = 'error'
+      return
+    }
   }
+
+  status.value = 'idle'
+  emit('all-uploaded')
 }
 </script>
 
@@ -156,6 +184,12 @@ async function handleSubmit() {
       outline: 2px solid $color-primary;
       outline-offset: 2px;
     }
+  }
+
+  &__field-hint {
+    margin: 0;
+    font-size: 0.875rem;
+    color: $color-text-dark;
   }
 
   &__field-error {
