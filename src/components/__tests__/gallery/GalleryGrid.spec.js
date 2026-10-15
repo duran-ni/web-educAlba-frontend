@@ -20,6 +20,23 @@ const router = createRouter({
   ],
 })
 
+// Pequeño generador de carpetas con una foto, para no repetir el mismo
+// objeto literal en cada test
+function folderWithPhotos(id, name) {
+  return {
+    id,
+    name,
+    photos: [
+      {
+        id,
+        imageUrl: `https://res.cloudinary.com/demo/${id}.jpg`,
+        caption: '',
+        uploadedAt: '2026-09-10T10:00:00',
+      },
+    ],
+  }
+}
+
 async function mountGrid() {
   const wrapper = mount(GalleryGrid, { global: { plugins: [router] } })
   await flushPromises()
@@ -39,35 +56,24 @@ describe('GalleryGrid.vue', () => {
     expect(wrapper.text()).toContain('Cargando fotos…')
   })
 
+  it('requests the first page using the default page and size', async () => {
+    fetchGalleryFolders.mockResolvedValueOnce({
+      status: 200,
+      data: { folders: [], hasMore: false },
+    })
+
+    await mountGrid()
+
+    expect(fetchGalleryFolders).toHaveBeenCalledWith(0, 8)
+  })
+
   it('shows a card for each folder that has photos', async () => {
     fetchGalleryFolders.mockResolvedValueOnce({
       status: 200,
-      data: [
-        {
-          id: 1,
-          name: 'Nuestra academia',
-          photos: [
-            {
-              id: 1,
-              imageUrl: 'https://res.cloudinary.com/demo/one.jpg',
-              caption: 'Día de puertas abiertas',
-              uploadedAt: '2026-09-10T10:00:00',
-            },
-          ],
-        },
-        {
-          id: 2,
-          name: 'Breakout Halloween',
-          photos: [
-            {
-              id: 2,
-              imageUrl: 'https://res.cloudinary.com/demo/two.jpg',
-              caption: 'Taller de ciencias',
-              uploadedAt: '2026-09-05T10:00:00',
-            },
-          ],
-        },
-      ],
+      data: {
+        folders: [folderWithPhotos(1, 'Nuestra academia'), folderWithPhotos(2, 'Breakout Halloween')],
+        hasMore: false,
+      },
     })
 
     const wrapper = await mountGrid()
@@ -80,21 +86,10 @@ describe('GalleryGrid.vue', () => {
   it('excludes folders that do not have any photos yet', async () => {
     fetchGalleryFolders.mockResolvedValueOnce({
       status: 200,
-      data: [
-        {
-          id: 1,
-          name: 'Con fotos',
-          photos: [
-            {
-              id: 1,
-              imageUrl: 'https://res.cloudinary.com/demo/one.jpg',
-              caption: '',
-              uploadedAt: '2026-09-10T10:00:00',
-            },
-          ],
-        },
-        { id: 2, name: 'Vacía todavía', photos: [] },
-      ],
+      data: {
+        folders: [folderWithPhotos(1, 'Con fotos'), { id: 2, name: 'Vacía todavía', photos: [] }],
+        hasMore: false,
+      },
     })
 
     const wrapper = await mountGrid()
@@ -104,7 +99,10 @@ describe('GalleryGrid.vue', () => {
   })
 
   it('shows an empty state when no folder has any photos', async () => {
-    fetchGalleryFolders.mockResolvedValueOnce({ status: 200, data: [] })
+    fetchGalleryFolders.mockResolvedValueOnce({
+      status: 200,
+      data: { folders: [], hasMore: false },
+    })
 
     const wrapper = await mountGrid()
 
@@ -117,5 +115,50 @@ describe('GalleryGrid.vue', () => {
     const wrapper = await mountGrid()
 
     expect(wrapper.text()).toContain('No hemos podido cargar la galería. Inténtalo de nuevo más tarde.')
+  })
+
+  it('shows the "load more" button when the backend reports more folders', async () => {
+    fetchGalleryFolders.mockResolvedValueOnce({
+      status: 200,
+      data: { folders: [folderWithPhotos(1, 'Nuestra academia')], hasMore: true },
+    })
+
+    const wrapper = await mountGrid()
+
+    expect(wrapper.find('.gallery-grid__load-more').exists()).toBe(true)
+  })
+
+  it('does not show the "load more" button when there are no more folders', async () => {
+    fetchGalleryFolders.mockResolvedValueOnce({
+      status: 200,
+      data: { folders: [folderWithPhotos(1, 'Nuestra academia')], hasMore: false },
+    })
+
+    const wrapper = await mountGrid()
+
+    expect(wrapper.find('.gallery-grid__load-more').exists()).toBe(false)
+  })
+
+  it('loads and appends the next page when "load more" is clicked', async () => {
+    fetchGalleryFolders.mockResolvedValueOnce({
+      status: 200,
+      data: { folders: [folderWithPhotos(1, 'Página uno')], hasMore: true },
+    })
+
+    const wrapper = await mountGrid()
+
+    fetchGalleryFolders.mockResolvedValueOnce({
+      status: 200,
+      data: { folders: [folderWithPhotos(2, 'Página dos')], hasMore: false },
+    })
+
+    await wrapper.find('.gallery-grid__load-more').trigger('click')
+    await flushPromises()
+
+    expect(fetchGalleryFolders).toHaveBeenLastCalledWith(1, 8)
+    expect(wrapper.findAllComponents(GalleryFolderCard)).toHaveLength(2)
+    expect(wrapper.text()).toContain('Página uno')
+    expect(wrapper.text()).toContain('Página dos')
+    expect(wrapper.find('.gallery-grid__load-more').exists()).toBe(false)
   })
 })
