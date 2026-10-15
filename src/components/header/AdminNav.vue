@@ -43,6 +43,7 @@ const links = [
   { label: 'Refuerzo', to: { name: 'reinforcement' } },
   { label: 'Talleres', to: { name: 'workshops' } },
   { label: 'Alumnos', to: { name: 'students' } },
+  { label: 'Galería', to: { name: 'admin-gallery' } },
 ]
 
 // Cierra el menu movil, cierra la sesion del administrador y vuelve a la pagina de inicio publica
