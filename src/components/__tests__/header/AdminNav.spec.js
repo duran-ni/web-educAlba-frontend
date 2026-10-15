@@ -18,6 +18,7 @@ const router = createRouter({
     { path: '/talleres', name: 'workshops', component: { template: '<div />' } },
     { path: '/refuerzo', name: 'reinforcement', component: { template: '<div />' } },
     { path: '/admin/alumnos', name: 'students', component: { template: '<div />' } },
+    { path: '/admin/galeria', name: 'admin-gallery', component: { template: '<div />' } },
   ],
 })
 
@@ -30,17 +31,18 @@ describe('AdminNav.vue', () => {
     vi.clearAllMocks()
   })
 
-  it('renders the 6 admin navigation links', async () => {
+  it('renders the 7 admin navigation links', async () => {
     await router.isReady()
     const wrapper = mount(AdminNav, { global: { plugins: [router, createPinia()] } })
     const links = wrapper.findAll('.admin-nav__link')
-    expect(links).toHaveLength(6)
+    expect(links).toHaveLength(7)
     expect(links.map((link) => link.text())).toEqual([
       'Inicio',
       'Dashboard',
       'Refuerzo',
       'Talleres',
       'Alumnos',
+      'Galería',
       'Salir',
     ])
   })
