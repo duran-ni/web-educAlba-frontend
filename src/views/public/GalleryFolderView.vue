@@ -17,11 +17,21 @@
     <p v-if="status === 'loading'" class="folder-view__message">Cargando fotos…</p>
 
     <template v-else-if="status === 'found'">
-      <h1 class="folder-view__title">{{ folder.name }}</h1>
+      <h1 class="folder-view__title">{{ folderName }}</h1>
 
       <div class="folder-view__grid">
-        <GalleryPhotoCard v-for="photo in folder.photos" :key="photo.id" :photo="photo" />
+        <GalleryPhotoCard v-for="photo in photos" :key="photo.id" :photo="photo" />
       </div>
+
+      <button
+        v-if="hasMore"
+        type="button"
+        class="folder-view__load-more"
+        :disabled="loadingMore"
+        @click="loadMore"
+      >
+        {{ loadingMore ? 'Cargando…' : 'Cargar Más Recuerdos' }}
+      </button>
     </template>
 
     <p v-else-if="status === 'empty'" class="folder-view__message">
@@ -40,22 +50,53 @@ import { useRoute, RouterLink } from 'vue-router'
 import { fetchGalleryFolder } from '@/services/gallery'
 import GalleryPhotoCard from '@/components/gallery/GalleryPhotoCard.vue'
 
+// Numero de fotos que pedimos al backend en cada pagina
+const PAGE_SIZE = 8
+
 const route = useRoute()
+const folderId = Number(route.params.folderId)
 
 const status = ref('loading')
-const folder = ref(null)
+const folderName = ref('')
+const photos = ref([])
+const page = ref(0)
+const hasMore = ref(false)
+const loadingMore = ref(false)
+
+// Pide una pagina de fotos de esta carpeta al backend y la acumula en
+// "photos", sin perder las que ya se habian cargado antes
+async function loadPage(pageNumber) {
+  const response = await fetchGalleryFolder(folderId, pageNumber, PAGE_SIZE)
+
+  folderName.value = response.data.name
+  photos.value = [...photos.value, ...response.data.photos]
+  hasMore.value = response.data.hasMore
+  page.value = pageNumber
+}
 
 onMounted(async () => {
   try {
-    const folderId = Number(route.params.folderId)
-    const response = await fetchGalleryFolder(folderId)
-
-    folder.value = response.data
-    status.value = response.data.photos.length > 0 ? 'found' : 'empty'
+    await loadPage(0)
+    status.value = photos.value.length > 0 ? 'found' : 'empty'
   } catch {
     status.value = 'error'
   }
 })
+
+// Pide la siguiente pagina de fotos cuando el usuario pulsa el boton
+// "Cargar Mas Recuerdos"
+async function loadMore() {
+  loadingMore.value = true
+
+  try {
+    await loadPage(page.value + 1)
+  } catch {
+    // Si falla la carga de mas fotos, dejamos las ya cargadas visibles
+    // y el boton disponible para que el usuario pueda reintentarlo
+  } finally {
+    loadingMore.value = false
+  }
+}
 </script>
 
 <style lang="scss">
@@ -112,6 +153,35 @@ onMounted(async () => {
 
     @include respond-to(desktop) {
       grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  &__load-more {
+    display: block;
+    margin: 2.5rem auto 0;
+    padding: 0.5rem 1.25rem;
+    border-radius: 999px;
+    background-color: $color-primary;
+    color: $color-background;
+    font-family: $font-body;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: filter 0.2s ease;
+
+    &:hover:not(:disabled),
+    &:focus-visible:not(:disabled) {
+      filter: brightness(0.9);
+    }
+
+    &:focus-visible {
+      outline: 2px solid $color-accent-yellow;
+      outline-offset: 2px;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
     }
   }
 }
