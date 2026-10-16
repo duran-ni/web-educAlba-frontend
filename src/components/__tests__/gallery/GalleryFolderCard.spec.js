@@ -118,4 +118,57 @@ describe('GalleryFolderCard.vue', () => {
     expect(wrapper.find('img').exists()).toBe(false)
     expect(wrapper.text()).toContain('Carpeta vacía')
   })
+
+  it('shows a derived jpg preview image as the front cover when it is a video', async () => {
+    const folder = {
+      id: 1,
+      name: 'Carpeta',
+      photos: [
+        {
+          id: 1,
+          imageUrl: 'https://res.cloudinary.com/demo/recent.mp4',
+          mediaType: 'VIDEO',
+          caption: '',
+          uploadedAt: '2026-09-10T10:00:00',
+        },
+      ],
+    }
+
+    const wrapper = mount(GalleryFolderCard, { props: { folder }, global: { plugins: [router] } })
+    await router.isReady()
+
+    expect(wrapper.get('.gallery-folder-card__image--front').attributes('src')).toBe(
+      'https://res.cloudinary.com/demo/recent.jpg'
+    )
+    expect(wrapper.find('video').exists()).toBe(false)
+  })
+
+  it('shows a derived jpg preview image for the back photo when it is a video', async () => {
+    const folder = {
+      id: 1,
+      name: 'Carpeta',
+      photos: [
+        {
+          id: 1,
+          imageUrl: 'https://res.cloudinary.com/demo/recent.jpg',
+          caption: '',
+          uploadedAt: '2026-09-10T10:00:00',
+        },
+        {
+          id: 2,
+          imageUrl: 'https://res.cloudinary.com/demo/older.mp4',
+          mediaType: 'VIDEO',
+          caption: '',
+          uploadedAt: '2026-09-05T10:00:00',
+        },
+      ],
+    }
+
+    const wrapper = mount(GalleryFolderCard, { props: { folder }, global: { plugins: [router] } })
+    await router.isReady()
+
+    expect(wrapper.get('.gallery-folder-card__image--back').attributes('src')).toBe(
+      'https://res.cloudinary.com/demo/older.jpg'
+    )
+  })
 })
