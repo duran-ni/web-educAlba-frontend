@@ -1,6 +1,20 @@
 <template>
   <figure class="gallery-photo-card">
-    <img class="gallery-photo-card__image" :src="photo.imageUrl" :alt="altText" loading="lazy" />
+    <video
+      v-if="photo.mediaType === 'VIDEO'"
+      class="gallery-photo-card__image"
+      :src="photo.imageUrl"
+      controls
+      preload="metadata"
+      :aria-label="altText"
+    ></video>
+    <img
+      v-else
+      class="gallery-photo-card__image"
+      :src="photo.imageUrl"
+      :alt="altText"
+      loading="lazy"
+    />
   </figure>
 </template>
 
@@ -16,7 +30,8 @@ const props = defineProps({
 })
 
 // El caption ya no se muestra en pantalla, pero se sigue usando como texto
-// alternativo de la imagen para que no se pierda la descripcion de accesibilidad
+// alternativo de la imagen (o como etiqueta accesible del video) para que no
+// se pierda la descripcion de accesibilidad
 const altText = computed(() => props.photo.caption || 'Foto de la galería de Academia EducAlba')
 </script>
 
