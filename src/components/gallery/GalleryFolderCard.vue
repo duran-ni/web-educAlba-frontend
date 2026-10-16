@@ -9,7 +9,7 @@
       <img
         v-if="secondPhoto"
         class="gallery-folder-card__image gallery-folder-card__image--back"
-        :src="secondPhoto.imageUrl"
+        :src="secondPreviewUrl"
         alt=""
         aria-hidden="true"
         loading="lazy"
@@ -17,7 +17,7 @@
       <img
         v-if="coverPhoto"
         class="gallery-folder-card__image gallery-folder-card__image--front"
-        :src="coverPhoto.imageUrl"
+        :src="coverPreviewUrl"
         :alt="`Portada de la carpeta ${folder.name}`"
         loading="lazy"
       />
@@ -43,6 +43,20 @@ const props = defineProps({
 // ordenadas de mas reciente a mas antigua, asi que basta con las dos primeras
 const coverPhoto = computed(() => props.folder.photos[0] ?? null)
 const secondPhoto = computed(() => props.folder.photos[1] ?? null)
+
+// Si el elemento es un video, no lo reproducimos en la rejilla publica (seria
+// muy pesado y se autorreproducirian varios videos a la vez sin que el
+// usuario lo pida). En su lugar, pedimos a Cloudinary una previsualizacion
+// estatica del video cambiando la extension del archivo por ".jpg": Cloudinary
+// genera automaticamente una imagen a partir del primer fotograma del video
+function toPreviewUrl(photo) {
+  if (!photo) return null
+  if (photo.mediaType !== 'VIDEO') return photo.imageUrl
+  return photo.imageUrl.replace(/\.\w+$/, '.jpg')
+}
+
+const coverPreviewUrl = computed(() => toPreviewUrl(coverPhoto.value))
+const secondPreviewUrl = computed(() => toPreviewUrl(secondPhoto.value))
 </script>
 
 <style lang="scss">
