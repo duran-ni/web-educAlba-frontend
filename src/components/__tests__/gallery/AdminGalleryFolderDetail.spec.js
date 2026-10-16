@@ -88,4 +88,31 @@ describe('AdminGalleryFolderDetail.vue', () => {
     await items[0].get('.admin-gallery-folder-detail__photo-delete').trigger('click')
     expect(wrapper.emitted('delete-photo')).toBeUndefined()
   })
+
+  it('renders a video player with its caption as aria-label for video items', () => {
+    const videoPhotos = [{ id: 10, imageUrl: 'https://example.com/10.mp4', caption: 'Clase de baile', mediaType: 'VIDEO' }]
+    const wrapper = mount(AdminGalleryFolderDetail, { props: { folder, photos: videoPhotos } })
+
+    const video = wrapper.get('.admin-gallery-folder-detail__photo-image')
+    expect(video.element.tagName).toBe('VIDEO')
+    expect(video.attributes('src')).toBe('https://example.com/10.mp4')
+    expect(video.attributes('aria-label')).toBe('Clase de baile')
+    expect(video.attributes('controls')).toBeDefined()
+  })
+
+  it('falls back to a generic aria-label for videos without a caption', () => {
+    const videoPhotos = [{ id: 10, imageUrl: 'https://example.com/10.mp4', caption: '', mediaType: 'VIDEO' }]
+    const wrapper = mount(AdminGalleryFolderDetail, { props: { folder, photos: videoPhotos } })
+
+    const video = wrapper.get('.admin-gallery-folder-detail__photo-image')
+    expect(video.attributes('aria-label')).toBe('Vídeo de la galería')
+  })
+
+  it('renders an image, not a video, for photo items', () => {
+    const wrapper = mount(AdminGalleryFolderDetail, { props: { folder, photos } })
+    const items = wrapper.findAll('.admin-gallery-folder-detail__photo')
+
+    expect(items[0].get('.admin-gallery-folder-detail__photo-image').element.tagName).toBe('IMG')
+    expect(items[0].find('video').exists()).toBe(false)
+  })
 })
