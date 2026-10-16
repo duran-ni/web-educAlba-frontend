@@ -30,7 +30,7 @@ describe('GalleryPhotoUploadForm.vue', () => {
     const wrapper = mount(GalleryPhotoUploadForm, { props })
     await wrapper.find('form').trigger('submit.prevent')
     expect(uploadGalleryPhoto).not.toHaveBeenCalled()
-    expect(wrapper.find('#gallery-photo-image-error').text()).toBe('Selecciona al menos una fotografía')
+    expect(wrapper.find('#gallery-photo-image-error').text()).toBe('Selecciona al menos un archivo')
   })
 
   it('shows the caption field only when a single file is selected', async () => {
@@ -43,7 +43,12 @@ describe('GalleryPhotoUploadForm.vue', () => {
   })
 
   it('uploads a single photo with its caption and emits "photo-uploaded" then "all-uploaded"', async () => {
-    const uploaded = { id: 10, folderId: 4, imageUrl: 'https://example.com/a.jpg', caption: 'Clase de robótica' }
+    const uploaded = {
+      id: 10,
+      folderId: 4,
+      imageUrl: 'https://example.com/a.jpg',
+      caption: 'Clase de robótica',
+    }
     uploadGalleryPhoto.mockResolvedValueOnce({ data: uploaded })
     const wrapper = mount(GalleryPhotoUploadForm, { props })
 
@@ -64,22 +69,34 @@ describe('GalleryPhotoUploadForm.vue', () => {
   it('uploads several photos without a caption and emits "photo-uploaded" once per photo', async () => {
     const uploadedA = { id: 10, folderId: 4, imageUrl: 'https://example.com/a.jpg' }
     const uploadedB = { id: 11, folderId: 4, imageUrl: 'https://example.com/b.jpg' }
-    uploadGalleryPhoto.mockResolvedValueOnce({ data: uploadedA }).mockResolvedValueOnce({ data: uploadedB })
+    uploadGalleryPhoto
+      .mockResolvedValueOnce({ data: uploadedA })
+      .mockResolvedValueOnce({ data: uploadedB })
     const wrapper = mount(GalleryPhotoUploadForm, { props })
 
     await selectFiles(wrapper, [makeFile('a.png'), makeFile('b.png')])
     await wrapper.find('form').trigger('submit.prevent')
     await flushPromises()
 
-    expect(uploadGalleryPhoto).toHaveBeenNthCalledWith(1, { image: expect.anything(), caption: '', folderId: 4 })
-    expect(uploadGalleryPhoto).toHaveBeenNthCalledWith(2, { image: expect.anything(), caption: '', folderId: 4 })
+    expect(uploadGalleryPhoto).toHaveBeenNthCalledWith(1, {
+      image: expect.anything(),
+      caption: '',
+      folderId: 4,
+    })
+    expect(uploadGalleryPhoto).toHaveBeenNthCalledWith(2, {
+      image: expect.anything(),
+      caption: '',
+      folderId: 4,
+    })
     expect(wrapper.emitted('photo-uploaded')).toEqual([[uploadedA], [uploadedB]])
     expect(wrapper.emitted('all-uploaded')).toHaveLength(1)
   })
 
   it('stops after a failed upload and does not emit "all-uploaded", keeping prior successes', async () => {
     const uploadedA = { id: 10, folderId: 4, imageUrl: 'https://example.com/a.jpg' }
-    uploadGalleryPhoto.mockResolvedValueOnce({ data: uploadedA }).mockRejectedValueOnce(new Error('network error'))
+    uploadGalleryPhoto
+      .mockResolvedValueOnce({ data: uploadedA })
+      .mockRejectedValueOnce(new Error('network error'))
     const wrapper = mount(GalleryPhotoUploadForm, { props })
 
     await selectFiles(wrapper, [makeFile('a.png'), makeFile('b.png'), makeFile('c.png')])
@@ -90,13 +107,17 @@ describe('GalleryPhotoUploadForm.vue', () => {
     expect(wrapper.emitted('photo-uploaded')).toEqual([[uploadedA]])
     expect(wrapper.emitted('all-uploaded')).toBeUndefined()
     expect(wrapper.find('[role="alert"]').text()).toBe(
-      'No hemos podido subir todas las fotos. Las que se subieron correctamente ya aparecen en la carpeta; vuelve a intentarlo con el resto.'
+      'No hemos podido subir todos los archivos. Los que se subieron correctamente ya aparecen en la carpeta; vuelve a intentarlo con el resto.'
     )
   })
 
   it('shows "Subiendo…" and disables both buttons while the request is in flight', async () => {
     let resolveUpload
-    uploadGalleryPhoto.mockReturnValueOnce(new Promise((resolve) => { resolveUpload = resolve }))
+    uploadGalleryPhoto.mockReturnValueOnce(
+      new Promise((resolve) => {
+        resolveUpload = resolve
+      })
+    )
     const wrapper = mount(GalleryPhotoUploadForm, { props })
 
     await selectFiles(wrapper, [makeFile('a.png')])
