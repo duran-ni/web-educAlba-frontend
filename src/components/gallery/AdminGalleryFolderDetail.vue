@@ -13,7 +13,7 @@
           class="admin-gallery-folder-detail__upload"
           @click="$emit('upload-photo', folder)"
         >
-          Subir foto
+          Subir archivo
         </button>
 
         <button
@@ -32,7 +32,17 @@
 
     <ul v-else class="admin-gallery-folder-detail__photos">
       <li v-for="photo in photos" :key="photo.id" class="admin-gallery-folder-detail__photo">
+        <video
+          v-if="photo.mediaType === 'VIDEO'"
+          class="admin-gallery-folder-detail__photo-image"
+          :src="photo.imageUrl"
+          :aria-label="photo.caption || 'Vídeo de la galería'"
+          controls
+          playsinline
+          preload="metadata"
+        ></video>
         <img
+          v-else
           class="admin-gallery-folder-detail__photo-image"
           :src="photo.imageUrl"
           :alt="photo.caption || ''"
@@ -174,13 +184,13 @@ function handleDeletePhotoClick(photo) {
   }
 
   &__upload {
-    padding: 0.4rem 1rem;
+    padding: 0.55rem 1.3rem;
     border: 2px solid $color-primary;
     border-radius: 999px;
     background-color: $color-background;
     color: $color-primary;
     font-family: $font-heading;
-    font-size: 0.85rem;
+    font-size: 0.95rem;
     font-weight: 700;
     cursor: pointer;
     transition:
@@ -195,13 +205,13 @@ function handleDeletePhotoClick(photo) {
   }
 
   &__delete-folder {
-    padding: 0.4rem 1rem;
+    padding: 0.55rem 1.3rem;
     border: 2px solid $color-error;
     border-radius: 999px;
     background-color: $color-background;
     color: $color-error;
     font-family: $font-heading;
-    font-size: 0.85rem;
+    font-size: 0.95rem;
     font-weight: 700;
     cursor: pointer;
     transition:
