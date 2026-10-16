@@ -50,7 +50,6 @@ const secondPhoto = computed(() => props.folder.photos[1] ?? null)
 // estatica del video cambiando la extension del archivo por ".jpg": Cloudinary
 // genera automaticamente una imagen a partir del primer fotograma del video
 function toPreviewUrl(photo) {
-  if (!photo) return null
   if (photo.mediaType !== 'VIDEO') return photo.imageUrl
   return photo.imageUrl.replace(/\.\w+$/, '.jpg')
 }
