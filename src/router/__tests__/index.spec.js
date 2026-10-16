@@ -49,6 +49,14 @@ describe('router navigation guard', () => {
     expect(router.currentRoute.value.name).toBe('admin')
   })
 
+  it('allows access to the admin gallery once the user is authenticated', async () => {
+    const authStore = useAuthStore()
+    authStore.user = { email: 'admin@educalba.com', roles: ['ADMINISTRADOR'] }
+
+    await router.push({ name: 'admin-gallery' })
+    expect(router.currentRoute.value.name).toBe('admin-gallery')
+  })
+
   it('does not require authentication for the registration and password-recovery routes', async () => {
     await router.push({ name: 'register' })
     expect(router.currentRoute.value.name).toBe('register')
