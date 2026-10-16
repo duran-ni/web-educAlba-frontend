@@ -65,7 +65,7 @@ describe('AdminGalleryFolderCard.vue', () => {
 
     const video = wrapper.get('video.admin-gallery-folder-card__image--front')
     expect(video.attributes('src')).toBe('https://example.com/20.mp4')
-    expect(video.attributes('muted')).toBeDefined()
+    expect(video.element.muted).toBe(true)
     expect(wrapper.find('img.admin-gallery-folder-card__image--front').exists()).toBe(false)
   })
 
