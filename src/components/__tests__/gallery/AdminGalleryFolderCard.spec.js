@@ -55,4 +55,29 @@ describe('AdminGalleryFolderCard.vue', () => {
     await wrapper.trigger('click')
     expect(wrapper.emitted('select')).toEqual([[1]])
   })
+
+  it('renders a video instead of an image for the front cover when it is a video', () => {
+    const videoPhotos = [
+      { id: 10, imageUrl: 'https://example.com/10.jpg' },
+      { id: 20, imageUrl: 'https://example.com/20.mp4', mediaType: 'VIDEO' },
+    ]
+    const wrapper = mount(AdminGalleryFolderCard, { props: { folder, photos: videoPhotos } })
+
+    const video = wrapper.get('video.admin-gallery-folder-card__image--front')
+    expect(video.attributes('src')).toBe('https://example.com/20.mp4')
+    expect(video.attributes('muted')).toBeDefined()
+    expect(wrapper.find('img.admin-gallery-folder-card__image--front').exists()).toBe(false)
+  })
+
+  it('renders a video instead of an image for the back photo when it is a video', () => {
+    const videoPhotos = [
+      { id: 10, imageUrl: 'https://example.com/10.mp4', mediaType: 'VIDEO' },
+      { id: 20, imageUrl: 'https://example.com/20.jpg' },
+    ]
+    const wrapper = mount(AdminGalleryFolderCard, { props: { folder, photos: videoPhotos } })
+
+    const video = wrapper.get('video.admin-gallery-folder-card__image--back')
+    expect(video.attributes('src')).toBe('https://example.com/10.mp4')
+    expect(wrapper.find('img.admin-gallery-folder-card__image--back').exists()).toBe(false)
+  })
 })
