@@ -8,16 +8,33 @@
     <div class="admin-gallery-folder-card__tab" aria-hidden="true"></div>
 
     <div class="admin-gallery-folder-card__body">
+      <video
+        v-if="secondPhoto && secondPhoto.mediaType === 'VIDEO'"
+        class="admin-gallery-folder-card__image admin-gallery-folder-card__image--back"
+        :src="secondPhoto.imageUrl"
+        muted
+        preload="metadata"
+        aria-hidden="true"
+      ></video>
       <img
-        v-if="secondPhoto"
+        v-else-if="secondPhoto"
         class="admin-gallery-folder-card__image admin-gallery-folder-card__image--back"
         :src="secondPhoto.imageUrl"
         alt=""
         aria-hidden="true"
         loading="lazy"
       />
+
+      <video
+        v-if="coverPhoto && coverPhoto.mediaType === 'VIDEO'"
+        class="admin-gallery-folder-card__image admin-gallery-folder-card__image--front"
+        :src="coverPhoto.imageUrl"
+        muted
+        preload="metadata"
+        aria-hidden="true"
+      ></video>
       <img
-        v-if="coverPhoto"
+        v-else-if="coverPhoto"
         class="admin-gallery-folder-card__image admin-gallery-folder-card__image--front"
         :src="coverPhoto.imageUrl"
         alt=""
@@ -126,14 +143,14 @@ const secondPhoto = computed(
   }
 
   &__body {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  background-color: $color-accent-yellow-soft;
-  border-radius: 4px 16px 16px 16px;
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.16);
-  transition: box-shadow 0.25s ease;
-}
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background-color: $color-accent-yellow-soft;
+    border-radius: 4px 16px 16px 16px;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.16);
+    transition: box-shadow 0.25s ease;
+  }
 
   &__image {
     position: absolute;
