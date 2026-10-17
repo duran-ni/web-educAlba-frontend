@@ -2,10 +2,6 @@
   <section class="admin-dashboard-view">
     <div class="admin-dashboard-view__header">
       <h1 class="admin-dashboard-view__title">Panel de Administración</h1>
-      <button type="button" class="admin-dashboard-view__new-workshop" @click="openDialog">
-        <span class="material-symbols-outlined" aria-hidden="true">palette</span>
-        + Nuevo Taller
-      </button>
     </div>
 
     <p v-if="summaryStatus === 'loading'" class="admin-dashboard-view__message">
@@ -45,20 +41,15 @@
       @toggle-active="handleWorkshopToggleActive"
       @delete-enrollment="handleEnrollmentDeleted"
       @edit="openEditDialog"
+      @create="openDialog"
     />
-
-    <div class="admin-dashboard-view__teachers-header">
-      <button type="button" class="admin-dashboard-view__new-teacher" @click="openTeacherDialog">
-        <span class="material-symbols-outlined" aria-hidden="true">person_add</span>
-        + Nuevo Profesor
-      </button>
-    </div>
 
     <AdminTeachersList
       :status="teachersStatus"
       :teachers="teachers"
       @delete="handleTeacherDeleted"
       @edit="openEditTeacherDialog"
+      @create="openTeacherDialog"
     />
 
     <dialog ref="dialogRef" class="admin-dashboard-view__dialog" @close="handleDialogClose">
@@ -127,7 +118,7 @@ onMounted(async () => {
 
 // Se suscribe al stream en tiempo real: cualquier cambio que afecte al
 // resumen (desde este panel o desde cualquier otro sitio, como un alumno
-// inscribiéndose en la vista pública) vuelve a llamar a loadSummary()
+// inscribiendose en la vista publica) vuelve a llamar a loadSummary()
 useDashboardSummaryStream(loadSummary)
 
 async function loadSummary() {
@@ -194,7 +185,7 @@ function handleDialogClose() {
   editingWorkshop.value = null
 }
 
-// Abre el dialog de "+ Nuevo Profesor", sin ningún profesor precargado
+// Abre el dialog de "+ Nuevo Profesor", sin ningun profesor precargado
 function openTeacherDialog() {
   editingTeacher.value = null
   teacherDialogRef.value.showModal()
@@ -211,15 +202,15 @@ function closeTeacherDialog() {
   teacherDialogRef.value.close()
 }
 
-// Al cerrar el dialog de profesores se limpia el profesor en edición, para
-// que la próxima vez que se abra "+ Nuevo Profesor" no arrastre datos de
-// una edición anterior
+// Al cerrar el dialog de profesores se limpia el profesor en edicion, para
+// que la proxima vez que se abra "+ Nuevo Profesor" no arrastre datos de
+// una edicion anterior
 function handleTeacherDialogClose() {
   editingTeacher.value = null
 }
 
-// Se inserta el taller recién creado y se reordena la lista por fecha/hora,
-// sin volver a pedirla al backend: evita una petición de red innecesaria
+// Se inserta el taller recien creado y se reordena la lista por fecha/hora,
+// sin volver a pedirla al backend: evita una peticion de red innecesaria
 // para algo que ya tenemos
 function handleWorkshopCreated(newWorkshop) {
   workshops.value = [...workshops.value, newWorkshop].sort((a, b) =>
@@ -229,8 +220,8 @@ function handleWorkshopCreated(newWorkshop) {
   loadSummary()
 }
 
-// Sustituye el taller editado en el listado por su versión actualizada y
-// reordena por fecha/hora, por si la edición ha cambiado la fecha o la hora
+// Sustituye el taller editado en el listado por su version actualizada y
+// reordena por fecha/hora, por si la edicion ha cambiado la fecha o la hora
 function handleWorkshopUpdated(updatedWorkshop) {
   workshops.value = workshops.value
     .map((workshop) => (workshop.id === updatedWorkshop.id ? updatedWorkshop : workshop))
@@ -241,8 +232,8 @@ function handleWorkshopUpdated(updatedWorkshop) {
   loadSummary()
 }
 
-// Elimina el taller en el backend y, solo si la petición tiene éxito, lo
-// quita también del listado en memoria, sin volver a pedirlo entero al
+// Elimina el taller en el backend y, solo si la peticion tiene exito, lo
+// quita tambien del listado en memoria, sin volver a pedirlo entero al
 // backend
 async function handleWorkshopDeleted(id) {
   try {
@@ -261,8 +252,8 @@ async function handleWorkshopDeleted(id) {
 }
 
 // Activa/desactiva el taller en el backend (PUT con el taller completo,
-// solo cambia "active") y, solo si la petición tiene éxito, actualiza
-// también el listado en memoria, sin volver a pedirlo entero al backend
+// solo cambia "active") y, solo si la peticion tiene exito, actualiza
+// tambien el listado en memoria, sin volver a pedirlo entero al backend
 async function handleWorkshopToggleActive(workshop) {
   try {
     const response = await updateWorkshop(workshop.id, { ...workshop, active: !workshop.active })
@@ -275,8 +266,8 @@ async function handleWorkshopToggleActive(workshop) {
   }
 }
 
-// Elimina la inscripción en el backend y, solo si la petición tiene éxito,
-// la quita también del listado en memoria; además refresca el KPI de
+// Elimina la inscripcion en el backend y, solo si la peticion tiene exito,
+// la quita tambien del listado en memoria; ademas refresca el KPI de
 // alumnos inscritos, igual que al crear/eliminar un taller
 async function handleEnrollmentDeleted(id) {
   try {
@@ -288,14 +279,14 @@ async function handleEnrollmentDeleted(id) {
   }
 }
 
-// Se inserta el profesor recién creado al final del listado, sin volver a
+// Se inserta el profesor recien creado al final del listado, sin volver a
 // pedirlo entero al backend
 function handleTeacherCreated(newTeacher) {
   teachers.value = [...teachers.value, newTeacher]
   closeTeacherDialog()
 }
 
-// Sustituye el profesor editado en el listado por su versión actualizada
+// Sustituye el profesor editado en el listado por su version actualizada
 function handleTeacherUpdated(updatedTeacher) {
   teachers.value = teachers.value.map((teacher) =>
     teacher.id === updatedTeacher.id ? updatedTeacher : teacher
@@ -303,8 +294,8 @@ function handleTeacherUpdated(updatedTeacher) {
   closeTeacherDialog()
 }
 
-// Elimina el profesor en el backend y, solo si la petición tiene éxito, lo
-// quita también del listado en memoria
+// Elimina el profesor en el backend y, solo si la peticion tiene exito, lo
+// quita tambien del listado en memoria
 async function handleTeacherDeleted(id) {
   try {
     await deleteTeacher(id)
@@ -321,10 +312,7 @@ async function handleTeacherDeleted(id) {
 
   &__header {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 1.5rem;
+    justify-content: center;
     margin: 3rem 0 2rem;
   }
 
@@ -333,8 +321,7 @@ async function handleTeacherDeleted(id) {
     font-family: $font-doodle;
     font-size: 2.25rem;
     color: $color-primary;
-    transform: rotate(-5deg);
-    display: inline-block;
+    text-align: center;
 
     @include respond-to(tablet) {
       font-size: 3.5rem;
@@ -417,64 +404,6 @@ async function handleTeacherDeleted(id) {
     font-size: 1.25rem;
     color: $color-primary;
     font-weight: 700;
-  }
-
-  &__new-workshop {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    border: 2px solid $color-text-dark;
-    border-radius: 999px;
-    background-color: $color-primary;
-    color: $color-background;
-    font-family: $font-heading;
-    font-weight: 600;
-    box-shadow: 4px 4px 0 0 $color-text-dark;
-    cursor: pointer;
-    transition: opacity 0.2s ease;
-
-    @include respond-to(tablet) {
-      margin-right: 16rem;
-      transform: translateY(-3rem);
-    }
-
-    &:hover,
-    &:focus-visible {
-      opacity: 0.9;
-    }
-  }
-
-  &__teachers-header {
-    display: flex;
-    justify-content: center;
-    margin-top: 5rem;
-
-    @include respond-to(tablet) {
-      justify-content: flex-end;
-      margin-right: 10rem;
-    }
-  }
-
-  &__new-teacher {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    border: 2px solid $color-text-dark;
-    border-radius: 999px;
-    background-color: $color-accent-green-soft;
-    color: $color-text-dark;
-    font-family: $font-heading;
-    font-weight: 600;
-    box-shadow: 4px 4px 0 0 $color-text-dark;
-    cursor: pointer;
-    transition: opacity 0.2s ease;
-
-    &:hover,
-    &:focus-visible {
-      opacity: 0.9;
-    }
   }
 
   &__dialog {
