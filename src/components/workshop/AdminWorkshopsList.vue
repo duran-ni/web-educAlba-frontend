@@ -1,6 +1,13 @@
 <template>
   <section class="admin-workshops-list">
-    <h2 class="admin-workshops-list__title">Talleres</h2>
+    <div class="admin-workshops-list__header">
+      <h2 class="admin-workshops-list__title">Talleres</h2>
+
+      <button type="button" class="admin-workshops-list__new" @click="$emit('create')">
+        <span class="material-symbols-outlined" aria-hidden="true">palette</span>
+        + Nuevo Taller
+      </button>
+    </div>
 
     <p v-if="status === 'loading'" class="admin-workshops-list__message">Cargando talleres…</p>
 
@@ -123,7 +130,13 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['delete', 'toggle-active', 'delete-enrollment', 'edit'])
+const emit = defineEmits([
+  'delete',
+  'toggle-active',
+  'delete-enrollment',
+  'edit',
+  'create',
+])
 
 // Guarda los ids de los talleres cuyo listado de inscritos esta desplegado;
 // un Set permite tener varios talleres abiertos a la vez sin duplicados
@@ -203,12 +216,43 @@ function handleDeleteEnrollmentClick(enrollment) {
 .admin-workshops-list {
   margin-top: 8rem;
 
-  &__title {
+  &__header {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 2.5rem;
     margin: 0 0 3rem;
-    margin-left: 0rem;
+  }
+
+  &__title {
+    margin: 0;
     font-family: $font-doodle;
     font-size: 3.5rem;
-    color: $color-error;
+    color: $color-green-dark;
+    transform: rotate(-8deg);
+    display: inline-block;
+  }
+
+  &__new {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+    padding: 0.75rem 1.5rem;
+    border: 2px solid $color-text-dark;
+    border-radius: 999px;
+    background-color: $color-accent-pink-medium;
+    color: $color-background;
+    font-family: $font-heading;
+    font-weight: 600;
+    box-shadow: 4px 4px 0 0 $color-text-dark;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+
+    &:hover,
+    &:focus-visible {
+      opacity: 0.9;
+    }
   }
 
   &__message {
