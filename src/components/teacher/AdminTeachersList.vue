@@ -159,7 +159,7 @@ function handleEditClick(teacher) {
     gap: 1rem;
     flex-wrap: wrap;
     padding: 1.75rem 2.25rem;
-    background-color: $color-background-soft;
+    background-color: $color-accent-green-soft;
     @include doodle-frame;
   }
 
