@@ -106,10 +106,11 @@ describe('AdminDashboardView.vue', () => {
     )
   })
 
-  it('opens the dialog with an empty form when "+ Nuevo Taller" is clicked', async () => {
+  it('opens the dialog with an empty form when AdminWorkshopsList emits "create"', async () => {
     const wrapper = await mountLoaded()
 
-    await wrapper.get('.admin-dashboard-view__new-workshop').trigger('click')
+    wrapper.findComponent(AdminWorkshopsList).vm.$emit('create')
+    await flushPromises()
 
     expect(HTMLDialogElement.prototype.showModal).toHaveBeenCalled()
     expect(wrapper.findComponent(WorkshopForm).props('workshop')).toBeNull()
@@ -369,10 +370,11 @@ describe('AdminDashboardView.vue', () => {
     expect(wrapper.findComponent(AdminWorkshopsList).props('enrollments')).toEqual([])
   })
 
-  it('opens the teacher dialog with an empty form when "+ Nuevo Profesor" is clicked', async () => {
+  it('opens the teacher dialog with an empty form when AdminTeachersList emits "create"', async () => {
     const wrapper = await mountLoaded()
 
-    await wrapper.get('.admin-dashboard-view__new-teacher').trigger('click')
+    wrapper.findComponent(AdminTeachersList).vm.$emit('create')
+    await flushPromises()
 
     expect(HTMLDialogElement.prototype.showModal).toHaveBeenCalled()
     expect(wrapper.findComponent(TeacherForm).props('teacher')).toBeNull()
