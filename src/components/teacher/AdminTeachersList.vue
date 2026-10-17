@@ -1,6 +1,13 @@
 <template>
   <section class="admin-teachers-list">
-    <h2 class="admin-teachers-list__title">Profesores</h2>
+    <div class="admin-teachers-list__header">
+      <h2 class="admin-teachers-list__title">Profesores</h2>
+
+      <button type="button" class="admin-teachers-list__new" @click="$emit('create')">
+        <span class="material-symbols-outlined" aria-hidden="true">person_add</span>
+        + Nuevo Profesor
+      </button>
+    </div>
 
     <p v-if="status === 'loading'" class="admin-teachers-list__message">Cargando profesores…</p>
 
@@ -56,7 +63,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['delete', 'edit'])
+const emit = defineEmits(['delete', 'edit', 'create'])
 
 // Pide confirmacion antes de avisar al componente padre, para evitar que
 // un clic accidental borre un profesor sin darse cuenta
@@ -82,11 +89,43 @@ function handleEditClick(teacher) {
 .admin-teachers-list {
   margin-top: 8rem;
 
-  &__title {
+  &__header {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 2.5rem;
     margin: 0 0 3rem;
+  }
+
+  &__title {
+    margin: 0;
     font-family: $font-doodle;
     font-size: 3.5rem;
-    color: $color-error;
+    color: $color-green-dark;
+    transform: rotate(-8deg);
+    display: inline-block;
+  }
+
+  &__new {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+    padding: 0.75rem 1.5rem;
+    border: 2px solid $color-text-dark;
+    border-radius: 999px;
+    background-color: $color-accent-pink-medium;
+    color: $color-background;
+    font-family: $font-heading;
+    font-weight: 600;
+    box-shadow: 4px 4px 0 0 $color-text-dark;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+
+    &:hover,
+    &:focus-visible {
+      opacity: 0.9;
+    }
   }
 
   &__message {
