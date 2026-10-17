@@ -132,6 +132,34 @@ describe('AdminGalleryView.vue', () => {
     expect(wrapper.get('.admin-gallery-folder-card__count').text()).toBe('2 fotos')
   })
 
+  it('uploads a photo without changing the photo count of other folders', async () => {
+    const folderB = { id: 2, name: 'Graduación', photoCount: 0, coverPhotoId: null }
+    fetchAdminGalleryFolders.mockResolvedValueOnce({ data: [folderA, folderB] })
+    fetchAdminGalleryPhotos.mockResolvedValueOnce({ data: [photoA] })
+    const newPhoto = { id: 12, folderId: 1, imageUrl: 'https://example.com/12.jpg', caption: '' }
+    uploadGalleryPhoto.mockResolvedValueOnce({ data: newPhoto })
+
+    const wrapper = mount(AdminGalleryView)
+    await flushPromises()
+
+    await openFolder(wrapper, folderA)
+    await wrapper.get('.admin-gallery-folder-detail__upload').trigger('click')
+
+    const fileInput = wrapper.get('#gallery-photo-image').element
+    Object.defineProperty(fileInput, 'files', {
+      value: [new File(['contenido'], 'a.png', { type: 'image/png' })],
+      configurable: true,
+    })
+    await wrapper.get('#gallery-photo-image').trigger('change')
+    await wrapper.find('.gallery-photo-upload-form').trigger('submit.prevent')
+    await flushPromises()
+
+    await wrapper.get('.admin-gallery-folder-detail__back').trigger('click')
+    const counts = wrapper.findAll('.admin-gallery-folder-card__count')
+    expect(counts[0].text()).toBe('2 fotos')
+    expect(counts[1].text()).toBe('0 fotos')
+  })
+
   it('edits a photo caption through the dialog and updates it in the detail view', async () => {
     fetchAdminGalleryFolders.mockResolvedValueOnce({ data: [folderA] })
     fetchAdminGalleryPhotos.mockResolvedValueOnce({ data: [photoA] })
@@ -150,6 +178,27 @@ describe('AdminGalleryView.vue', () => {
     expect(wrapper.get('.admin-gallery-folder-detail__photo-caption').text()).toBe('Clase de robótica')
   })
 
+  it('edits a photo caption without changing the caption of the other photos', async () => {
+    fetchAdminGalleryFolders.mockResolvedValueOnce({ data: [folderA] })
+    fetchAdminGalleryPhotos.mockResolvedValueOnce({ data: [photoA, photoB] })
+    const updatedPhoto = { ...photoA, caption: 'Clase de robótica' }
+    updateGalleryPhotoCaption.mockResolvedValueOnce({ data: updatedPhoto })
+
+    const wrapper = mount(AdminGalleryView)
+    await flushPromises()
+
+    await openFolder(wrapper)
+    const items = wrapper.findAll('.admin-gallery-folder-detail__photo')
+    await items[0].get('.admin-gallery-folder-detail__photo-edit').trigger('click')
+    await wrapper.get('#gallery-photo-edit-caption').setValue('Clase de robótica')
+    await wrapper.find('.gallery-photo-edit-form').trigger('submit.prevent')
+    await flushPromises()
+
+    const updatedItems = wrapper.findAll('.admin-gallery-folder-detail__photo')
+    expect(updatedItems[0].get('.admin-gallery-folder-detail__photo-caption').text()).toBe('Clase de robótica')
+    expect(updatedItems[1].find('.admin-gallery-folder-detail__photo-caption').exists()).toBe(false)
+  })
+
   it('updates the folder when a photo is successfully set as the cover', async () => {
     fetchAdminGalleryFolders.mockResolvedValueOnce({ data: [folderA] })
     fetchAdminGalleryPhotos.mockResolvedValueOnce({ data: [photoA, photoB] })
@@ -166,6 +215,25 @@ describe('AdminGalleryView.vue', () => {
 
     expect(setGalleryFolderCover).toHaveBeenCalledWith(folderA.id, photoB.id)
     expect(items[1].find('.admin-gallery-folder-detail__photo-cover-badge').exists()).toBe(true)
+  })
+
+  it('updates the correct folder when setting the cover, leaving other folders untouched', async () => {
+    const folderB = { id: 2, name: 'Graduación', photoCount: 0, coverPhotoId: null }
+    fetchAdminGalleryFolders.mockResolvedValueOnce({ data: [folderA, folderB] })
+    fetchAdminGalleryPhotos.mockResolvedValueOnce({ data: [photoA, photoB] })
+    const updatedFolder = { ...folderA, coverPhotoId: photoB.id }
+    setGalleryFolderCover.mockResolvedValueOnce({ data: updatedFolder })
+
+    const wrapper = mount(AdminGalleryView)
+    await flushPromises()
+
+    await openFolder(wrapper, folderA)
+    const items = wrapper.findAll('.admin-gallery-folder-detail__photo')
+    await items[1].get('.admin-gallery-folder-detail__photo-cover').trigger('click')
+    await flushPromises()
+
+    await wrapper.get('.admin-gallery-folder-detail__back').trigger('click')
+    expect(wrapper.text()).toContain('Graduación')
   })
 
   it('shows an alert when setting the cover photo fails', async () => {
@@ -251,6 +319,31 @@ describe('AdminGalleryView.vue', () => {
     expect(wrapper.find('.admin-gallery-folder-detail__photo').exists()).toBe(false)
     await wrapper.get('.admin-gallery-folder-detail__back').trigger('click')
     expect(wrapper.get('.admin-gallery-folder-card__count').text()).toBe('0 fotos')
+  })
+
+  it('deletes a non-cover photo, keeps the cover, decrements the count, and leaves other folders untouched', async () => {
+    vi.spyOn(window, 'confirm').mockReturnValue(true)
+    const folderB = { id: 2, name: 'Graduación', photoCount: 0, coverPhotoId: null }
+    fetchAdminGalleryFolders.mockResolvedValueOnce({ data: [folderA, folderB] })
+    fetchAdminGalleryPhotos.mockResolvedValueOnce({ data: [photoA, photoB] })
+    deleteGalleryPhoto.mockResolvedValueOnce({})
+
+    const wrapper = mount(AdminGalleryView)
+    await flushPromises()
+
+    await openFolder(wrapper, folderA)
+    const items = wrapper.findAll('.admin-gallery-folder-detail__photo')
+    // photoB (items[1]) no es la portada: la portada de folderA es photoA (coverPhotoId: 10)
+    await items[1].get('.admin-gallery-folder-detail__photo-delete').trigger('click')
+    await flushPromises()
+
+    expect(wrapper.findAll('.admin-gallery-folder-detail__photo')).toHaveLength(1)
+    expect(wrapper.get('.admin-gallery-folder-detail__photo-cover-badge').exists()).toBe(true)
+
+    await wrapper.get('.admin-gallery-folder-detail__back').trigger('click')
+    const counts = wrapper.findAll('.admin-gallery-folder-card__count')
+    expect(counts[0].text()).toBe('0 fotos')
+    expect(counts[1].text()).toBe('0 fotos')
   })
 
   it('shows an alert when deleting a photo fails', async () => {
