@@ -123,6 +123,24 @@ describe('TeacherForm.vue', () => {
     expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:mock-preview-url-0')
   })
 
+  it('falls back to no photo when a new teacher clears the file selection', async () => {
+    const wrapper = mount(TeacherForm)
+    const file = new File(['contenido'], 'foto.jpg', { type: 'image/jpeg' })
+
+    await selectPhoto(wrapper, file)
+    await selectPhoto(wrapper, null)
+
+    expect(wrapper.find('.teacher-form__preview').exists()).toBe(false)
+  })
+
+  it('does not try to revoke anything when the form is closed without picking a new photo', () => {
+    const wrapper = mount(TeacherForm, { props: { teacher: EXISTING_TEACHER_WITH_PHOTO } })
+
+    wrapper.unmount()
+
+    expect(URL.revokeObjectURL).not.toHaveBeenCalled()
+  })
+
   it('creates a new teacher and emits "created" with the response data when no photo is selected', async () => {
     const created = { id: 9, name: 'Marcos Ruiz', specialty: 'Educación Física' }
     createTeacher.mockResolvedValueOnce({ data: created })
@@ -247,4 +265,5 @@ describe('TeacherForm.vue', () => {
 
     expect(wrapper.emitted('cancel')).toHaveLength(1)
   })
+
 })
