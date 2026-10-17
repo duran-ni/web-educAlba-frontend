@@ -36,6 +36,23 @@
       </p>
     </div>
 
+    <div class="teacher-form__field">
+      <label class="teacher-form__label" for="teacher-photo">Foto (opcional)</label>
+      <img
+        v-if="photoPreviewUrl"
+        :src="photoPreviewUrl"
+        class="teacher-form__preview"
+        alt="Vista previa de la foto del profesor"
+      />
+      <input
+        id="teacher-photo"
+        class="teacher-form__input"
+        type="file"
+        accept="image/*"
+        @change="handlePhotoChange"
+      />
+    </div>
+
     <div class="teacher-form__actions">
       <button
         type="button"
@@ -57,12 +74,21 @@
     >
       {{ submitErrorMessage }}
     </p>
+
+    <p
+      v-if="status === 'photo-error'"
+      class="teacher-form__message teacher-form__message--error"
+      role="alert"
+    >
+      El profesor se ha guardado, pero no hemos podido subir la foto. Puedes volver a intentarlo
+      editándolo de nuevo.
+    </p>
   </form>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { createTeacher, updateTeacher } from '@/services/teachers'
+import { ref, computed, onBeforeUnmount } from 'vue'
+import { createTeacher, updateTeacher, uploadTeacherPhoto } from '@/services/teachers'
 
 // Si se recibe un profesor por prop, el formulario entra en modo edición:
 // precarga sus datos y, al guardar, actualiza en vez de crear. El
@@ -83,9 +109,17 @@ const isEditing = computed(() => props.teacher !== null)
 const name = ref(props.teacher?.name ?? '')
 const specialty = ref(props.teacher?.specialty ?? '')
 
+// Archivo seleccionado (null si no se ha elegido ninguno nuevo) y la URL
+// que se usa para previsualizarlo: al editar, empieza mostrando la foto
+// que ya tenía el profesor (si tiene); al elegir un archivo nuevo, pasa a
+// mostrar una vista previa generada en el propio navegador
+const photo = ref(null)
+const photoPreviewUrl = ref(props.teacher?.photoUrl ?? null)
+
 const nameError = ref('')
 const specialtyError = ref('')
 
+// idle | submitting | error | photo-error
 const status = ref('idle')
 const submitErrorMessage = ref('')
 
@@ -104,6 +138,30 @@ function validate() {
   return !nameError.value && !specialtyError.value
 }
 
+// El navegador entrega el fichero elegido en event.target.files (un
+// FileList); con un input sin "multiple" solo nos interesa el primero
+function handlePhotoChange(event) {
+  const file = event.target.files[0] ?? null
+  photo.value = file
+
+  // Si ya había una vista previa generada en el navegador (no la URL real
+  // que vino del backend), hay que liberarla antes de crear la siguiente,
+  // para no acumular memoria sin usar
+  if (photoPreviewUrl.value?.startsWith('blob:')) {
+    URL.revokeObjectURL(photoPreviewUrl.value)
+  }
+
+  photoPreviewUrl.value = file ? URL.createObjectURL(file) : (props.teacher?.photoUrl ?? null)
+}
+
+// Libera la vista previa generada en el navegador si el componente se
+// destruye antes de guardar (p. ej. al cancelar), para no dejarla en memoria
+onBeforeUnmount(() => {
+  if (photoPreviewUrl.value?.startsWith('blob:')) {
+    URL.revokeObjectURL(photoPreviewUrl.value)
+  }
+})
+
 async function handleSubmit() {
   if (!validate()) {
     return
@@ -116,22 +174,38 @@ async function handleSubmit() {
     specialty: specialty.value,
   }
 
+  let teacherData
+  const eventName = isEditing.value ? 'updated' : 'created'
+
   try {
-    if (isEditing.value) {
-      const response = await updateTeacher(props.teacher.id, payload)
-      status.value = 'idle'
-      emit('updated', response.data)
-    } else {
-      const response = await createTeacher(payload)
-      status.value = 'idle'
-      emit('created', response.data)
-    }
+    const response = isEditing.value
+      ? await updateTeacher(props.teacher.id, payload)
+      : await createTeacher(payload)
+    teacherData = response.data
   } catch {
     status.value = 'error'
     submitErrorMessage.value = isEditing.value
       ? 'No hemos podido guardar los cambios. Inténtalo de nuevo en unos minutos.'
       : 'No hemos podido guardar el profesor. Inténtalo de nuevo en unos minutos.'
+    return
   }
+
+  // El profesor (nombre/especialidad) ya se ha guardado en este punto.
+  // Si hay una foto seleccionada, se sube en un segundo paso, aparte,
+  // para no complicar el endpoint de creacion/edicion con datos binarios
+  if (photo.value) {
+    try {
+      const photoResponse = await uploadTeacherPhoto(teacherData.id, photo.value)
+      teacherData = photoResponse.data
+    } catch {
+      status.value = 'photo-error'
+      emit(eventName, teacherData)
+      return
+    }
+  }
+
+  status.value = 'idle'
+  emit(eventName, teacherData)
 }
 </script>
 
@@ -179,6 +253,15 @@ async function handleSubmit() {
       outline: none;
       border-color: $color-primary;
     }
+  }
+
+  &__preview {
+    width: 6rem;
+    height: 6rem;
+    align-self: flex-start;
+    object-fit: cover;
+    border: 2px solid $color-text-dark;
+    border-radius: 0.5rem;
   }
 
   &__field-error {
