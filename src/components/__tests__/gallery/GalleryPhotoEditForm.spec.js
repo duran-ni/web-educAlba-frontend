@@ -21,6 +21,12 @@ describe('GalleryPhotoEditForm.vue', () => {
     expect(wrapper.get('#gallery-photo-edit-caption').element.value).toBe('Clase de robótica')
   })
 
+  it('pre-fills the caption input with an empty string when the photo has no caption', () => {
+    const photoWithoutCaption = { id: 8, imageUrl: 'https://example.com/photo-8.jpg', caption: null }
+    const wrapper = mount(GalleryPhotoEditForm, { props: { photo: photoWithoutCaption } })
+    expect(wrapper.get('#gallery-photo-edit-caption').element.value).toBe('')
+  })
+
   it('updates the caption and emits "updated" with the response data', async () => {
     const updated = { ...photo, caption: 'Taller de robótica avanzado' }
     updateGalleryPhotoCaption.mockResolvedValueOnce({ data: updated })
