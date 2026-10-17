@@ -106,6 +106,14 @@ describe('AdminWorkshopsList.vue', () => {
     expect(wrapper.emitted('edit')).toEqual([[WORKSHOP_FULL]])
   })
 
+  it('emits "create" when "+ Nuevo Taller" is clicked', async () => {
+    const wrapper = mountList({ workshops: [], enrollments: [] }) // ajusta los props según tu mountList real
+
+    await wrapper.get('.admin-workshops-list__new').trigger('click')
+
+    expect(wrapper.emitted('create')).toHaveLength(1)
+  })
+
   it('does nothing when the delete confirmation is cancelled', async () => {
     window.confirm.mockReturnValueOnce(false)
     const wrapper = mountList({ workshops: [WORKSHOP_FULL] })
