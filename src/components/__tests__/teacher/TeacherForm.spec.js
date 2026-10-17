@@ -31,13 +31,14 @@ async function fillValidForm(wrapper) {
 // previa de la foto) no falle al ejecutarse en los tests
 function selectPhoto(wrapper, file) {
   const input = wrapper.get('#teacher-photo')
-  Object.defineProperty(input.element, 'files', { value: [file], configurable: true })
+  Object.defineProperty(input.element, 'files', { value: file ? [file] : [], configurable: true })
   return input.trigger('change')
 }
 
 describe('TeacherForm.vue', () => {
   beforeEach(() => {
-    global.URL.createObjectURL = vi.fn(() => 'blob:mock-preview-url')
+    let blobCount = 0
+    global.URL.createObjectURL = vi.fn(() => `blob:mock-preview-url-${blobCount++}`)
     global.URL.revokeObjectURL = vi.fn()
   })
 
@@ -84,7 +85,42 @@ describe('TeacherForm.vue', () => {
     await selectPhoto(wrapper, file)
 
     expect(URL.createObjectURL).toHaveBeenCalledWith(file)
-    expect(wrapper.get('.teacher-form__preview').attributes('src')).toBe('blob:mock-preview-url')
+    expect(wrapper.get('.teacher-form__preview').attributes('src')).toBe('blob:mock-preview-url-0')
+  })
+
+  it('revokes the previous browser preview when a second photo is selected', async () => {
+    const wrapper = mount(TeacherForm)
+    const firstFile = new File(['contenido-1'], 'foto1.jpg', { type: 'image/jpeg' })
+    const secondFile = new File(['contenido-2'], 'foto2.jpg', { type: 'image/jpeg' })
+
+    await selectPhoto(wrapper, firstFile)
+    await selectPhoto(wrapper, secondFile)
+
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:mock-preview-url-0')
+    expect(wrapper.get('.teacher-form__preview').attributes('src')).toBe('blob:mock-preview-url-1')
+  })
+
+  it('falls back to the teacher\'s original photo when the file selection is cleared', async () => {
+    const wrapper = mount(TeacherForm, { props: { teacher: EXISTING_TEACHER_WITH_PHOTO } })
+    const file = new File(['contenido'], 'foto.jpg', { type: 'image/jpeg' })
+
+    await selectPhoto(wrapper, file)
+    await selectPhoto(wrapper, null)
+
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:mock-preview-url-0')
+    expect(wrapper.get('.teacher-form__preview').attributes('src')).toBe(
+      EXISTING_TEACHER_WITH_PHOTO.photoUrl
+    )
+  })
+
+  it('revokes the browser preview when the form is closed without saving', async () => {
+    const wrapper = mount(TeacherForm)
+    const file = new File(['contenido'], 'foto.jpg', { type: 'image/jpeg' })
+
+    await selectPhoto(wrapper, file)
+    wrapper.unmount()
+
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:mock-preview-url-0')
   })
 
   it('creates a new teacher and emits "created" with the response data when no photo is selected', async () => {
@@ -122,20 +158,22 @@ describe('TeacherForm.vue', () => {
     expect(wrapper.emitted('created')).toEqual([[withPhoto]])
   })
 
-  it('updates an existing teacher and emits "updated" with the response data', async () => {
-    const updated = { ...EXISTING_TEACHER, specialty: 'Música' }
+  it('uploads the selected photo after updating an existing teacher and emits the photo response', async () => {
+    const updated = { ...EXISTING_TEACHER, specialty: 'Música', photoUrl: null }
+    const withPhoto = { ...updated, photoUrl: 'https://res.cloudinary.com/demo/laura-nueva.jpg' }
     updateTeacher.mockResolvedValueOnce({ data: updated })
+    uploadTeacherPhoto.mockResolvedValueOnce({ data: withPhoto })
+
     const wrapper = mount(TeacherForm, { props: { teacher: EXISTING_TEACHER } })
     await wrapper.get('#teacher-specialty').setValue('Música')
+    const file = new File(['contenido'], 'foto.jpg', { type: 'image/jpeg' })
+    await selectPhoto(wrapper, file)
 
     await wrapper.find('form').trigger('submit.prevent')
     await flushPromises()
 
-    expect(updateTeacher).toHaveBeenCalledWith(
-      EXISTING_TEACHER.id,
-      expect.objectContaining({ specialty: 'Música' })
-    )
-    expect(wrapper.emitted('updated')).toEqual([[updated]])
+    expect(uploadTeacherPhoto).toHaveBeenCalledWith(EXISTING_TEACHER.id, file)
+    expect(wrapper.emitted('updated')).toEqual([[withPhoto]])
   })
 
   it('shows a photo-specific error but still emits the teacher data when the photo upload fails', async () => {
