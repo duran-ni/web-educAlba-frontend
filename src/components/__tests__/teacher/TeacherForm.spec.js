@@ -1,12 +1,13 @@
-import { describe, it, expect, vi, afterEach } from 'vitest'
+import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 
 import TeacherForm from '../../teacher/TeacherForm.vue'
-import { createTeacher, updateTeacher } from '@/services/teachers'
+import { createTeacher, updateTeacher, uploadTeacherPhoto } from '@/services/teachers'
 
 vi.mock('@/services/teachers', () => ({
   createTeacher: vi.fn(),
   updateTeacher: vi.fn(),
+  uploadTeacherPhoto: vi.fn(),
 }))
 
 const EXISTING_TEACHER = {
@@ -15,12 +16,31 @@ const EXISTING_TEACHER = {
   specialty: 'Matemáticas',
 }
 
+const EXISTING_TEACHER_WITH_PHOTO = {
+  ...EXISTING_TEACHER,
+  photoUrl: 'https://res.cloudinary.com/demo/laura.jpg',
+}
+
 async function fillValidForm(wrapper) {
   await wrapper.get('#teacher-name').setValue('Marcos Ruiz')
   await wrapper.get('#teacher-specialty').setValue('Educación Física')
 }
 
+// jsdom no implementa URL.createObjectURL/revokeObjectURL de forma nativa,
+// asi que se simulan para que el componente (que las usa para la vista
+// previa de la foto) no falle al ejecutarse en los tests
+function selectPhoto(wrapper, file) {
+  const input = wrapper.get('#teacher-photo')
+  Object.defineProperty(input.element, 'files', { value: [file], configurable: true })
+  return input.trigger('change')
+}
+
 describe('TeacherForm.vue', () => {
+  beforeEach(() => {
+    global.URL.createObjectURL = vi.fn(() => 'blob:mock-preview-url')
+    global.URL.revokeObjectURL = vi.fn()
+  })
+
   afterEach(() => {
     vi.clearAllMocks()
   })
@@ -43,7 +63,31 @@ describe('TeacherForm.vue', () => {
     expect(wrapper.get('.teacher-form__submit').text()).toBe('Guardar cambios')
   })
 
-  it('creates a new teacher and emits "created" with the response data', async () => {
+  it("pre-fills the photo preview when editing a teacher that already has one", () => {
+    const wrapper = mount(TeacherForm, { props: { teacher: EXISTING_TEACHER_WITH_PHOTO } })
+
+    expect(wrapper.get('.teacher-form__preview').attributes('src')).toBe(
+      EXISTING_TEACHER_WITH_PHOTO.photoUrl
+    )
+  })
+
+  it('does not show a photo preview when creating a new teacher', () => {
+    const wrapper = mount(TeacherForm)
+
+    expect(wrapper.find('.teacher-form__preview').exists()).toBe(false)
+  })
+
+  it('shows a preview generated in the browser when a photo file is selected', async () => {
+    const wrapper = mount(TeacherForm)
+    const file = new File(['contenido'], 'foto.jpg', { type: 'image/jpeg' })
+
+    await selectPhoto(wrapper, file)
+
+    expect(URL.createObjectURL).toHaveBeenCalledWith(file)
+    expect(wrapper.get('.teacher-form__preview').attributes('src')).toBe('blob:mock-preview-url')
+  })
+
+  it('creates a new teacher and emits "created" with the response data when no photo is selected', async () => {
     const created = { id: 9, name: 'Marcos Ruiz', specialty: 'Educación Física' }
     createTeacher.mockResolvedValueOnce({ data: created })
     const wrapper = mount(TeacherForm)
@@ -56,7 +100,26 @@ describe('TeacherForm.vue', () => {
       name: 'Marcos Ruiz',
       specialty: 'Educación Física',
     })
+    expect(uploadTeacherPhoto).not.toHaveBeenCalled()
     expect(wrapper.emitted('created')).toEqual([[created]])
+  })
+
+  it('uploads the selected photo after creating a new teacher and emits the photo response', async () => {
+    const created = { id: 9, name: 'Marcos Ruiz', specialty: 'Educación Física', photoUrl: null }
+    const withPhoto = { ...created, photoUrl: 'https://res.cloudinary.com/demo/marcos.jpg' }
+    createTeacher.mockResolvedValueOnce({ data: created })
+    uploadTeacherPhoto.mockResolvedValueOnce({ data: withPhoto })
+
+    const wrapper = mount(TeacherForm)
+    await fillValidForm(wrapper)
+    const file = new File(['contenido'], 'foto.jpg', { type: 'image/jpeg' })
+    await selectPhoto(wrapper, file)
+
+    await wrapper.find('form').trigger('submit.prevent')
+    await flushPromises()
+
+    expect(uploadTeacherPhoto).toHaveBeenCalledWith(9, file)
+    expect(wrapper.emitted('created')).toEqual([[withPhoto]])
   })
 
   it('updates an existing teacher and emits "updated" with the response data', async () => {
@@ -73,6 +136,25 @@ describe('TeacherForm.vue', () => {
       expect.objectContaining({ specialty: 'Música' })
     )
     expect(wrapper.emitted('updated')).toEqual([[updated]])
+  })
+
+  it('shows a photo-specific error but still emits the teacher data when the photo upload fails', async () => {
+    const created = { id: 9, name: 'Marcos Ruiz', specialty: 'Educación Física', photoUrl: null }
+    createTeacher.mockResolvedValueOnce({ data: created })
+    uploadTeacherPhoto.mockRejectedValueOnce(new Error('network error'))
+
+    const wrapper = mount(TeacherForm)
+    await fillValidForm(wrapper)
+    const file = new File(['contenido'], 'foto.jpg', { type: 'image/jpeg' })
+    await selectPhoto(wrapper, file)
+
+    await wrapper.find('form').trigger('submit.prevent')
+    await flushPromises()
+
+    expect(wrapper.find('[role="alert"]').text()).toBe(
+      'El profesor se ha guardado, pero no hemos podido subir la foto. Puedes volver a intentarlo editándolo de nuevo.'
+    )
+    expect(wrapper.emitted('created')).toEqual([[created]])
   })
 
   it('shows a generic error message when creating a teacher fails', async () => {
