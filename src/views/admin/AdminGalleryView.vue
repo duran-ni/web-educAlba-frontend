@@ -231,15 +231,16 @@ async function handleSetCover({ folderId, photoId }) {
 }
 
 // Elimina la carpeta en el backend y, solo si la peticion tiene exito, la
-// quita tambien del listado en memoria; si era la carpeta que se estaba
-// gestionando, se vuelve a la rejilla de carpetas
+// quita tambien del listado en memoria. Esta funcion solo se invoca desde el
+// evento "delete-folder" de AdminGalleryFolderDetail, que siempre esta
+// mostrando la carpeta seleccionada y siempre emite el id de esa misma
+// carpeta, asi que al llegar aqui siempre estabamos gestionando justo la
+// carpeta que se borra: volvemos a la rejilla sin necesidad de comprobarlo
 async function handleDeleteFolder(folderId) {
   try {
     await deleteGalleryFolder(folderId)
     folders.value = folders.value.filter((folder) => folder.id !== folderId)
-    if (selectedFolderId.value === folderId) {
-      selectedFolderId.value = null
-    }
+    selectedFolderId.value = null
   } catch (error) {
     if (error.response?.status === 409) {
       window.alert(
