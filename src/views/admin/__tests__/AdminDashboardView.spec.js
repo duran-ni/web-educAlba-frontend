@@ -4,9 +4,12 @@ import { shallowMount, flushPromises } from '@vue/test-utils'
 import AdminDashboardView from '../AdminDashboardView.vue'
 import AdminWorkshopsList from '@/components/workshop/AdminWorkshopsList.vue'
 import WorkshopForm from '@/components/workshop/WorkshopForm.vue'
+import AdminTeachersList from '@/components/teacher/AdminTeachersList.vue'
+import TeacherForm from '@/components/teacher/TeacherForm.vue'
 import { fetchDashboardSummary } from '@/services/dashboard'
 import { fetchAdminWorkshops, deleteWorkshop, updateWorkshop } from '@/services/workshops'
 import { fetchEnrollments, deleteEnrollment } from '@/services/enrollments'
+import { fetchAdminTeachers, deleteTeacher } from '@/services/teachers'
 
 vi.mock('@/services/dashboard', () => ({
   fetchDashboardSummary: vi.fn(),
@@ -21,6 +24,11 @@ vi.mock('@/services/workshops', () => ({
 vi.mock('@/services/enrollments', () => ({
   fetchEnrollments: vi.fn(),
   deleteEnrollment: vi.fn(),
+}))
+
+vi.mock('@/services/teachers', () => ({
+  fetchAdminTeachers: vi.fn(),
+  deleteTeacher: vi.fn(),
 }))
 
 // El stream SSE en tiempo real no tiene sentido en un entorno de test (jsdom
@@ -38,6 +46,9 @@ HTMLDialogElement.prototype.close = vi.fn()
 const WORKSHOP_A = { id: 1, name: 'Robótica', date: '2026-10-24', time: '17:00', active: true }
 const WORKSHOP_B = { id: 2, name: 'Pintura', date: '2026-10-20', time: '18:00', active: true }
 
+const TEACHER_A = { id: 1, name: 'Laura Gómez', specialty: 'Matemáticas' }
+const TEACHER_B = { id: 2, name: 'Marcos Ruiz', specialty: 'Educación Física' }
+
 function mountView() {
   return shallowMount(AdminDashboardView)
 }
@@ -48,6 +59,7 @@ async function mountLoaded() {
   })
   fetchAdminWorkshops.mockResolvedValueOnce({ data: [WORKSHOP_B, WORKSHOP_A] })
   fetchEnrollments.mockResolvedValueOnce({ data: [] })
+  fetchAdminTeachers.mockResolvedValueOnce({ data: [TEACHER_A, TEACHER_B] })
   const wrapper = mountView()
   await flushPromises()
   return wrapper
@@ -66,6 +78,7 @@ describe('AdminDashboardView.vue', () => {
     fetchDashboardSummary.mockReturnValue(new Promise(() => {}))
     fetchAdminWorkshops.mockReturnValue(new Promise(() => {}))
     fetchEnrollments.mockReturnValue(new Promise(() => {}))
+    fetchAdminTeachers.mockReturnValue(new Promise(() => {}))
     const wrapper = mountView()
 
     expect(wrapper.text()).toContain('Cargando indicadores…')
@@ -84,6 +97,7 @@ describe('AdminDashboardView.vue', () => {
     fetchDashboardSummary.mockRejectedValueOnce(new Error('network error'))
     fetchAdminWorkshops.mockResolvedValueOnce({ data: [] })
     fetchEnrollments.mockResolvedValueOnce({ data: [] })
+    fetchAdminTeachers.mockResolvedValueOnce({ data: [] })
     const wrapper = mountView()
     await flushPromises()
 
@@ -126,7 +140,8 @@ describe('AdminDashboardView.vue', () => {
     await flushPromises()
     expect(wrapper.findComponent(WorkshopForm).props('workshop')).toEqual(WORKSHOP_A)
 
-    await wrapper.get('.admin-dashboard-view__dialog').trigger('close')
+    const dialogs = wrapper.findAll('.admin-dashboard-view__dialog')
+    await dialogs[0].trigger('close')
 
     expect(wrapper.findComponent(WorkshopForm).props('workshop')).toBeNull()
   })
@@ -296,6 +311,7 @@ describe('AdminDashboardView.vue', () => {
     fetchEnrollments.mockResolvedValueOnce({
       data: [{ id: 99, workshopId: WORKSHOP_A.id, studentFullName: 'Lucía García López' }],
     })
+    fetchAdminTeachers.mockResolvedValueOnce({ data: [] })
     const wrapper = mountView()
     await flushPromises()
 
@@ -330,6 +346,7 @@ describe('AdminDashboardView.vue', () => {
     })
     fetchAdminWorkshops.mockRejectedValueOnce(new Error('network error'))
     fetchEnrollments.mockResolvedValueOnce({ data: [] })
+    fetchAdminTeachers.mockResolvedValueOnce({ data: [] })
 
     const wrapper = mountView()
     await flushPromises()
@@ -343,11 +360,125 @@ describe('AdminDashboardView.vue', () => {
     })
     fetchAdminWorkshops.mockResolvedValueOnce({ data: [WORKSHOP_A] })
     fetchEnrollments.mockRejectedValueOnce(new Error('network error'))
+    fetchAdminTeachers.mockResolvedValueOnce({ data: [] })
 
     const wrapper = mountView()
     await flushPromises()
 
     expect(wrapper.findComponent(AdminWorkshopsList).props('workshops')).toEqual([WORKSHOP_A])
     expect(wrapper.findComponent(AdminWorkshopsList).props('enrollments')).toEqual([])
+  })
+
+  it('opens the teacher dialog with an empty form when "+ Nuevo Profesor" is clicked', async () => {
+    const wrapper = await mountLoaded()
+
+    await wrapper.get('.admin-dashboard-view__new-teacher').trigger('click')
+
+    expect(HTMLDialogElement.prototype.showModal).toHaveBeenCalled()
+    expect(wrapper.findComponent(TeacherForm).props('teacher')).toBeNull()
+  })
+
+  it('opens the teacher dialog with the selected teacher when AdminTeachersList emits "edit"', async () => {
+    const wrapper = await mountLoaded()
+
+    wrapper.findComponent(AdminTeachersList).vm.$emit('edit', TEACHER_A)
+    await flushPromises()
+
+    expect(HTMLDialogElement.prototype.showModal).toHaveBeenCalled()
+    expect(wrapper.findComponent(TeacherForm).props('teacher')).toEqual(TEACHER_A)
+  })
+
+  it('closes the teacher dialog when TeacherForm emits "cancel"', async () => {
+    const wrapper = await mountLoaded()
+
+    wrapper.findComponent(TeacherForm).vm.$emit('cancel')
+    await flushPromises()
+
+    expect(HTMLDialogElement.prototype.close).toHaveBeenCalled()
+  })
+
+  it('clears the editing teacher when the teacher dialog fires its native close event', async () => {
+    const wrapper = await mountLoaded()
+    wrapper.findComponent(AdminTeachersList).vm.$emit('edit', TEACHER_A)
+    await flushPromises()
+    expect(wrapper.findComponent(TeacherForm).props('teacher')).toEqual(TEACHER_A)
+
+    const dialogs = wrapper.findAll('.admin-dashboard-view__dialog')
+    await dialogs[1].trigger('close')
+
+    expect(wrapper.findComponent(TeacherForm).props('teacher')).toBeNull()
+  })
+
+  it('inserts a newly created teacher, then closes the dialog', async () => {
+    const wrapper = await mountLoaded()
+    const newTeacher = { id: 3, name: 'Sofía Díaz', specialty: 'Música' }
+
+    wrapper.findComponent(TeacherForm).vm.$emit('created', newTeacher)
+    await flushPromises()
+
+    expect(HTMLDialogElement.prototype.close).toHaveBeenCalled()
+    expect(
+      wrapper
+        .findComponent(AdminTeachersList)
+        .props('teachers')
+        .map((teacher) => teacher.id)
+    ).toEqual([1, 2, 3])
+  })
+
+  it('replaces an updated teacher, then closes the dialog', async () => {
+    const wrapper = await mountLoaded()
+    const updatedTeacher = { ...TEACHER_A, specialty: 'Física' }
+
+    wrapper.findComponent(TeacherForm).vm.$emit('updated', updatedTeacher)
+    await flushPromises()
+
+    expect(HTMLDialogElement.prototype.close).toHaveBeenCalled()
+    const updated = wrapper
+      .findComponent(AdminTeachersList)
+      .props('teachers')
+      .find((teacher) => teacher.id === TEACHER_A.id)
+    expect(updated.specialty).toBe('Física')
+  })
+
+  it('removes a teacher when AdminTeachersList emits "delete"', async () => {
+    deleteTeacher.mockResolvedValueOnce({})
+    const wrapper = await mountLoaded()
+
+    wrapper.findComponent(AdminTeachersList).vm.$emit('delete', TEACHER_A.id)
+    await flushPromises()
+
+    expect(deleteTeacher).toHaveBeenCalledWith(TEACHER_A.id)
+    expect(
+      wrapper
+        .findComponent(AdminTeachersList)
+        .props('teachers')
+        .map((teacher) => teacher.id)
+    ).toEqual([2])
+  })
+
+  it('shows an alert when deleting a teacher fails', async () => {
+    deleteTeacher.mockRejectedValueOnce(new Error('network error'))
+    const wrapper = await mountLoaded()
+
+    wrapper.findComponent(AdminTeachersList).vm.$emit('delete', TEACHER_A.id)
+    await flushPromises()
+
+    expect(window.alert).toHaveBeenCalledWith(
+      'No se ha podido eliminar el profesor. Inténtalo de nuevo.'
+    )
+  })
+
+  it('passes the error status to AdminTeachersList when the teachers request fails', async () => {
+    fetchDashboardSummary.mockResolvedValueOnce({
+      data: { totalEnrolledStudents: 0, totalActiveWorkshops: 0 },
+    })
+    fetchAdminWorkshops.mockResolvedValueOnce({ data: [] })
+    fetchEnrollments.mockResolvedValueOnce({ data: [] })
+    fetchAdminTeachers.mockRejectedValueOnce(new Error('network error'))
+
+    const wrapper = mountView()
+    await flushPromises()
+
+    expect(wrapper.findComponent(AdminTeachersList).props('status')).toBe('error')
   })
 })
