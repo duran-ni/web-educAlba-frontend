@@ -49,6 +49,14 @@ describe('AdminTeachersList.vue', () => {
     expect(wrapper.emitted('edit')).toEqual([[TEACHER]])
   })
 
+  it('emits "create" when "+ Nuevo Profesor" is clicked', async () => {
+    const wrapper = mountList({ teachers: [] })
+
+    await wrapper.get('.admin-teachers-list__new').trigger('click')
+
+    expect(wrapper.emitted('create')).toHaveLength(1)
+  })
+
   it('does nothing when the delete confirmation is cancelled', async () => {
     window.confirm.mockReturnValueOnce(false)
     const wrapper = mountList({ teachers: [TEACHER] })
