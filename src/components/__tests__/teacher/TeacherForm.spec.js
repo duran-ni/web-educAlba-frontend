@@ -38,8 +38,8 @@ function selectPhoto(wrapper, file) {
 describe('TeacherForm.vue', () => {
   beforeEach(() => {
     let blobCount = 0
-    global.URL.createObjectURL = vi.fn(() => `blob:mock-preview-url-${blobCount++}`)
-    global.URL.revokeObjectURL = vi.fn()
+    globalThis.URL.createObjectURL = vi.fn(() => `blob:mock-preview-url-${blobCount++}`)
+    globalThis.URL.revokeObjectURL = vi.fn()
   })
 
   afterEach(() => {
