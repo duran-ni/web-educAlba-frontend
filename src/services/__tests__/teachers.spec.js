@@ -1,7 +1,14 @@
 import { describe, it, expect, vi } from 'vitest'
 
 import http from '../http'
-import { fetchTeachers, fetchAdminTeachers, createTeacher, updateTeacher, deleteTeacher } from '../teachers'
+import {
+  fetchTeachers,
+  fetchAdminTeachers,
+  createTeacher,
+  updateTeacher,
+  deleteTeacher,
+  uploadTeacherPhoto,
+} from '../teachers'
 
 vi.mock('../http', () => ({
   default: { get: vi.fn(), post: vi.fn(), put: vi.fn(), delete: vi.fn() },
@@ -38,5 +45,18 @@ describe('teachers service', () => {
     deleteTeacher(5)
 
     expect(http.delete).toHaveBeenCalledWith('/admin/teachers/5')
+  })
+
+  it("uploads a teacher's photo as form data", () => {
+    const image = new File(['contenido'], 'foto.jpg', { type: 'image/jpeg' })
+
+    uploadTeacherPhoto(5, image)
+
+    expect(http.post).toHaveBeenCalledWith('/admin/teachers/5/photo', expect.any(FormData), {
+      headers: { 'Content-Type': undefined },
+    })
+
+    const formData = http.post.mock.calls[0][1]
+    expect(formData.get('image')).toBe(image)
   })
 })
