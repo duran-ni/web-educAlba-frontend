@@ -25,6 +25,8 @@ defineProps({
   },
 })
 
+defineEmits(['navigate'])
+
 // Los 7 enlaces principales de navegación pública.
 const links = [
   { label: 'Inicio', to: { name: 'home' } },
