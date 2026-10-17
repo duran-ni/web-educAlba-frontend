@@ -63,13 +63,17 @@ onMounted(async () => {
 })
 
 // Pide la siguiente pagina de carpetas cuando el usuario pulsa el boton
-// "Cargar Mas Recuerdos", sin perder las carpetas ya mostradas
+// "Cargar Mas Recuerdos", sin perder las carpetas ya mostradas. Este boton
+// solo se muestra cuando ya hay carpetas cargadas (status === 'has-folders'),
+// y loadPage solo añade carpetas, nunca las quita, asi que al terminar
+// siempre seguimos teniendo al menos las mismas de antes: por eso el
+// resultado siempre vuelve a ser 'has-folders', sin necesidad de condicion
 async function loadMore() {
   loadingMore.value = true
 
   try {
     await loadPage(page.value + 1)
-    status.value = folders.value.length > 0 ? 'has-folders' : status.value
+    status.value = 'has-folders'
   } catch {
     // Si falla la carga de mas carpetas, dejamos las ya cargadas visibles
     // y el boton disponible para que el usuario pueda reintentarlo
