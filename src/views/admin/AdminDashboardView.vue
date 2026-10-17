@@ -47,6 +47,20 @@
       @edit="openEditDialog"
     />
 
+    <div class="admin-dashboard-view__teachers-header">
+      <button type="button" class="admin-dashboard-view__new-teacher" @click="openTeacherDialog">
+        <span class="material-symbols-outlined" aria-hidden="true">person_add</span>
+        + Nuevo Profesor
+      </button>
+    </div>
+
+    <AdminTeachersList
+      :status="teachersStatus"
+      :teachers="teachers"
+      @delete="handleTeacherDeleted"
+      @edit="openEditTeacherDialog"
+    />
+
     <dialog ref="dialogRef" class="admin-dashboard-view__dialog" @close="handleDialogClose">
       <WorkshopForm
         :key="editingWorkshop?.id ?? 'new'"
@@ -54,6 +68,20 @@
         @created="handleWorkshopCreated"
         @updated="handleWorkshopUpdated"
         @cancel="closeDialog"
+      />
+    </dialog>
+
+    <dialog
+      ref="teacherDialogRef"
+      class="admin-dashboard-view__dialog"
+      @close="handleTeacherDialogClose"
+    >
+      <TeacherForm
+        :key="editingTeacher?.id ?? 'new'"
+        :teacher="editingTeacher"
+        @created="handleTeacherCreated"
+        @updated="handleTeacherUpdated"
+        @cancel="closeTeacherDialog"
       />
     </dialog>
   </section>
@@ -64,9 +92,12 @@ import { ref, onMounted } from 'vue'
 import { fetchDashboardSummary } from '@/services/dashboard'
 import { fetchAdminWorkshops, deleteWorkshop, updateWorkshop } from '@/services/workshops'
 import { fetchEnrollments, deleteEnrollment } from '@/services/enrollments'
+import { fetchAdminTeachers, deleteTeacher } from '@/services/teachers'
 import { useDashboardSummaryStream } from '@/composables/useDashboardSummaryStream'
 import AdminWorkshopsList from '@/components/workshop/AdminWorkshopsList.vue'
 import WorkshopForm from '@/components/workshop/WorkshopForm.vue'
+import AdminTeachersList from '@/components/teacher/AdminTeachersList.vue'
+import TeacherForm from '@/components/teacher/TeacherForm.vue'
 
 // loading | loaded | error
 const summaryStatus = ref('loading')
@@ -80,16 +111,23 @@ const workshops = ref([])
 const enrollmentsStatus = ref('loading')
 const enrollments = ref([])
 
+// loading | loaded | error
+const teachersStatus = ref('loading')
+const teachers = ref([])
+
 const dialogRef = ref(null)
 const editingWorkshop = ref(null)
 
+const teacherDialogRef = ref(null)
+const editingTeacher = ref(null)
+
 onMounted(async () => {
-  await Promise.all([loadSummary(), loadWorkshops(), loadEnrollments()])
+  await Promise.all([loadSummary(), loadWorkshops(), loadEnrollments(), loadTeachers()])
 })
 
 // Se suscribe al stream en tiempo real: cualquier cambio que afecte al
 // resumen (desde este panel o desde cualquier otro sitio, como un alumno
-// inscribiendose en la vista publica) vuelve a llamar a loadSummary()
+// inscribiéndose en la vista pública) vuelve a llamar a loadSummary()
 useDashboardSummaryStream(loadSummary)
 
 async function loadSummary() {
@@ -122,6 +160,17 @@ async function loadEnrollments() {
   }
 }
 
+// Pide al backend el listado completo de profesores para el panel de Admin
+async function loadTeachers() {
+  try {
+    const response = await fetchAdminTeachers()
+    teachers.value = response.data
+    teachersStatus.value = 'loaded'
+  } catch {
+    teachersStatus.value = 'error'
+  }
+}
+
 function openDialog() {
   editingWorkshop.value = null
   dialogRef.value.showModal()
@@ -145,8 +194,32 @@ function handleDialogClose() {
   editingWorkshop.value = null
 }
 
-// Se inserta el taller recien creado y se reordena la lista por fecha/hora,
-// sin volver a pedirla al backend: evita una peticion de red innecesaria
+// Abre el dialog de "+ Nuevo Profesor", sin ningún profesor precargado
+function openTeacherDialog() {
+  editingTeacher.value = null
+  teacherDialogRef.value.showModal()
+}
+
+// Abre el mismo dialog, pero guardando que profesor se quiere editar: el
+// formulario, al recibirlo por prop, precarga sus datos
+function openEditTeacherDialog(teacher) {
+  editingTeacher.value = teacher
+  teacherDialogRef.value.showModal()
+}
+
+function closeTeacherDialog() {
+  teacherDialogRef.value.close()
+}
+
+// Al cerrar el dialog de profesores se limpia el profesor en edición, para
+// que la próxima vez que se abra "+ Nuevo Profesor" no arrastre datos de
+// una edición anterior
+function handleTeacherDialogClose() {
+  editingTeacher.value = null
+}
+
+// Se inserta el taller recién creado y se reordena la lista por fecha/hora,
+// sin volver a pedirla al backend: evita una petición de red innecesaria
 // para algo que ya tenemos
 function handleWorkshopCreated(newWorkshop) {
   workshops.value = [...workshops.value, newWorkshop].sort((a, b) =>
@@ -156,8 +229,8 @@ function handleWorkshopCreated(newWorkshop) {
   loadSummary()
 }
 
-// Sustituye el taller editado en el listado por su version actualizada y
-// reordena por fecha/hora, por si la edicion ha cambiado la fecha o la hora
+// Sustituye el taller editado en el listado por su versión actualizada y
+// reordena por fecha/hora, por si la edición ha cambiado la fecha o la hora
 function handleWorkshopUpdated(updatedWorkshop) {
   workshops.value = workshops.value
     .map((workshop) => (workshop.id === updatedWorkshop.id ? updatedWorkshop : workshop))
@@ -168,8 +241,8 @@ function handleWorkshopUpdated(updatedWorkshop) {
   loadSummary()
 }
 
-// Elimina el taller en el backend y, solo si la peticion tiene exito, lo
-// quita tambien del listado en memoria, sin volver a pedirlo entero al
+// Elimina el taller en el backend y, solo si la petición tiene éxito, lo
+// quita también del listado en memoria, sin volver a pedirlo entero al
 // backend
 async function handleWorkshopDeleted(id) {
   try {
@@ -188,8 +261,8 @@ async function handleWorkshopDeleted(id) {
 }
 
 // Activa/desactiva el taller en el backend (PUT con el taller completo,
-// solo cambia "active") y, solo si la peticion tiene exito, actualiza
-// tambien el listado en memoria, sin volver a pedirlo entero al backend
+// solo cambia "active") y, solo si la petición tiene éxito, actualiza
+// también el listado en memoria, sin volver a pedirlo entero al backend
 async function handleWorkshopToggleActive(workshop) {
   try {
     const response = await updateWorkshop(workshop.id, { ...workshop, active: !workshop.active })
@@ -202,8 +275,8 @@ async function handleWorkshopToggleActive(workshop) {
   }
 }
 
-// Elimina la inscripcion en el backend y, solo si la peticion tiene exito,
-// la quita tambien del listado en memoria; ademas refresca el KPI de
+// Elimina la inscripción en el backend y, solo si la petición tiene éxito,
+// la quita también del listado en memoria; además refresca el KPI de
 // alumnos inscritos, igual que al crear/eliminar un taller
 async function handleEnrollmentDeleted(id) {
   try {
@@ -212,6 +285,32 @@ async function handleEnrollmentDeleted(id) {
     loadSummary()
   } catch {
     window.alert('No se ha podido eliminar la inscripción. Inténtalo de nuevo.')
+  }
+}
+
+// Se inserta el profesor recién creado al final del listado, sin volver a
+// pedirlo entero al backend
+function handleTeacherCreated(newTeacher) {
+  teachers.value = [...teachers.value, newTeacher]
+  closeTeacherDialog()
+}
+
+// Sustituye el profesor editado en el listado por su versión actualizada
+function handleTeacherUpdated(updatedTeacher) {
+  teachers.value = teachers.value.map((teacher) =>
+    teacher.id === updatedTeacher.id ? updatedTeacher : teacher
+  )
+  closeTeacherDialog()
+}
+
+// Elimina el profesor en el backend y, solo si la petición tiene éxito, lo
+// quita también del listado en memoria
+async function handleTeacherDeleted(id) {
+  try {
+    await deleteTeacher(id)
+    teachers.value = teachers.value.filter((teacher) => teacher.id !== id)
+  } catch {
+    window.alert('No se ha podido eliminar el profesor. Inténtalo de nuevo.')
   }
 }
 </script>
@@ -339,6 +438,38 @@ async function handleEnrollmentDeleted(id) {
       margin-right: 16rem;
       transform: translateY(-3rem);
     }
+
+    &:hover,
+    &:focus-visible {
+      opacity: 0.9;
+    }
+  }
+
+  &__teachers-header {
+    display: flex;
+    justify-content: center;
+    margin-top: 5rem;
+
+    @include respond-to(tablet) {
+      justify-content: flex-end;
+      margin-right: 10rem;
+    }
+  }
+
+  &__new-teacher {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border: 2px solid $color-text-dark;
+    border-radius: 999px;
+    background-color: $color-accent-green-soft;
+    color: $color-text-dark;
+    font-family: $font-heading;
+    font-weight: 600;
+    box-shadow: 4px 4px 0 0 $color-text-dark;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
 
     &:hover,
     &:focus-visible {
