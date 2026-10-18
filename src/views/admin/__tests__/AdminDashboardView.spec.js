@@ -442,6 +442,37 @@ describe('AdminDashboardView.vue', () => {
     expect(updated.specialty).toBe('Física')
   })
 
+  it('keeps the dialog open when TeacherForm emits "created" after a failed photo upload', async () => {
+    const wrapper = await mountLoaded()
+    const newTeacher = { id: 3, name: 'Sofía Díaz', specialty: 'Música' }
+
+    wrapper.findComponent(TeacherForm).vm.$emit('created', newTeacher, { photoFailed: true })
+    await flushPromises()
+
+    expect(HTMLDialogElement.prototype.close).not.toHaveBeenCalled()
+    expect(
+      wrapper
+        .findComponent(AdminTeachersList)
+        .props('teachers')
+        .map((teacher) => teacher.id)
+    ).toEqual([1, 2, 3])
+  })
+
+  it('keeps the dialog open when TeacherForm emits "updated" after a failed photo upload', async () => {
+    const wrapper = await mountLoaded()
+    const updatedTeacher = { ...TEACHER_A, specialty: 'Física' }
+
+    wrapper.findComponent(TeacherForm).vm.$emit('updated', updatedTeacher, { photoFailed: true })
+    await flushPromises()
+
+    expect(HTMLDialogElement.prototype.close).not.toHaveBeenCalled()
+    const updated = wrapper
+      .findComponent(AdminTeachersList)
+      .props('teachers')
+      .find((teacher) => teacher.id === TEACHER_A.id)
+    expect(updated.specialty).toBe('Física')
+  })
+
   it('removes a teacher when AdminTeachersList emits "delete"', async () => {
     deleteTeacher.mockResolvedValueOnce({})
     const wrapper = await mountLoaded()
