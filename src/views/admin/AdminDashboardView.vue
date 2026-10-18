@@ -280,18 +280,26 @@ async function handleEnrollmentDeleted(id) {
 }
 
 // Se inserta el profesor recien creado al final del listado, sin volver a
-// pedirlo entero al backend
-function handleTeacherCreated(newTeacher) {
+// pedirlo entero al backend. Si fallo la subida de la foto, el dialogo se
+// deja abierto a proposito para que el aviso de error sea visible
+function handleTeacherCreated(newTeacher, { photoFailed = false } = {}) {
   teachers.value = [...teachers.value, newTeacher]
-  closeTeacherDialog()
+
+  if (!photoFailed) {
+    closeTeacherDialog()
+  }
 }
 
-// Sustituye el profesor editado en el listado por su version actualizada
-function handleTeacherUpdated(updatedTeacher) {
+// Sustituye el profesor editado en el listado por su version actualizada.
+// Mismo criterio que al crear: si fallo la foto, el dialogo se queda abierto
+function handleTeacherUpdated(updatedTeacher, { photoFailed = false } = {}) {
   teachers.value = teachers.value.map((teacher) =>
     teacher.id === updatedTeacher.id ? updatedTeacher : teacher
   )
-  closeTeacherDialog()
+
+  if (!photoFailed) {
+    closeTeacherDialog()
+  }
 }
 
 // Elimina el profesor en el backend y, solo si la peticion tiene exito, lo
