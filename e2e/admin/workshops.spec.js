@@ -83,7 +83,11 @@ test.describe('Admin — Workshops', () => {
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) })
     })
     await page.route('**/admin/workshops', (route) => {
-      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([WORKSHOP_A]) })
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([WORKSHOP_A]),
+      })
     })
     await page.route('**/admin/workshops/5', (route) => {
       route.fulfill({
@@ -107,7 +111,11 @@ test.describe('Admin — Workshops', () => {
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) })
     })
     await page.route('**/admin/workshops', (route) => {
-      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([WORKSHOP_A]) })
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([WORKSHOP_A]),
+      })
     })
     await page.route('**/admin/workshops/5', (route) => {
       route.fulfill({ status: 204 })
@@ -127,7 +135,11 @@ test.describe('Admin — Workshops', () => {
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) })
     })
     await page.route('**/admin/workshops', (route) => {
-      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([WORKSHOP_A]) })
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([WORKSHOP_A]),
+      })
     })
     page.once('dialog', (dialog) => dialog.dismiss())
 
@@ -143,19 +155,31 @@ test.describe('Admin — Workshops', () => {
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) })
     })
     await page.route('**/admin/workshops', (route) => {
-      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([WORKSHOP_A]) })
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([WORKSHOP_A]),
+      })
     })
     await page.route('**/admin/workshops/5', (route) => {
       route.fulfill({ status: 409 })
     })
-    page.once('dialog', (dialog) => dialog.accept())
+
+    // Se registra un listener permanente, en vez de uno de "un solo uso" seguido
+    // de waitForEvent: así se capturan los dos diálogos nativos (confirm y alert)
+    // en el orden en que aparezcan, sin una ventana de tiempo en la que uno pueda
+    // dispararse antes de que el test esté escuchando
+    const dialogMessages = []
+    page.on('dialog', (dialog) => {
+      dialogMessages.push(dialog.message())
+      dialog.accept()
+    })
 
     await page.goto('/admin')
     await page.getByRole('button', { name: 'Eliminar' }).click()
 
-    const alertDialog = await page.waitForEvent('dialog')
-    expect(alertDialog.message()).toContain('tiene alumnos inscritos')
-    await alertDialog.accept()
+    await expect.poll(() => dialogMessages.length).toBe(2)
+    expect(dialogMessages[1]).toContain('tiene alumnos inscritos')
 
     await expect(page.getByText('Taller de Cerámica')).toBeVisible()
   })
@@ -166,7 +190,11 @@ test.describe('Admin — Workshops', () => {
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) })
     })
     await page.route('**/admin/workshops', (route) => {
-      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([WORKSHOP_A]) })
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([WORKSHOP_A]),
+      })
     })
     await page.route('**/admin/workshops/5', (route) => {
       route.fulfill({
@@ -186,7 +214,11 @@ test.describe('Admin — Workshops', () => {
   test('deletes a student enrollment after confirming', async ({ page }) => {
     await mockAdminBasics(page)
     await page.route('**/admin/workshops', (route) => {
-      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([WORKSHOP_A]) })
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([WORKSHOP_A]),
+      })
     })
     await page.route('**/admin/enrollments', (route) => {
       route.fulfill({
