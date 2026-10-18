@@ -65,6 +65,8 @@ const secondPreviewUrl = computed(() => toPreviewUrl(secondPhoto.value))
   flex-direction: column;
   gap: 0.75rem;
   padding-top: 1.25rem;
+  width: 100%;
+  max-width: 16rem;
   text-decoration: none;
   transition: transform 0.25s ease;
 
@@ -106,24 +108,16 @@ const secondPreviewUrl = computed(() => toPreviewUrl(secondPhoto.value))
 
   &__body {
     position: relative;
-    height: 14rem;
+    aspect-ratio: 1 / 1;
     background-color: $color-accent-yellow-soft;
     border-radius: 4px 16px 16px 16px;
     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.16);
     transition: box-shadow 0.25s ease;
-
-    @include respond-to(tablet) {
-      height: 16rem;
-    }
-
-    @include respond-to(desktop) {
-      height: 18rem;
-    }
   }
 
   // Las dos fotos se centran sobre el cuerpo (top/left: 50%) y cada una se
   // desplaza y gira hacia un lado distinto con "translate", dando el efecto
-  // de dos fotografias superpuestas en cascada, como si estuvieran sueltas
+  // de dos fotografías superpuestas en cascada, como si estuvieran sueltas
   // dentro de la carpeta
   &__image {
     position: absolute;

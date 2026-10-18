@@ -95,16 +95,9 @@ async function loadMore() {
 
   &__folders {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(0, 16rem));
+    justify-content: center;
     gap: 2rem;
-
-    @include respond-to(tablet) {
-      grid-template-columns: repeat(2, 1fr);
-    }
-
-    @include respond-to(desktop) {
-      grid-template-columns: repeat(3, 1fr);
-    }
   }
 
   &__load-more {
