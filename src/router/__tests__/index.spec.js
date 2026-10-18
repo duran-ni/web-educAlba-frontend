@@ -57,6 +57,22 @@ describe('router navigation guard', () => {
     expect(router.currentRoute.value.name).toBe('admin-gallery')
   })
 
+  it('redirects a family account away from the admin panel to its own dashboard', async () => {
+    const authStore = useAuthStore()
+    authStore.user = { email: 'familia@educalba.com', roles: ['ALUMNO_FAMILIA'] }
+
+    await router.push({ name: 'admin' })
+    expect(router.currentRoute.value.name).toBe('dashboard')
+  })
+
+  it('redirects an administrator away from the user dashboard to the admin panel', async () => {
+    const authStore = useAuthStore()
+    authStore.user = { email: 'admin@educalba.com', roles: ['ADMINISTRADOR'] }
+
+    await router.push({ name: 'dashboard' })
+    expect(router.currentRoute.value.name).toBe('admin')
+  })
+
   it('does not require authentication for the registration and password-recovery routes', async () => {
     await router.push({ name: 'register' })
     expect(router.currentRoute.value.name).toBe('register')
