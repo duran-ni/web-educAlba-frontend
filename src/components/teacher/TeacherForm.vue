@@ -199,7 +199,7 @@ async function handleSubmit() {
       teacherData = photoResponse.data
     } catch {
       status.value = 'photo-error'
-      emit(eventName, teacherData)
+      emit(eventName, teacherData, { photoFailed: true })
       return
     }
   }
