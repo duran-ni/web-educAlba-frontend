@@ -210,7 +210,7 @@ describe('TeacherForm.vue', () => {
     expect(wrapper.find('[role="alert"]').text()).toBe(
       'El profesor se ha guardado, pero no hemos podido subir la foto. Puedes volver a intentarlo editándolo de nuevo.'
     )
-    expect(wrapper.emitted('created')).toEqual([[created]])
+        expect(wrapper.emitted('created')).toEqual([[created, { photoFailed: true }]])
   })
 
   it('shows a generic error message when creating a teacher fails', async () => {
