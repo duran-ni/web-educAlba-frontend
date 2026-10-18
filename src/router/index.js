@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 import { useAuthStore } from '@/stores/auth'
+import { ROLES } from '@/config/roles'
 
 // Rutas de la aplicación, agrupadas por layout: cada área (pública, autenticación,
 // usuario, administrador) anida sus vistas dentro del layout que le corresponde,
@@ -67,7 +68,7 @@ const routes = [
   {
     path: '/dashboard',
     component: () => import('@/layouts/UserLayout.vue'),
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, role: ROLES.FAMILY },
     children: [
       {
         path: '',
@@ -79,7 +80,7 @@ const routes = [
   {
     path: '/admin',
     component: () => import('@/layouts/AdminLayout.vue'),
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, role: ROLES.ADMIN },
     children: [
       { path: '', name: 'admin', component: () => import('@/views/admin/AdminDashboardView.vue') },
       {
@@ -113,14 +114,20 @@ const router = createRouter({
 })
 
 // Guard de navegación: protege las rutas marcadas con "meta.requiresAuth"
-// comprobando si hay un usuario autenticado en la store. La comprobacion de
-// sesion activa al recargar la pagina (via /api/auth/me) llega con la
-// Historia de Cerrar sesion
+// comprobando si hay un usuario autenticado en la store, y las marcadas con
+// "meta.role" comprobando además que ese usuario tiene el rol necesario.
+// Si esta autenticado pero con el rol equivocado (p. ej. una familia
+// entrando a /admin), no tiene sentido mandarlo a login (ya ha iniciado
+// sesion), asi que lo redirigimos directamente a su propia zona
 router.beforeEach((to) => {
   const authStore = useAuthStore()
 
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     return { name: 'login' }
+  }
+
+  if (to.meta.role && !authStore.user?.roles.includes(to.meta.role)) {
+    return { name: authStore.user.roles.includes(ROLES.ADMIN) ? 'admin' : 'dashboard' }
   }
 })
 
