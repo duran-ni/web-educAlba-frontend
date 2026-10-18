@@ -24,6 +24,16 @@ export default [
     },
   },
   {
+    // Los tests e2e de Playwright se ejecutan en Node, no en el navegador:
+    // aqui viven objetos globales como Buffer o process
+    files: ['e2e/**/*.js'],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+    },
+  },
+  {
     // Archivos de configuracion que se ejecutan en entorno Node (no navegador),
     // por eso necesitan la variable global "process"
     files: ['*.config.js'],
