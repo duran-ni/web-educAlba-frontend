@@ -1,6 +1,6 @@
 # 🎓 EducAlba · Frontend
 
-Web de **EducAlba**, academia de refuerzo escolar y talleres extraescolares. Incluye la parte pública de la academia (inicio, talleres, refuerzo, quiénes somos, qué hacemos, galería y contacto), el registro y login de familias y los paneles privados de la familia y del administrador.
+Web de **EducAlba**, academia de refuerzo escolar y talleres extraescolares. Incluye la parte pública de la academia (inicio, talleres, refuerzo, quiénes somos con el equipo de profesores, qué hacemos, galería de fotos y vídeos, y contacto), el registro y login de familias y los paneles privados de la familia y del administrador.
 
 > 🔗 **Backend:** [web-educAlba-backend](https://github.com/duran-ni/web-educAlba-backend)
 > 🎨 **Diseño en Figma:** _(enlace pendiente)_
@@ -17,6 +17,7 @@ Web de **EducAlba**, academia de refuerzo escolar y talleres extraescolares. Inc
 - [Scripts disponibles](#-scripts-disponibles)
 - [Estructura de carpetas](#-estructura-de-carpetas)
 - [Arquitectura](#-arquitectura)
+- [Diagramas del proyecto](#-diagramas-del-proyecto)
 - [Rutas de la aplicación](#-rutas-de-la-aplicación)
 - [Diseño responsive y estilos](#-diseño-responsive-y-estilos)
 - [Accesibilidad](#-accesibilidad)
@@ -33,7 +34,8 @@ EducAlba ofrece clases de refuerzo (Infantil, Primaria y ESO), técnicas de estu
 
 **Visitantes**
 - Consultar los talleres en un calendario y en un listado, e **inscribirse** sin necesidad de cuenta.
-- Ver la galería de fotos, la metodología y la historia de la academia.
+- Ver la galería de fotos y vídeos organizada en carpetas, con el botón "cargar más".
+- Conocer al equipo de profesores, la metodología y la historia de la academia.
 - Enviar el formulario de contacto o el formulario rápido de interés de la portada.
 
 **Familias (`ALUMNO_FAMILIA`)**
@@ -42,7 +44,10 @@ EducAlba ofrece clases de refuerzo (Infantil, Primaria y ESO), técnicas de estu
 
 **Administración (`ADMINISTRADOR`)**
 - Ver los indicadores de la academia **actualizados en tiempo real**.
-- Crear y gestionar talleres y dar de alta alumnos.
+- Crear, editar, activar o desactivar y eliminar talleres, y gestionar las inscripciones.
+- Gestionar los alumnos.
+- Gestionar el equipo de profesores, con subida de foto y vista previa.
+- Gestionar la galería: crear y borrar carpetas, elegir la portada, subir varias fotos y vídeos a la vez, editar su descripción y borrarlos.
 
 ---
 
@@ -63,7 +68,7 @@ EducAlba ofrece clases de refuerzo (Infantil, Primaria y ESO), técnicas de estu
 |-----------|-----------|
 | Framework | Vue 3 (Composition API, `<script setup>`) |
 | Build | Vite |
-| Enrutado | Vue Router 4 (lazy loading y guard de autenticación) |
+| Enrutado | Vue Router 4 (lazy loading y guards de autenticación y de rol) |
 | Estado global | Pinia |
 | Peticiones HTTP | Axios (instancia única con interceptores) |
 | Estilos | Sass (SCSS modular) + metodología BEM, mobile-first |
@@ -140,16 +145,18 @@ src
 ├── components      # Componentes reutilizables, agrupados por área
 │   ├── about       ├── auth        ├── footer      ├── gallery
 │   ├── header      ├── home        ├── methodology ├── student
-│   └── workshop
+│   ├── teacher     └── workshop
 ├── composables     # Lógica reutilizable (useDashboardSummaryStream)
 ├── config          # Constantes compartidas (roles, datos de contacto)
 ├── layouts         # PublicLayout, UserLayout, AdminLayout
-├── router          # Rutas y guard de autenticación
+├── router          # Rutas y guards de autenticación y de rol
 ├── services        # Llamadas a la API, una por recurso (auth, workshops…)
-├── stores          # Stores de Pinia (auth)
+├── stores          # Store de Pinia (auth)
 ├── styles          # SCSS: abstracts (variables, mixins), base, components
 ├── utils           # Funciones puras (formato de fechas y horas)
 └── views           # Vistas por área: public, auth, user, admin
+
+e2e                 # Tests end-to-end de Playwright: admin, auth, public y panel de la familia
 ```
 
 Cada carpeta tiene su propia carpeta `__tests__` con los tests de sus archivos.
@@ -163,17 +170,17 @@ flowchart LR
     subgraph Vistas
         V[Views<br/>public · auth · user · admin]
         L[Layouts<br/>Public · User · Admin]
-        C[Components<br/>header · footer · workshop · auth…]
+        C[Components<br/>header · workshop · gallery · teacher…]
     end
-    R[Vue Router<br/>guard requiresAuth]
+    R[Vue Router<br/>guards requiresAuth y role]
     S[(Pinia<br/>authStore)]
     CO[Composables<br/>useDashboardSummaryStream]
-    SV[Services<br/>auth · workshops · students…]
+    SV[Services<br/>auth · workshops · gallery · teachers…]
     H[http.js<br/>Axios + interceptor 401]
     API[(API REST<br/>Spring Boot)]
 
     R --> L --> V --> C
-    R -. comprueba sesión .-> S
+    R -. comprueba sesión y rol .-> S
     V --> SV
     C --> SV
     S --> SV
@@ -187,10 +194,29 @@ flowchart LR
 - **Interceptor de 401**: si la sesión caduca a mitad de uso, se redirige al login automáticamente. Las peticiones donde un 401 es normal (comprobar sesión al arrancar, login con credenciales incorrectas) lo desactivan con `skipAuthRedirect`.
 - **Sesión por cookie, no por token en `localStorage`**: el login envía HTTP Basic una sola vez y a partir de ahí viaja la cookie `JSESSIONID` (`withCredentials: true`), que no es accesible desde JavaScript.
 - **Comprobación de sesión antes de montar la app** (`main.js`): al recargar la página en `/admin` o `/dashboard`, el usuario no es expulsado si su sesión sigue siendo válida.
+- **Control de acceso por rol en el router**: cada panel declara el rol que necesita (`meta.role`). Si una familia intenta entrar en `/admin`, o un administrador en `/dashboard`, el guard lo redirige a su propio panel. La seguridad real la impone el backend; el router solo evita mostrar pantallas que no corresponden.
 - **Layouts anidados en el router**: cada área (pública, familia, administración) tiene su propio layout con su cabecera y pie, sin lógica condicional en `App.vue`.
 - **Lazy loading** de todas las vistas con `import()` dinámico para reducir la carga inicial.
 - **Tiempo real con Server-Sent Events**: el composable `useDashboardSummaryStream` abre un `EventSource` y refresca los indicadores del administrador cuando el backend avisa de un cambio; la conexión se cierra sola al salir de la vista (`onUnmounted`).
 - **Contraseña codificada en Base64** antes de enviarla; el backend la decodifica y la cifra con BCrypt.
+- **Galería paginada**: las carpetas y las fotos de cada carpeta se piden por páginas; el backend indica con `hasMore` si quedan más y el botón "cargar más" se oculta al llegar al final.
+- **Subida de archivos con `FormData`**: las fotos y vídeos de la galería y la foto de cada profesor se envían como `multipart/form-data`. Se pueden subir varios archivos a la vez, y si uno falla se avisa sin perder los que ya se han subido.
+- **Vídeos con reproductor nativo** (`<video controls>`), y un fotograma estático como miniatura en la portada de las carpetas.
+
+---
+
+## 📐 Diagramas del proyecto
+
+**Casos de uso**: qué puede hacer cada actor en la aplicación. `Familia` y `Administrador` heredan de `Visitante`.
+
+![Diagrama de casos de uso](src/assets/diagrama-casos-de-uso.png)
+
+El resto de diagramas está en el [README del backend](https://github.com/duran-ni/web-educAlba-backend#readme):
+
+- [Diagrama entidad-relación (notación Chen)](https://github.com/duran-ni/web-educAlba-backend#-diagrama-entidad-relación-chen)
+- [Diagrama de base de datos (notación pata de gallo)](https://github.com/duran-ni/web-educAlba-backend#️-diagrama-de-base-de-datos)
+- [Diagramas de clases](https://github.com/duran-ni/web-educAlba-backend#-diagrama-de-clases)
+- [Diagramas de secuencia](https://github.com/duran-ni/web-educAlba-backend#-diagramas-de-secuencia): login, inscripción pública, indicadores en tiempo real y subida a la galería, desde el componente de Vue hasta la base de datos
 
 ---
 
@@ -203,12 +229,15 @@ flowchart LR
 | `/refuerzo` | Refuerzo por etapas | Público |
 | `/quienes-somos` | Quiénes somos | Público |
 | `/que-hacemos` | Qué hacemos | Público |
-| `/galeria` | Galería | Público |
+| `/galeria` | Galería (carpetas) | Público |
+| `/galeria/:folderId` | Fotos y vídeos de una carpeta | Público |
 | `/contacto` | Contacto y mapa | Público |
 | `/login` · `/registro` | Login y registro | Público |
 | `/recuperar-contrasena` · `/restablecer-contrasena` | Recuperación de contraseña | Público |
-| `/dashboard` | Panel de la familia | Sesión iniciada |
-| `/admin` · `/admin/alumnos` | Panel de administración y alumnos | Sesión iniciada |
+| `/dashboard` | Panel de la familia | Rol `ALUMNO_FAMILIA` |
+| `/admin` | Panel de administración: indicadores, talleres, inscripciones y profesores | Rol `ADMINISTRADOR` |
+| `/admin/alumnos` | Gestión de alumnos | Rol `ADMINISTRADOR` |
+| `/admin/galeria` | Gestión de la galería | Rol `ADMINISTRADOR` |
 | `/*` | Página 404 | Público |
 
 ---
@@ -218,7 +247,7 @@ flowchart LR
 - **Mobile-first** con dos breakpoints (`768px` tablet y `1024px` escritorio) aplicados mediante el mixin `respond-to`.
 - **SCSS modular**: `abstracts` (variables y mixins, inyectados automáticamente en cada componente desde `vite.config.js`), `base` (reset) y `components` (estilos compartidos).
 - **Metodología BEM** en todos los componentes (`bloque__elemento--modificador`): cada componente usa su propio bloque como prefijo, lo que evita colisiones de estilos entre componentes.
-- **Identidad visual "cuaderno / doodle"**: fondo cuadriculado, tipografías Space Grotesk, Be Vietnam Pro y Playwrite IN, y paleta de colores definida en `_variables.scss`.
+- **Identidad visual "cuaderno / doodle"**: fondo cuadriculado, tipografías Space Grotesk, Be Vietnam Pro y Playwrite IN, y paleta de colores definida en `_variables.scss`. Las carpetas de la galería son tarjetas cuadradas y las fotos de los profesores se muestran como polaroids inclinadas (o un avatar genérico si no tienen foto).
 - **Menú hamburguesa** en móvil.
 
 ---
@@ -230,24 +259,42 @@ flowchart LR
 - Menú de navegación móvil con `aria-expanded` y `aria-controls`.
 - Iconos decorativos ocultos a los lectores de pantalla con `aria-hidden`.
 - Al cambiar de página, el scroll vuelve al inicio.
-- Los atributos ARIA del menú (`aria-expanded`, `aria-controls`) están cubiertos por tests de componentes, y los tests end-to-end localizan los elementos por su rol accesible.
+- Los atributos ARIA del menú (`aria-expanded`, `aria-controls`) están cubiertos por tests de componentes, y los tests end-to-end localizan los elementos sobre todo por su rol accesible (`getByRole`), igual que lo haría un lector de pantalla.
 
 ---
 
 ## ✅ Tests
 
-**Tests unitarios y de componentes** con Vitest y Vue Test Utils: más de 270 tests en 66 archivos que cubren componentes, vistas, layouts, router, servicios, store, composables y utilidades.
+### Tests unitarios y de componentes
+
+Con Vitest y Vue Test Utils: **431 tests en 80 archivos, todos pasados**. Cubren componentes, vistas, layouts, router (incluidas las redirecciones por rol), servicios, store, composables y utilidades.
 
 ```bash
 npm run test:unit            # modo watch
 npm run test:unit:coverage   # con informe de cobertura (coverage/index.html)
 ```
 
-**Cobertura actual: 100 % de sentencias, ramas, funciones y líneas.**
+**Cobertura actual:**
 
-![Cobertura de tests del frontend](docs/images/coverage-frontend.png)
+| Sentencias | Ramas | Funciones | Líneas |
+| ---------- | ----- | --------- | ------ |
+| 100 % (1347/1347) | 100 % (1093/1093) | 100 % (374/374) | 100 % (1271/1271) |
 
-**Tests end-to-end** con Playwright en Chromium, Firefox y WebKit (navegación, rutas protegidas y página 404). Playwright arranca automáticamente el servidor de desarrollo:
+![Cobertura de tests del frontend](src/assets/coverage-frontend.png)
+
+### Tests end-to-end
+
+Con Playwright: **71 tests distintos en 14 archivos**. Cada uno se ejecuta en 3 navegadores (Chromium, Firefox y WebKit), así que en total son **213 ejecuciones, todas pasadas**. Se ejecutan en paralelo y Playwright arranca automáticamente el servidor de desarrollo.
+
+Las respuestas del backend se simulan interceptando las peticiones (`page.route`), así que los tests son rápidos, no necesitan el backend arrancado y pueden probar también los casos de error.
+
+| Área | Qué se prueba |
+| ---- | ------------- |
+| Autenticación | Login de administrador y de familia, credenciales incorrectas, cierre de sesión, sesión que se mantiene al recargar, registro, recuperación de contraseña y redirecciones por rol |
+| Parte pública | Inscripción a talleres, formulario de contacto, galería con "cargar más" y equipo de profesores |
+| Panel de la familia | Saludo, talleres inscritos y mensajes de error |
+| Panel de administración | Gestión de talleres, alumnos, profesores y galería, incluidos los avisos de error (borrar un taller con inscripciones o una carpeta con fotos) |
+| Navegación | Rutas protegidas y página 404 |
 
 ```bash
 npx playwright install   # solo la primera vez
@@ -273,7 +320,7 @@ En cada `push` y `pull request` a `main` y `dev`, GitHub Actions (`.github/workf
 - **Diseño previo**: prototipos de todas las vistas antes de programar y diseño final en Figma.
 - **Gestión ágil en Jira**: una épica por vista o área, con historias de usuario, criterios de aceptación y subtareas.
 - **Git Flow simplificado**: `main` (estable) ← `dev` (integración) ← una rama `feature/…` por tarea.
-- **Commits atómicos** con [Conventional Commits](https://www.conventionalcommits.org/es/) (`feat:`, `fix:`, `test:`, `style:`, `refactor:`…).
+- **Commits atómicos** con [Conventional Commits](https://www.conventionalcommits.org/es/) (`feat:`, `fix:`, `test:`, `style:`, `refactor:`…), indicando el módulo cuando aplica (`feat(gallery):`, `test(e2e):`).
 
 ---
 
