@@ -126,6 +126,7 @@
       :materials="materialsForStudent(selectedStudent.id)"
       @back="selectedStudentId = null"
       @upload-material="openMaterialDialog"
+      @edit-material="openMaterialEditDialog"
       @delete-material="handleDeleteMaterial"
     />
 
@@ -155,6 +156,20 @@
         @cancel="closeMaterialDialog"
       />
     </dialog>
+
+    <dialog
+      ref="materialEditDialogRef"
+      class="admin-students-view__dialog"
+      @close="handleMaterialEditDialogClose"
+    >
+      <StudentMaterialEditForm
+        v-if="materialEditTarget"
+        :key="materialEditTarget.id"
+        :material="materialEditTarget"
+        @updated="handleMaterialDetailsUpdated"
+        @cancel="closeMaterialEditDialog"
+      />
+    </dialog>
   </section>
 </template>
 
@@ -166,6 +181,7 @@ import { fetchStudentMaterials, deleteStudentMaterial } from '@/services/materia
 import StudentForm from '@/components/student/StudentForm.vue'
 import StudentMaterialsDetail from '@/components/student/StudentMaterialsDetail.vue'
 import StudentMaterialUploadForm from '@/components/student/StudentMaterialUploadForm.vue'
+import StudentMaterialEditForm from '@/components/student/StudentMaterialEditForm.vue'
 
 // loading | loaded | error
 const status = ref('loading')
@@ -181,6 +197,11 @@ const materialDialogRef = ref(null)
 // Alumno sobre el que se está subiendo un material ahora mismo (null cuando
 // el dialog de subida está cerrado)
 const materialUploadTarget = ref(null)
+
+const materialEditDialogRef = ref(null)
+// Material cuyo título/descripción se está editando ahora mismo (null
+// cuando el dialog de edición está cerrado)
+const materialEditTarget = ref(null)
 
 // Id del alumno seleccionado para ver sus materiales (null muestra la tabla
 // de alumnos; con un id se muestra la vista de materiales de ese alumno)
@@ -334,6 +355,30 @@ function handleMaterialDialogClose() {
 // varios de golpe): se añade a la lista, sin volver a pedir nada al backend
 function handleMaterialUploaded(newMaterial) {
   materials.value = [...materials.value, newMaterial]
+}
+
+function openMaterialEditDialog(material) {
+  materialEditTarget.value = material
+  materialEditDialogRef.value.showModal()
+}
+
+function closeMaterialEditDialog() {
+  materialEditDialogRef.value.close()
+}
+
+// Al cerrar el dialog de edición se limpia el material objetivo, para que
+// la próxima vez que se abra no arrastre el material de la edición anterior
+function handleMaterialEditDialogClose() {
+  materialEditTarget.value = null
+}
+
+// Sustituye el material editado por la versión que devuelve el backend (ya
+// con su nuevo título/descripción), sin volver a pedir nada más
+function handleMaterialDetailsUpdated(updatedMaterial) {
+  materials.value = materials.value.map((material) =>
+    material.id === updatedMaterial.id ? updatedMaterial : material
+  )
+  closeMaterialEditDialog()
 }
 
 // Elimina el material en el backend y, solo si la petición tiene éxito, lo
