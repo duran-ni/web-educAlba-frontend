@@ -38,8 +38,11 @@
           :src="photo.imageUrl"
           :aria-label="photo.caption || 'Vídeo de la galería'"
           controls
+          controlsList="nodownload noremoteplayback"
+          disablePictureInPicture
           playsinline
           preload="metadata"
+          @contextmenu.prevent
         ></video>
         <img
           v-else
