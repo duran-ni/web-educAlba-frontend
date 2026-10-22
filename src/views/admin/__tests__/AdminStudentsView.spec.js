@@ -5,6 +5,7 @@ import AdminStudentsView from '../AdminStudentsView.vue'
 import StudentForm from '@/components/student/StudentForm.vue'
 import { fetchStudents, deleteStudent } from '@/services/students'
 import { fetchEnrollments } from '@/services/enrollments'
+import { fetchStudentMaterials } from '@/services/materials'
 
 vi.mock('@/services/students', () => ({
   fetchStudents: vi.fn(),
@@ -13,6 +14,11 @@ vi.mock('@/services/students', () => ({
 
 vi.mock('@/services/enrollments', () => ({
   fetchEnrollments: vi.fn(),
+}))
+
+vi.mock('@/services/materials', () => ({
+  fetchStudentMaterials: vi.fn(),
+  deleteStudentMaterial: vi.fn(),
 }))
 
 // jsdom no implementa el elemento <dialog>: se simulan sus dos únicos
@@ -45,10 +51,12 @@ function mountView() {
 
 async function mountLoaded(
   students = [STUDENT_LUCIA, STUDENT_MARCOS],
-  enrollments = [ENROLLMENT_LUCIA]
+  enrollments = [ENROLLMENT_LUCIA],
+  materials = []
 ) {
   fetchStudents.mockResolvedValueOnce({ data: students })
   fetchEnrollments.mockResolvedValueOnce({ data: enrollments })
+  fetchStudentMaterials.mockResolvedValueOnce({ data: materials })
   const wrapper = mountView()
   await flushPromises()
   return wrapper
@@ -67,6 +75,7 @@ describe('AdminStudentsView.vue', () => {
   it('shows the loading message before the students arrive', () => {
     fetchStudents.mockReturnValue(new Promise(() => {}))
     fetchEnrollments.mockReturnValue(new Promise(() => {}))
+    fetchStudentMaterials.mockReturnValue(new Promise(() => {}))
     const wrapper = mountView()
 
     expect(wrapper.text()).toContain('Cargando alumnos…')
@@ -75,6 +84,7 @@ describe('AdminStudentsView.vue', () => {
   it('shows an error message when the request fails', async () => {
     fetchStudents.mockRejectedValueOnce(new Error('network error'))
     fetchEnrollments.mockResolvedValueOnce({ data: [] })
+    fetchStudentMaterials.mockResolvedValueOnce({ data: [] })
     const wrapper = mountView()
     await flushPromises()
 
@@ -182,6 +192,7 @@ describe('AdminStudentsView.vue', () => {
     const wrapper = await mountLoaded()
     fetchStudents.mockResolvedValueOnce({ data: [STUDENT_LUCIA, STUDENT_MARCOS] })
     fetchEnrollments.mockResolvedValueOnce({ data: [ENROLLMENT_LUCIA] })
+    fetchStudentMaterials.mockResolvedValueOnce({ data: [] })
 
     wrapper.findComponent(StudentForm).vm.$emit('created')
     await flushPromises()
@@ -194,6 +205,7 @@ describe('AdminStudentsView.vue', () => {
     const wrapper = await mountLoaded()
     fetchStudents.mockResolvedValueOnce({ data: [STUDENT_LUCIA, STUDENT_MARCOS] })
     fetchEnrollments.mockResolvedValueOnce({ data: [ENROLLMENT_LUCIA] })
+    fetchStudentMaterials.mockResolvedValueOnce({ data: [] })
 
     wrapper.findComponent(StudentForm).vm.$emit('updated')
     await flushPromises()
