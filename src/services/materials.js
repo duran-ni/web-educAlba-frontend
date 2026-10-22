@@ -26,6 +26,13 @@ export function uploadStudentMaterial({ file, title, description, studentId }) {
   })
 }
 
+// Actualiza el título y la descripción de un material ya subido (el archivo
+// en sí no se puede editar por aquí: para cambiarlo hay que eliminar el
+// material y subir uno nuevo)
+export function updateStudentMaterial(id, { title, description }) {
+  return http.put(`/admin/materials/${id}`, { title, description })
+}
+
 // Elimina un material ya subido
 export function deleteStudentMaterial(id) {
   return http.delete(`/admin/materials/${id}`)
