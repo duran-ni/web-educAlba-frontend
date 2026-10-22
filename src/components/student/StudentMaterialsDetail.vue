@@ -29,7 +29,7 @@
         class="student-materials-detail__item"
       >
         <a
-          :href="material.fileUrl"
+          :href="material.downloadUrl"
           target="_blank"
           rel="noopener noreferrer"
           class="student-materials-detail__item-link"
