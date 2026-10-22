@@ -44,14 +44,25 @@
 
         <p class="student-materials-detail__item-date">Subido el {{ formatDate(material.uploadedAt) }}</p>
 
-        <button
-          type="button"
-          class="student-materials-detail__item-delete"
-          :aria-label="`Eliminar ${material.title}`"
-          @click="handleDeleteClick(material)"
-        >
-          Eliminar
-        </button>
+        <div class="student-materials-detail__item-actions">
+          <button
+            type="button"
+            class="student-materials-detail__item-edit"
+            :aria-label="`Editar ${material.title}`"
+            @click="$emit('edit-material', material)"
+          >
+            Editar
+          </button>
+
+          <button
+            type="button"
+            class="student-materials-detail__item-delete"
+            :aria-label="`Eliminar ${material.title}`"
+            @click="handleDeleteClick(material)"
+          >
+            Eliminar
+          </button>
+        </div>
       </li>
     </ul>
   </section>
@@ -73,7 +84,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['back', 'upload-material', 'delete-material'])
+const emit = defineEmits(['back', 'upload-material', 'edit-material', 'delete-material'])
 
 // Se muestran del más reciente al más antiguo, para que las últimas tareas
 // mandadas aparezcan siempre arriba, sin que el administrador tenga que
@@ -212,19 +223,40 @@ function handleDeleteClick(material) {
     opacity: 0.75;
   }
 
+  &__item-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  &__item-edit,
   &__item-delete {
     align-self: flex-start;
     padding: 0.3rem 0.9rem;
-    border: 1px solid $color-error;
     border-radius: 999px;
-    background: none;
-    color: $color-error;
     font-size: 0.8125rem;
     font-weight: 600;
     cursor: pointer;
     transition:
       background-color 0.2s ease,
       color 0.2s ease;
+  }
+
+  &__item-edit {
+    border: 1px solid $color-green-dark;
+    background: none;
+    color: $color-green-dark;
+
+    &:hover,
+    &:focus-visible {
+      background-color: $color-green-dark;
+      color: $color-background;
+    }
+  }
+
+  &__item-delete {
+    border: 1px solid $color-error;
+    background: none;
+    color: $color-error;
 
     &:hover,
     &:focus-visible {
