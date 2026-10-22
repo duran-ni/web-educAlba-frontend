@@ -4,7 +4,7 @@
 
     <div class="student-material-upload-form__field">
       <label class="student-material-upload-form__label" for="student-material-files">
-        Archivos PDF (puedes seleccionar varios a la vez)
+        Archivos PDF (puedes seleccionar varios a la vez, máx. {{ maxFileSizeMb }} MB cada uno)
       </label>
       <input
         id="student-material-files"
@@ -33,46 +33,52 @@
       >
         <p class="student-material-upload-form__entry-filename">{{ entry.file.name }}</p>
 
-        <div class="student-material-upload-form__field">
-          <label
-            class="student-material-upload-form__label"
-            :for="`student-material-title-${entry.id}`"
-          >
-            Título
-          </label>
-          <input
-            :id="`student-material-title-${entry.id}`"
-            v-model.trim="entry.title"
-            class="student-material-upload-form__input"
-            type="text"
-            placeholder="Ej. Tarea de Lengua"
-            :aria-invalid="Boolean(entry.titleError)"
-            :aria-describedby="entry.titleError ? `student-material-title-${entry.id}-error` : undefined"
-          />
-          <p
-            v-if="entry.titleError"
-            :id="`student-material-title-${entry.id}-error`"
-            class="student-material-upload-form__field-error"
-          >
-            {{ entry.titleError }}
-          </p>
-        </div>
+        <p v-if="entry.fileError" class="student-material-upload-form__field-error" role="alert">
+          {{ entry.fileError }}
+        </p>
 
-        <div class="student-material-upload-form__field">
-          <label
-            class="student-material-upload-form__label"
-            :for="`student-material-description-${entry.id}`"
-          >
-            Descripción (opcional)
-          </label>
-          <textarea
-            :id="`student-material-description-${entry.id}`"
-            v-model.trim="entry.description"
-            class="student-material-upload-form__textarea"
-            rows="2"
-            placeholder="Ej. Resuelve los ejercicios 3 y 4"
-          ></textarea>
-        </div>
+        <template v-else>
+          <div class="student-material-upload-form__field">
+            <label
+              class="student-material-upload-form__label"
+              :for="`student-material-title-${entry.id}`"
+            >
+              Título
+            </label>
+            <input
+              :id="`student-material-title-${entry.id}`"
+              v-model.trim="entry.title"
+              class="student-material-upload-form__input"
+              type="text"
+              placeholder="Ej. Tarea de Lengua"
+              :aria-invalid="Boolean(entry.titleError)"
+              :aria-describedby="entry.titleError ? `student-material-title-${entry.id}-error` : undefined"
+            />
+            <p
+              v-if="entry.titleError"
+              :id="`student-material-title-${entry.id}-error`"
+              class="student-material-upload-form__field-error"
+            >
+              {{ entry.titleError }}
+            </p>
+          </div>
+
+          <div class="student-material-upload-form__field">
+            <label
+              class="student-material-upload-form__label"
+              :for="`student-material-description-${entry.id}`"
+            >
+              Descripción (opcional)
+            </label>
+            <textarea
+              :id="`student-material-description-${entry.id}`"
+              v-model.trim="entry.description"
+              class="student-material-upload-form__textarea"
+              rows="2"
+              placeholder="Ej. Resuelve los ejercicios 3 y 4"
+            ></textarea>
+          </div>
+        </template>
 
         <button
           type="button"
@@ -135,6 +141,11 @@ const props = defineProps({
 // lote completo termina sin ningún error
 const emit = defineEmits(['material-uploaded', 'all-uploaded', 'cancel'])
 
+// Tamaño máximo permitido por PDF (10 MB), expresado en bytes porque es la
+// unidad en la que el navegador informa de File.size
+const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024
+const maxFileSizeMb = MAX_FILE_SIZE_BYTES / (1024 * 1024)
+
 // A diferencia de la galería (donde el pie de foto solo tiene sentido si se
 // sube un único archivo), aquí cada PDF necesita su propio título siempre,
 // aunque se suban varios a la vez: por eso "entries" guarda un título y una
@@ -149,6 +160,22 @@ const status = ref('idle')
 // que el propio objeto File no sirve como key estable entre renders
 let nextEntryId = 0
 
+// Comprueba el tipo real del archivo (no basta con el atributo "accept" del
+// input, que solo es una ayuda visual del navegador y no impide seleccionar
+// otro tipo de archivo renombrado con extensión .pdf) y su tamaño máximo, y
+// devuelve el mensaje de error correspondiente, o cadena vacía si es válido
+function validateFile(file) {
+  if (file.type !== 'application/pdf') {
+    return 'Este archivo no es un PDF'
+  }
+
+  if (file.size > MAX_FILE_SIZE_BYTES) {
+    return `Este archivo pesa demasiado (máx. ${maxFileSizeMb} MB)`
+  }
+
+  return ''
+}
+
 function handleFileChange(event) {
   const files = Array.from(event.target.files)
 
@@ -158,6 +185,7 @@ function handleFileChange(event) {
     title: '',
     description: '',
     titleError: '',
+    fileError: validateFile(file),
   }))
   fileError.value = ''
 }
@@ -177,6 +205,13 @@ function validate() {
   let isValid = true
 
   for (const entry of entries.value) {
+    // El archivo ya se validó al seleccionarlo (handleFileChange); si sigue
+    // teniendo error, no se puede enviar
+    if (entry.fileError) {
+      isValid = false
+      continue
+    }
+
     entry.titleError = entry.title ? '' : 'Escribe un título para este PDF'
 
     if (entry.titleError) {
