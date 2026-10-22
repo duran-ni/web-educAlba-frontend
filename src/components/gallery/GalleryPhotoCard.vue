@@ -5,8 +5,11 @@
       class="gallery-photo-card__image"
       :src="photo.imageUrl"
       controls
+      controlsList="nodownload noremoteplayback"
+      disablePictureInPicture
       preload="metadata"
       :aria-label="altText"
+      @contextmenu.prevent
     ></video>
     <img
       v-else
