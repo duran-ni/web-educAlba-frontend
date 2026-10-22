@@ -28,21 +28,29 @@
         :key="material.id"
         class="student-materials-detail__item"
       >
-        <a
-          :href="material.downloadUrl"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="student-materials-detail__item-link"
-        >
-          <span class="material-symbols-outlined" aria-hidden="true">picture_as_pdf</span>
-          {{ material.title }}
-        </a>
+        <div class="student-materials-detail__item-info">
+          <div class="student-materials-detail__item-title-row">
+            <a
+              :href="material.downloadUrl"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="student-materials-detail__item-link"
+            >
+              <span class="material-symbols-outlined" aria-hidden="true">picture_as_pdf</span>
+              {{ material.title }}
+            </a>
 
-        <p v-if="material.description" class="student-materials-detail__item-description">
-          {{ material.description }}
-        </p>
+            <span class="student-materials-detail__item-separator" aria-hidden="true"></span>
 
-        <p class="student-materials-detail__item-date">Subido el {{ formatDate(material.uploadedAt) }}</p>
+            <span class="student-materials-detail__item-date">
+              Subido el {{ formatDate(material.uploadedAt) }}
+            </span>
+          </div>
+
+          <p v-if="material.description" class="student-materials-detail__item-description">
+            {{ material.description }}
+          </p>
+        </div>
 
         <div class="student-materials-detail__item-actions">
           <button
@@ -145,9 +153,12 @@ function handleDeleteClick(material) {
     flex-wrap: wrap;
   }
 
+  // Misma fuente "doodle" que usan el resto de títulos del panel de admin
+  // (por ejemplo, "Alumnos" y "Carpetas"), para que este título quede
+  // coherente con el resto de la aplicación
   &__title {
     margin: 0;
-    font-family: $font-heading;
+    font-family: $font-doodle;
     font-size: 1.75rem;
     font-weight: 600;
     color: $color-primary;
@@ -178,22 +189,49 @@ function handleDeleteClick(material) {
     color: $color-text-dark;
   }
 
+  // La lista pasa de ser una rejilla de tarjetas cuadradas a una columna de
+  // filas que ocupan todo el ancho disponible, una debajo de otra
   &__list {
     list-style: none;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+    display: flex;
+    flex-direction: column;
     gap: 1rem;
     margin: 0;
     padding: 0;
   }
 
+  // Cada fila coloca la información a la izquierda y las acciones a la
+  // derecha; "flex-wrap: wrap" hace que, en pantallas estrechas, las
+  // acciones bajen a su propia línea en vez de desbordar la fila
   &__item {
     display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    padding: 1rem;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    padding: 1rem 1.25rem;
     background-color: $color-background-soft;
     border-radius: 0.75rem;
+  }
+
+  // Agrupa el título+fecha y la descripción en una columna propia, separada
+  // de las acciones; "min-width: 0" evita que un título largo empuje a los
+  // botones fuera de la fila en vez de ajustarse
+  &__item-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 0;
+  }
+
+  // Coloca el enlace al PDF y la fecha de subida en la misma línea; si no
+  // caben (título largo o pantalla estrecha), la fecha pasa a su propia
+  // línea gracias a "flex-wrap: wrap"
+  &__item-title-row {
+    display: flex;
+    align-items: baseline;
+    gap: 1.5rem;
+    flex-wrap: wrap;
   }
 
   &__item-link {
@@ -217,15 +255,18 @@ function handleDeleteClick(material) {
   }
 
   &__item-date {
-    margin: 0;
     font-size: 0.75rem;
     color: $color-text-dark;
     opacity: 0.75;
+    white-space: nowrap;
   }
 
+  // "flex-shrink: 0" evita que los botones se compriman cuando el título o
+  // la descripción ocupan mucho espacio en la misma fila
   &__item-actions {
     display: flex;
     gap: 0.5rem;
+    flex-shrink: 0;
   }
 
   &__item-edit,
