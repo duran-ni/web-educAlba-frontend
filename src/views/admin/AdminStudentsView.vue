@@ -1,112 +1,133 @@
 <template>
   <section class="admin-students-view">
-    <div class="admin-students-view__header">
-      <div class="admin-students-view__header-top">
-        <h1 class="admin-students-view__title">Alumnos</h1>
-        <button type="button" class="admin-students-view__new-student" @click="openDialog">
-          <span class="material-symbols-outlined" aria-hidden="true">person_add</span>
-          + Nuevo Alumno
-        </button>
+    <template v-if="!selectedStudent">
+      <div class="admin-students-view__header">
+        <div class="admin-students-view__header-top">
+          <h1 class="admin-students-view__title">Alumnos</h1>
+          <button type="button" class="admin-students-view__new-student" @click="openDialog">
+            <span class="material-symbols-outlined" aria-hidden="true">person_add</span>
+            + Nuevo Alumno
+          </button>
+        </div>
+
+        <img src="@/assets/alumnos.jpeg" alt="" class="admin-students-view__header-image" />
       </div>
 
-      <img src="@/assets/alumnos.jpeg" alt="" class="admin-students-view__header-image" />
-    </div>
+      <div class="admin-students-view__search-field">
+        <label class="admin-students-view__search-label" for="student-search">
+          Buscar alumno
+        </label>
+        <input
+          id="student-search"
+          v-model="searchTerm"
+          type="search"
+          class="admin-students-view__search"
+          placeholder="Nombre del alumno…"
+        />
+      </div>
 
-    <div class="admin-students-view__search-field">
-      <label class="admin-students-view__search-label" for="student-search"> Buscar alumno </label>
-      <input
-        id="student-search"
-        v-model="searchTerm"
-        type="search"
-        class="admin-students-view__search"
-        placeholder="Nombre del alumno…"
-      />
-    </div>
+      <p v-if="status === 'loading'" class="admin-students-view__message">Cargando alumnos…</p>
 
-    <p v-if="status === 'loading'" class="admin-students-view__message">Cargando alumnos…</p>
+      <p
+        v-else-if="status === 'error'"
+        class="admin-students-view__message admin-students-view__message--error"
+      >
+        No hemos podido cargar los alumnos. Inténtalo de nuevo más tarde.
+      </p>
 
-    <p
-      v-else-if="status === 'error'"
-      class="admin-students-view__message admin-students-view__message--error"
-    >
-      No hemos podido cargar los alumnos. Inténtalo de nuevo más tarde.
-    </p>
+      <p v-else-if="filteredStudents.length === 0" class="admin-students-view__message">
+        No se han encontrado alumnos.
+      </p>
 
-    <p v-else-if="filteredStudents.length === 0" class="admin-students-view__message">
-      No se han encontrado alumnos.
-    </p>
+      <div v-else class="admin-students-view__table-wrapper">
+        <table class="admin-students-view__table">
+          <caption class="admin-students-view__table-caption">
+            Listado de alumnos de Refuerzo dados de alta
+          </caption>
+          <thead>
+            <tr class="admin-students-view__row admin-students-view__row--head">
+              <th scope="col" class="admin-students-view__cell admin-students-view__cell--head">
+                Nombre
+              </th>
+              <th scope="col" class="admin-students-view__cell admin-students-view__cell--head">
+                Apellidos
+              </th>
+              <th scope="col" class="admin-students-view__cell admin-students-view__cell--head">
+                Edad
+              </th>
+              <th scope="col" class="admin-students-view__cell admin-students-view__cell--head">
+                Teléfono
+              </th>
+              <th scope="col" class="admin-students-view__cell admin-students-view__cell--head">
+                Servicio
+              </th>
+              <th scope="col" class="admin-students-view__cell admin-students-view__cell--head">
+                Etapa educativa
+              </th>
+              <th scope="col" class="admin-students-view__cell admin-students-view__cell--head">
+                Talleres a los que asiste
+              </th>
+              <th scope="col" class="admin-students-view__cell admin-students-view__cell--head">
+                Acciones
+              </th>
+            </tr>
+          </thead>
 
-    <div v-else class="admin-students-view__table-wrapper">
-      <table class="admin-students-view__table">
-        <caption class="admin-students-view__table-caption">
-          Listado de alumnos de Refuerzo dados de alta
-        </caption>
-        <thead>
-          <tr class="admin-students-view__row admin-students-view__row--head">
-            <th scope="col" class="admin-students-view__cell admin-students-view__cell--head">
-              Nombre
-            </th>
-            <th scope="col" class="admin-students-view__cell admin-students-view__cell--head">
-              Apellidos
-            </th>
-            <th scope="col" class="admin-students-view__cell admin-students-view__cell--head">
-              Edad
-            </th>
-            <th scope="col" class="admin-students-view__cell admin-students-view__cell--head">
-              Teléfono
-            </th>
-            <th scope="col" class="admin-students-view__cell admin-students-view__cell--head">
-              Servicio
-            </th>
-            <th scope="col" class="admin-students-view__cell admin-students-view__cell--head">
-              Etapa educativa
-            </th>
-            <th scope="col" class="admin-students-view__cell admin-students-view__cell--head">
-              Talleres a los que asiste
-            </th>
-            <th scope="col" class="admin-students-view__cell admin-students-view__cell--head">
-              Acciones
-            </th>
-          </tr>
-        </thead>
+          <tbody>
+            <tr
+              v-for="student in filteredStudents"
+              :key="student.id"
+              class="admin-students-view__row"
+            >
+              <td class="admin-students-view__cell">{{ student.firstName }}</td>
+              <td class="admin-students-view__cell">{{ student.lastName }}</td>
+              <td class="admin-students-view__cell">{{ student.age ?? '—' }}</td>
+              <td class="admin-students-view__cell">{{ student.phone ?? '—' }}</td>
+              <td class="admin-students-view__cell">{{ student.serviceOfInterest ?? '—' }}</td>
+              <td class="admin-students-view__cell">{{ student.educationalStage ?? '—' }}</td>
+              <td class="admin-students-view__cell">
+                {{ workshopsForStudent(student.id).join(', ') || '—' }}
+              </td>
+              <td class="admin-students-view__cell admin-students-view__cell--actions">
+                <button
+                  type="button"
+                  class="admin-students-view__materials"
+                  :aria-label="`Ver materiales de ${student.firstName} ${student.lastName}`"
+                  @click="selectedStudentId = student.id"
+                >
+                  Materiales
+                </button>
+                <button
+                  type="button"
+                  class="admin-students-view__edit"
+                  :aria-label="`Editar a ${student.firstName} ${student.lastName}`"
+                  @click="openEditDialog(student)"
+                >
+                  Editar
+                </button>
+                <button
+                  type="button"
+                  class="admin-students-view__delete"
+                  :aria-label="`Eliminar a ${student.firstName} ${student.lastName}`"
+                  @click="handleDeleteClick(student)"
+                >
+                  Eliminar
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </template>
 
-        <tbody>
-          <tr
-            v-for="student in filteredStudents"
-            :key="student.id"
-            class="admin-students-view__row"
-          >
-            <td class="admin-students-view__cell">{{ student.firstName }}</td>
-            <td class="admin-students-view__cell">{{ student.lastName }}</td>
-            <td class="admin-students-view__cell">{{ student.age ?? '—' }}</td>
-            <td class="admin-students-view__cell">{{ student.phone ?? '—' }}</td>
-            <td class="admin-students-view__cell">{{ student.serviceOfInterest ?? '—' }}</td>
-            <td class="admin-students-view__cell">{{ student.educationalStage ?? '—' }}</td>
-            <td class="admin-students-view__cell">
-              {{ workshopsForStudent(student.id).join(', ') || '—' }}
-            </td>
-            <td class="admin-students-view__cell admin-students-view__cell--actions">
-              <button
-                type="button"
-                class="admin-students-view__edit"
-                :aria-label="`Editar a ${student.firstName} ${student.lastName}`"
-                @click="openEditDialog(student)"
-              >
-                Editar
-              </button>
-              <button
-                type="button"
-                class="admin-students-view__delete"
-                :aria-label="`Eliminar a ${student.firstName} ${student.lastName}`"
-                @click="handleDeleteClick(student)"
-              >
-                Eliminar
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <StudentMaterialsDetail
+      v-else
+      :student="selectedStudent"
+      :materials="materialsForStudent(selectedStudent.id)"
+      @back="selectedStudentId = null"
+      @upload-material="openMaterialDialog"
+      @delete-material="handleDeleteMaterial"
+    />
 
     <dialog ref="dialogRef" class="admin-students-view__dialog" @close="handleDialogClose">
       <StudentForm
@@ -118,6 +139,22 @@
         @cancel="closeDialog"
       />
     </dialog>
+
+    <dialog
+      ref="materialDialogRef"
+      class="admin-students-view__dialog"
+      @close="handleMaterialDialogClose"
+    >
+      <StudentMaterialUploadForm
+        v-if="materialUploadTarget"
+        :key="materialUploadTarget.id"
+        :student-id="materialUploadTarget.id"
+        :student-name="`${materialUploadTarget.firstName} ${materialUploadTarget.lastName}`"
+        @material-uploaded="handleMaterialUploaded"
+        @all-uploaded="closeMaterialDialog"
+        @cancel="closeMaterialDialog"
+      />
+    </dialog>
   </section>
 </template>
 
@@ -125,29 +162,51 @@
 import { ref, computed, onMounted } from 'vue'
 import { fetchStudents, deleteStudent } from '@/services/students'
 import { fetchEnrollments } from '@/services/enrollments'
+import { fetchStudentMaterials, deleteStudentMaterial } from '@/services/materials'
 import StudentForm from '@/components/student/StudentForm.vue'
+import StudentMaterialsDetail from '@/components/student/StudentMaterialsDetail.vue'
+import StudentMaterialUploadForm from '@/components/student/StudentMaterialUploadForm.vue'
 
 // loading | loaded | error
 const status = ref('loading')
 const students = ref([])
 const enrollments = ref([])
+const materials = ref([])
 const searchTerm = ref('')
 
 const dialogRef = ref(null)
 const editingStudent = ref(null)
 
+const materialDialogRef = ref(null)
+// Alumno sobre el que se está subiendo un material ahora mismo (null cuando
+// el dialog de subida está cerrado)
+const materialUploadTarget = ref(null)
+
+// Id del alumno seleccionado para ver sus materiales (null muestra la tabla
+// de alumnos; con un id se muestra la vista de materiales de ese alumno)
+const selectedStudentId = ref(null)
+
+// Se deriva de "students" en vez de guardar el alumno entero, para que la
+// vista de materiales siempre refleje los datos más recientes
+const selectedStudent = computed(
+  () => students.value.find((student) => student.id === selectedStudentId.value) ?? null
+)
+
 onMounted(loadData)
 
-// Carga en paralelo los alumnos y las inscripciones, ya que la vista
-// necesita ambas colecciones para cruzar cada alumno con sus talleres
+// Carga en paralelo los alumnos, las inscripciones y los materiales, ya que
+// la vista necesita las tres colecciones para cruzar cada alumno con sus
+// talleres y sus PDFs
 async function loadData() {
   try {
-    const [studentsResponse, enrollmentsResponse] = await Promise.all([
+    const [studentsResponse, enrollmentsResponse, materialsResponse] = await Promise.all([
       fetchStudents(),
       fetchEnrollments(),
+      fetchStudentMaterials(),
     ])
     students.value = studentsResponse.data
     enrollments.value = enrollmentsResponse.data
+    materials.value = materialsResponse.data
     status.value = 'loaded'
   } catch {
     status.value = 'error'
@@ -182,6 +241,13 @@ function workshopsForStudent(studentId) {
   return enrollments.value
     .filter((enrollment) => enrollment.studentId === studentId)
     .map((enrollment) => enrollment.workshopName)
+}
+
+// Filtra, del lado del frontend, los materiales que pertenecen a este
+// alumno concreto; evita pedir al backend un listado distinto por cada
+// alumno (mismo criterio que photosForFolder en la galería)
+function materialsForStudent(studentId) {
+  return materials.value.filter((material) => material.studentId === studentId)
 }
 
 // Devuelve la inscripción (si existe) del alumno dado, para precargarla en
@@ -245,6 +311,39 @@ async function handleDeleteClick(student) {
     } else {
       window.alert('No se ha podido eliminar el alumno. Inténtalo de nuevo.')
     }
+  }
+}
+
+function openMaterialDialog(student) {
+  materialUploadTarget.value = student
+  materialDialogRef.value.showModal()
+}
+
+function closeMaterialDialog() {
+  materialDialogRef.value.close()
+}
+
+// Al cerrar el dialog de subida (tanto si se guarda como si se cancela o se
+// pulsa Esc) se limpia el alumno objetivo, para que la próxima vez que se
+// abra no arrastre el alumno de la subida anterior
+function handleMaterialDialogClose() {
+  materialUploadTarget.value = null
+}
+
+// Se emite una vez por cada PDF subido con éxito (el formulario puede subir
+// varios de golpe): se añade a la lista, sin volver a pedir nada al backend
+function handleMaterialUploaded(newMaterial) {
+  materials.value = [...materials.value, newMaterial]
+}
+
+// Elimina el material en el backend y, solo si la petición tiene éxito, lo
+// quita también del listado en memoria
+async function handleDeleteMaterial(materialId) {
+  try {
+    await deleteStudentMaterial(materialId)
+    materials.value = materials.value.filter((material) => material.id !== materialId)
+  } catch {
+    window.alert('No se ha podido eliminar el material. Inténtalo de nuevo.')
   }
 }
 </script>
@@ -423,6 +522,7 @@ async function handleDeleteClick(student) {
     gap: 0.75rem;
   }
 
+  &__materials,
   &__edit,
   &__delete {
     padding: 0.4rem 0.9rem;
@@ -439,6 +539,10 @@ async function handleDeleteClick(student) {
     &:focus-visible {
       opacity: 0.75;
     }
+  }
+
+  &__materials {
+    color: $color-green-dark;
   }
 
   &__edit {
