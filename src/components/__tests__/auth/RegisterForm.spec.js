@@ -17,6 +17,11 @@ const router = createRouter({
     { path: '/login', name: 'login', component: { template: '<div />' } },
     { path: '/registro', name: 'register', component: { template: '<div />' } },
     { path: '/dashboard', name: 'dashboard', component: { template: '<div />' } },
+    {
+      path: '/politica-privacidad',
+      name: 'privacy-policy',
+      component: { template: '<div />' },
+    },
   ],
 })
 
@@ -32,6 +37,7 @@ async function fillValidForm(wrapper) {
   await wrapper.get('#register-service').setValue('Talleres')
   await wrapper.get('#register-password').setValue('Clave1234')
   await wrapper.get('#register-confirm-password').setValue('Clave1234')
+  await wrapper.get('#register-privacy-consent').setValue(true)
 }
 
 describe('RegisterForm.vue', () => {
@@ -52,6 +58,7 @@ describe('RegisterForm.vue', () => {
     expect(wrapper.text()).toContain('Selecciona un servicio')
     expect(wrapper.text()).toContain('Escribe una contraseña')
     expect(wrapper.text()).toContain('Confirma tu contraseña')
+    expect(wrapper.text()).toContain('Debes aceptar la política de privacidad para continuar')
   })
 
   it('rejects an invalid email format', async () => {
@@ -86,6 +93,30 @@ describe('RegisterForm.vue', () => {
 
     expect(register).not.toHaveBeenCalled()
     expect(wrapper.text()).toContain('Las contraseñas no coinciden')
+  })
+
+  it('blocks the submission when the privacy policy checkbox is not checked', async () => {
+    const wrapper = mountForm()
+    await wrapper.get('#register-first-name').setValue('Lucía')
+    await wrapper.get('#register-last-name').setValue('García López')
+    await wrapper.get('#register-email').setValue('familia@educalba.com')
+    await wrapper.get('#register-stage').setValue('PRIMARIA')
+    await wrapper.get('#register-service').setValue('Talleres')
+    await wrapper.get('#register-password').setValue('Clave1234')
+    await wrapper.get('#register-confirm-password').setValue('Clave1234')
+
+    await wrapper.find('form').trigger('submit.prevent')
+
+    expect(register).not.toHaveBeenCalled()
+    expect(wrapper.text()).toContain('Debes aceptar la política de privacidad para continuar')
+  })
+
+  it('links "política de privacidad" to the privacy policy page, opening in a new tab', () => {
+    const wrapper = mountForm()
+
+    const link = wrapper.get('.register-form__privacy-link')
+    expect(link.attributes('href')).toBe('/politica-privacidad')
+    expect(link.attributes('target')).toBe('_blank')
   })
 
   it('registers the account, logs in automatically and redirects to the dashboard', async () => {
