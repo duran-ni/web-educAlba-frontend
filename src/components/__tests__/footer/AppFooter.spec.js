@@ -46,4 +46,9 @@ describe('AppFooter.vue', () => {
         .exists()
     ).toBe(false)
   })
+
+  it('shows the designer/developer credit in both variants', () => {
+    expect(mountFooter({ variant: 'full' }).find('.footer-credit').exists()).toBe(true)
+    expect(mountFooter({ variant: 'reduced' }).find('.footer-credit').exists()).toBe(true)
+  })
 })
