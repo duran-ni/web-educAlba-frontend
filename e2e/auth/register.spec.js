@@ -18,6 +18,7 @@ async function fillRegisterForm(page, { email, password, confirmPassword }) {
   await page.locator('#register-service').selectOption('Talleres')
   await page.locator('#register-password').fill(password)
   await page.locator('#register-confirm-password').fill(confirmPassword)
+  await page.locator('#register-privacy-consent').check()
 }
 
 test.describe('Register', () => {
