@@ -37,8 +37,8 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
+    width: 46px;
+    height: 46px;
     border-radius: 50%;
     transition: transform 0.2s ease;
 
@@ -57,8 +57,8 @@
   }
 
   &__icon {
-    width: 22px;
-    height: 22px;
+    width: 30px;
+    height: 30px;
   }
 }
 </style>
