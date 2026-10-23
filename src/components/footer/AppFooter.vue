@@ -3,13 +3,13 @@
     <template v-if="variant === 'full'">
       <div class="app-footer__brand">
         <AppLogo />
-        <FooterLegal />
+        <FooterLegal :show-privacy-link="showPrivacyLink" />
       </div>
       <FooterContact />
       <FooterSocial />
     </template>
 
-    <FooterLegal v-else />
+    <FooterLegal v-else :show-privacy-link="showPrivacyLink" />
   </footer>
 </template>
 
@@ -23,6 +23,13 @@ defineProps({
   variant: {
     type: String,
     default: 'full',
+  },
+  // Se desactiva desde el Dashboard Administrador, donde el enlace a la
+  // política de privacidad no tiene sentido (es un documento pensado para
+  // las familias que se registran, no para el equipo de la academia)
+  showPrivacyLink: {
+    type: Boolean,
+    default: true,
   },
 })
 </script>
