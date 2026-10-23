@@ -94,4 +94,27 @@ describe('StudentMaterialEditForm.vue', () => {
     await wrapper.get('.student-material-edit-form__cancel').trigger('click')
     expect(wrapper.emitted('cancel')).toHaveLength(1)
   })
+
+  it('updates the description and sends the new value when the form is submitted', async () => {
+    const updated = { ...material, description: 'Nueva descripción' }
+    updateStudentMaterial.mockResolvedValueOnce({ data: updated })
+    const wrapper = mount(StudentMaterialEditForm, { props: { material } })
+
+    await wrapper.get('#student-material-edit-description').setValue('Nueva descripción')
+    await wrapper.find('form').trigger('submit.prevent')
+    await flushPromises()
+
+    expect(updateStudentMaterial).toHaveBeenCalledWith(7, {
+      title: 'Worksheet 1',
+      description: 'Nueva descripción',
+    })
+  })
+
+  it('pre-fills an empty title when the material has none', () => {
+    const wrapper = mount(StudentMaterialEditForm, {
+      props: { material: { ...material, title: null } },
+    })
+
+    expect(wrapper.get('#student-material-edit-title').element.value).toBe('')
+  })
 })
