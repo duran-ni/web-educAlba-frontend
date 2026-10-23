@@ -3,7 +3,7 @@
   <main class="app grid-background">
     <RouterView />
   </main>
-  <AppFooter variant="reduced" />
+  <AppFooter variant="reduced" :show-privacy-link="false" />
 </template>
 
 <script setup>
