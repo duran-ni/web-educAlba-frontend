@@ -98,6 +98,12 @@ describe('AdminGalleryFolderDetail.vue', () => {
     expect(video.attributes('src')).toBe('https://example.com/10.mp4')
     expect(video.attributes('aria-label')).toBe('Clase de baile')
     expect(video.attributes('controls')).toBeDefined()
+
+    // El menú contextual del navegador permitiría descargar el vídeo
+    // sin pasar por el backend, así que se bloquea
+    const contextMenuEvent = new Event('contextmenu', { cancelable: true })
+    video.element.dispatchEvent(contextMenuEvent)
+    expect(contextMenuEvent.defaultPrevented).toBe(true)
   })
 
   it('falls back to a generic aria-label for videos without a caption', () => {
