@@ -47,6 +47,11 @@ const routes = [
         name: 'contact',
         component: () => import('@/views/public/ContactView.vue'),
       },
+      {
+        path: 'politica-privacidad',
+        name: 'privacy-policy',
+        component: () => import('@/views/public/PrivacyPolicyView.vue'),
+      },
       { path: 'login', name: 'login', component: () => import('@/views/auth/LoginView.vue') },
       {
         path: '/registro',
