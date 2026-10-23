@@ -89,6 +89,11 @@ describe('router navigation guard', () => {
     expect(router.currentRoute.value.name).toBe('contact')
   })
 
+  it('does not require authentication to view the privacy policy page', async () => {
+    await router.push({ name: 'privacy-policy' })
+    expect(router.currentRoute.value.name).toBe('privacy-policy')
+  })
+
   it('falls back to the not-found view for an unknown URL', async () => {
     await router.push('/esto-no-existe')
     expect(router.currentRoute.value.name).toBe('not-found')
