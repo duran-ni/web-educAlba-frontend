@@ -46,14 +46,38 @@
         />
       </div>
     </div>
+
+    <div class="user-dashboard-view__materials">
+      <h2 class="user-dashboard-view__materials-title">Tus materiales</h2>
+
+      <p v-if="materialsStatus === 'loading'" class="user-dashboard-view__message">
+        Cargando tus materiales…
+      </p>
+
+      <p
+        v-else-if="materialsStatus === 'error'"
+        class="user-dashboard-view__message user-dashboard-view__message--error"
+      >
+        No hemos podido cargar tus materiales. Inténtalo de nuevo más tarde.
+      </p>
+
+      <p v-else-if="materialsStatus === 'empty'" class="user-dashboard-view__message">
+        Todavía no tienes ningún material disponible.
+      </p>
+
+      <div v-else class="user-dashboard-view__materials-list">
+        <MyMaterialRow v-for="material in materials" :key="material.id" :material="material" />
+      </div>
+    </div>
   </section>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { fetchMyProfile, fetchMyWorkshops } from '@/services/dashboard'
+import { fetchMyProfile, fetchMyWorkshops, fetchMyMaterials } from '@/services/dashboard'
 import { RouterLink } from 'vue-router'
 import MyWorkshopCard from '@/components/workshop/MyWorkshopCard.vue'
+import MyMaterialRow from '@/components/workshop/MyMaterialRow.vue'
 
 // loading | loaded | error
 const profileStatus = ref('loading')
@@ -63,8 +87,12 @@ const profile = ref(null)
 const workshopsStatus = ref('loading')
 const workshops = ref([])
 
+// loading | has-materials | empty | error
+const materialsStatus = ref('loading')
+const materials = ref([])
+
 onMounted(async () => {
-  await Promise.all([loadProfile(), loadWorkshops()])
+  await Promise.all([loadProfile(), loadWorkshops(), loadMaterials()])
 })
 
 async function loadProfile() {
@@ -84,6 +112,16 @@ async function loadWorkshops() {
     workshopsStatus.value = workshops.value.length > 0 ? 'has-workshops' : 'empty'
   } catch {
     workshopsStatus.value = 'error'
+  }
+}
+
+async function loadMaterials() {
+  try {
+    const response = await fetchMyMaterials()
+    materials.value = response.data
+    materialsStatus.value = materials.value.length > 0 ? 'has-materials' : 'empty'
+  } catch {
+    materialsStatus.value = 'error'
   }
 }
 </script>
@@ -140,7 +178,7 @@ async function loadWorkshops() {
     margin: 0 0 2rem;
     font-family: $font-doodle;
     font-size: 1.75rem;
-    color: $color-primary;
+    color: $color-green-dark;
 
     @include respond-to(tablet) {
       font-size: 2.25rem;
@@ -155,6 +193,27 @@ async function loadWorkshops() {
     @include respond-to(tablet) {
       grid-template-columns: repeat(2, 1fr);
     }
+  }
+
+  &__materials {
+    margin-top: 5.5rem;
+  }
+
+  &__materials-title {
+    margin: 0 0 2rem;
+    font-family: $font-doodle;
+    font-size: 1.75rem;
+    color: $color-error;
+
+    @include respond-to(tablet) {
+      font-size: 2.25rem;
+    }
+  }
+
+  &__materials-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
   }
 }
 </style>
