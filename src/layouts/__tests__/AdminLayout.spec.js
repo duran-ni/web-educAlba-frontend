@@ -11,5 +11,6 @@ describe('AdminLayout.vue', () => {
 
     expect(wrapper.findComponent(AppHeader).props('variant')).toBe('admin')
     expect(wrapper.findComponent(AppFooter).props('variant')).toBe('reduced')
+    expect(wrapper.findComponent(AppFooter).props('showPrivacyLink')).toBe(false)
   })
 })
