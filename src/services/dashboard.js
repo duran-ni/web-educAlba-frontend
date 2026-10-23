@@ -17,3 +17,9 @@ export function fetchMyProfile() {
 export function fetchMyWorkshops() {
   return http.get('/dashboard/my-workshops')
 }
+
+// Consulta los materiales (PDFs) subidos por el administrador para el
+// alumno vinculado al usuario que ha iniciado sesion
+export function fetchMyMaterials() {
+  return http.get('/dashboard/my-materials')
+}
