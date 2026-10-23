@@ -6,10 +6,16 @@
         <FooterLegal :show-privacy-link="showPrivacyLink" />
       </div>
       <FooterContact />
-      <FooterSocial />
+      <div class="app-footer__social-credit">
+        <FooterSocial />
+        <FooterCredit />
+      </div>
     </template>
 
-    <FooterLegal v-else :show-privacy-link="showPrivacyLink" />
+    <template v-else>
+      <FooterLegal :show-privacy-link="showPrivacyLink" />
+      <FooterCredit />
+    </template>
   </footer>
 </template>
 
@@ -18,6 +24,7 @@ import AppLogo from '../AppLogo.vue'
 import FooterContact from './FooterContact.vue'
 import FooterSocial from './FooterSocial.vue'
 import FooterLegal from './FooterLegal.vue'
+import FooterCredit from './FooterCredit.vue'
 
 defineProps({
   variant: {
@@ -45,6 +52,7 @@ defineProps({
 
   @include respond-to(tablet) {
     flex-direction: row;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
   }
@@ -63,6 +71,23 @@ defineProps({
 
     @include respond-to (tablet) {
       align-items: flex-start;
+    }
+  }
+
+  &__social-credit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+
+    @include respond-to(tablet) {
+      align-items: flex-end;
+
+      // Pequeño desplazamiento hacia la izquierda para que los iconos no
+      // queden pegados al borde derecho del footer
+      .footer-social__list {
+        margin-right: 0.5rem;
+      }
     }
   }
 }
