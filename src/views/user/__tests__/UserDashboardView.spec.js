@@ -3,11 +3,12 @@ import { mount, flushPromises } from '@vue/test-utils'
 import { createRouter, createWebHistory } from 'vue-router'
 
 import UserDashboardView from '../UserDashboardView.vue'
-import { fetchMyProfile, fetchMyWorkshops } from '@/services/dashboard'
+import { fetchMyProfile, fetchMyWorkshops, fetchMyMaterials } from '@/services/dashboard'
 
 vi.mock('@/services/dashboard', () => ({
   fetchMyProfile: vi.fn(),
   fetchMyWorkshops: vi.fn(),
+  fetchMyMaterials: vi.fn(),
 }))
 
 const router = createRouter({
@@ -30,10 +31,12 @@ describe('UserDashboardView.vue', () => {
   it('shows the loading messages before the data arrives', () => {
     fetchMyProfile.mockReturnValue(new Promise(() => {}))
     fetchMyWorkshops.mockReturnValue(new Promise(() => {}))
+    fetchMyMaterials.mockReturnValue(new Promise(() => {}))
     const wrapper = mountView()
 
     expect(wrapper.text()).toContain('Cargando…')
     expect(wrapper.text()).toContain('Cargando tus talleres…')
+    expect(wrapper.text()).toContain('Cargando tus materiales…')
   })
 
   it('greets the student and lists their enrolled workshops once loaded', async () => {
@@ -49,6 +52,7 @@ describe('UserDashboardView.vue', () => {
         },
       ],
     })
+    fetchMyMaterials.mockResolvedValueOnce({ data: [] })
     const wrapper = mountView()
     await flushPromises()
 
@@ -59,6 +63,7 @@ describe('UserDashboardView.vue', () => {
   it('shows an empty-state message with a link to Talleres when there are no enrollments', async () => {
     fetchMyProfile.mockResolvedValueOnce({ data: { firstName: 'Lucía' } })
     fetchMyWorkshops.mockResolvedValueOnce({ data: [] })
+    fetchMyMaterials.mockResolvedValueOnce({ data: [] })
     const wrapper = mountView()
     await flushPromises()
 
@@ -69,6 +74,7 @@ describe('UserDashboardView.vue', () => {
   it('shows an error message when the profile request fails', async () => {
     fetchMyProfile.mockRejectedValueOnce(new Error('network error'))
     fetchMyWorkshops.mockResolvedValueOnce({ data: [] })
+    fetchMyMaterials.mockResolvedValueOnce({ data: [] })
     const wrapper = mountView()
     await flushPromises()
 
@@ -78,11 +84,56 @@ describe('UserDashboardView.vue', () => {
   it('shows an error message when the workshops request fails', async () => {
     fetchMyProfile.mockResolvedValueOnce({ data: { firstName: 'Lucía' } })
     fetchMyWorkshops.mockRejectedValueOnce(new Error('network error'))
+    fetchMyMaterials.mockResolvedValueOnce({ data: [] })
     const wrapper = mountView()
     await flushPromises()
 
     expect(wrapper.text()).toContain(
       'No hemos podido cargar tus talleres. Inténtalo de nuevo más tarde.',
+    )
+  })
+
+  it('lists the materials once loaded', async () => {
+    fetchMyProfile.mockResolvedValueOnce({ data: { firstName: 'Lucía' } })
+    fetchMyWorkshops.mockResolvedValueOnce({ data: [] })
+    fetchMyMaterials.mockResolvedValueOnce({
+      data: [
+        {
+          id: 100,
+          title: 'Worksheet 1',
+          description: 'Ejercicios 1 y 2',
+          downloadUrl: 'https://res.cloudinary.com/demo/raw/upload/fl_attachment:Worksheet_1/worksheet.pdf',
+          fileSizeBytes: 245_760,
+          uploadedAt: '2026-10-22T09:00:00',
+        },
+      ],
+    })
+    const wrapper = mountView()
+    await flushPromises()
+
+    expect(wrapper.findAll('.my-material-row').length).toBe(1)
+    expect(wrapper.text()).toContain('Worksheet 1')
+  })
+
+  it('shows an empty-state message when there are no materials', async () => {
+    fetchMyProfile.mockResolvedValueOnce({ data: { firstName: 'Lucía' } })
+    fetchMyWorkshops.mockResolvedValueOnce({ data: [] })
+    fetchMyMaterials.mockResolvedValueOnce({ data: [] })
+    const wrapper = mountView()
+    await flushPromises()
+
+    expect(wrapper.text()).toContain('Todavía no tienes ningún material disponible.')
+  })
+
+  it('shows an error message when the materials request fails', async () => {
+    fetchMyProfile.mockResolvedValueOnce({ data: { firstName: 'Lucía' } })
+    fetchMyWorkshops.mockResolvedValueOnce({ data: [] })
+    fetchMyMaterials.mockRejectedValueOnce(new Error('network error'))
+    const wrapper = mountView()
+    await flushPromises()
+
+    expect(wrapper.text()).toContain(
+      'No hemos podido cargar tus materiales. Inténtalo de nuevo más tarde.',
     )
   })
 })
