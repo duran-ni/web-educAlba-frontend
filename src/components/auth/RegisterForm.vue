@@ -151,6 +151,35 @@
       </div>
     </div>
 
+    <div class="register-form__consent">
+      <label class="register-form__checkbox-label" for="register-privacy-consent">
+        <input
+          id="register-privacy-consent"
+          v-model="acceptedPrivacyPolicy"
+          class="register-form__checkbox"
+          type="checkbox"
+          :aria-invalid="Boolean(acceptedPrivacyPolicyError)"
+          :aria-describedby="
+            acceptedPrivacyPolicyError ? 'register-privacy-consent-error' : undefined
+          "
+        />
+        He leído y acepto la
+        <RouterLink
+          :to="{ name: 'privacy-policy' }"
+          target="_blank"
+          class="register-form__privacy-link"
+          >política de privacidad</RouterLink
+        >
+      </label>
+      <p
+        v-if="acceptedPrivacyPolicyError"
+        id="register-privacy-consent-error"
+        class="register-form__field-error"
+      >
+        {{ acceptedPrivacyPolicyError }}
+      </p>
+    </div>
+
     <button class="register-form__submit" type="submit" :disabled="status === 'submitting'">
       {{ status === 'submitting' ? 'Creando cuenta…' : 'Crear mi libreta en EducAlba 🚀' }}
     </button>
@@ -186,6 +215,7 @@ const educationalStage = ref('')
 const serviceOfInterest = ref('')
 const password = ref('')
 const confirmPassword = ref('')
+const acceptedPrivacyPolicy = ref(false)
 
 const firstNameError = ref('')
 const lastNameError = ref('')
@@ -194,18 +224,19 @@ const educationalStageError = ref('')
 const serviceOfInterestError = ref('')
 const passwordError = ref('')
 const confirmPasswordError = ref('')
+const acceptedPrivacyPolicyError = ref('')
 
 const status = ref('idle')
 const submitErrorMessage = ref('')
 
-// Mismo patron de validacion de email usado en el resto de formularios del proyecto
+// Mismo patrón de validación de email usado en el resto de formularios del proyecto
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-// Misma longitud minima que valida el backend (ver RegisterService) — se
-// comprueba tambien aqui para dar feedback inmediato sin esperar a la peticion
+// Misma longitud mínima que valida el backend (ver RegisterService) — se
+// comprueba también aquí para dar feedback inmediato sin esperar a la petición
 const MIN_PASSWORD_LENGTH = 8
 
 // Mismas etapas que contempla el backend (enum EducationalStage) y que ya
-// se usan en la pagina de Refuerzo
+// se usan en la página de Refuerzo
 const EDUCATIONAL_STAGES = [
   { value: 'INFANTIL', label: 'Infantil (3 a 6 años)' },
   { value: 'PRIMARIA', label: 'Primaria (1º a 6º)' },
@@ -243,6 +274,10 @@ function validate() {
     confirmPasswordError.value = 'Las contraseñas no coinciden'
   }
 
+  acceptedPrivacyPolicyError.value = acceptedPrivacyPolicy.value
+    ? ''
+    : 'Debes aceptar la política de privacidad para continuar'
+
   return (
     !firstNameError.value &&
     !lastNameError.value &&
@@ -250,7 +285,8 @@ function validate() {
     !educationalStageError.value &&
     !serviceOfInterestError.value &&
     !passwordError.value &&
-    !confirmPasswordError.value
+    !confirmPasswordError.value &&
+    !acceptedPrivacyPolicyError.value
   )
 }
 
@@ -271,7 +307,7 @@ async function handleSubmit() {
       educationalStage: educationalStage.value,
     })
 
-    // Tras crear la cuenta, iniciamos sesion automaticamente con las mismas
+    // Tras crear la cuenta, iniciamos sesion automáticamente con las mismas
     // credenciales para llevar directamente al Dashboard Usuario,
     // sin pedirle a la familia que vuelva a escribir sus datos en Login
     await authStore.login({ email: email.value, password: password.value })
@@ -418,6 +454,39 @@ async function handleSubmit() {
     font-size: 0.8125rem;
     font-weight: 600;
     color: $color-error;
+  }
+
+  &__consent {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  &__checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    font-family: $font-body;
+    font-size: 0.9375rem;
+    color: $color-text-dark;
+  }
+
+  &__checkbox {
+    margin-top: 0.2rem;
+    width: 1.125rem;
+    height: 1.125rem;
+    accent-color: $color-primary;
+    flex-shrink: 0;
+  }
+
+  &__privacy-link {
+    color: $color-primary;
+    font-weight: 600;
+
+    &:hover,
+    &:focus-visible {
+      text-decoration: underline;
+    }
   }
 
   &__submit {
