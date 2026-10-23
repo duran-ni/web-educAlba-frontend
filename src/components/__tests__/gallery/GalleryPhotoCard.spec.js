@@ -48,6 +48,12 @@ describe('GalleryPhotoCard.vue', () => {
     expect(video.attributes('aria-label')).toBe('Excursión al museo')
     expect(video.attributes('controls')).toBeDefined()
     expect(wrapper.find('img').exists()).toBe(false)
+
+    // El menú contextual del navegador permitiría descargar el vídeo
+    // sin pasar por el backend, así que se bloquea
+    const contextMenuEvent = new Event('contextmenu', { cancelable: true })
+    video.element.dispatchEvent(contextMenuEvent)
+    expect(contextMenuEvent.defaultPrevented).toBe(true)
   })
 
   it('falls back to a generic aria-label for videos without a caption', () => {
