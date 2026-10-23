@@ -38,6 +38,15 @@ async function mockAuth(page) {
   })
 }
 
+// AdminStudentsView también pide los materiales (PDFs) de los alumnos al
+// cargar; se simula vacío en todos los tests de este archivo, ya que
+// ninguno de ellos comprueba nada relacionado con materiales
+async function mockEmptyMaterials(page) {
+  await page.route('**/admin/materials', (route) => {
+    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) })
+  })
+}
+
 test.describe('Admin — Students', () => {
   test('creates a new student without a workshop', async ({ page }) => {
     await mockAuth(page)
@@ -82,6 +91,7 @@ test.describe('Admin — Students', () => {
     await page.route('**/admin/enrollments', (route) => {
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) })
     })
+    await mockEmptyMaterials(page)
     await page.route('**/public/workshops', (route) => {
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) })
     })
@@ -162,6 +172,8 @@ test.describe('Admin — Students', () => {
       })
     })
 
+    await mockEmptyMaterials(page)
+
     await page.route('**/public/workshops', (route) => {
       route.fulfill({
         status: 200,
@@ -196,6 +208,7 @@ test.describe('Admin — Students', () => {
     await page.route('**/admin/enrollments', (route) => {
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) })
     })
+    await mockEmptyMaterials(page)
 
     await page.goto('/admin/alumnos')
     await page.locator('#student-search').fill('Lucía')
@@ -226,6 +239,7 @@ test.describe('Admin — Students', () => {
     await page.route('**/admin/enrollments', (route) => {
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) })
     })
+    await mockEmptyMaterials(page)
 
     await page.goto('/admin/alumnos')
     await page.getByRole('button', { name: 'Editar a Lucía Gómez' }).click()
@@ -250,6 +264,7 @@ test.describe('Admin — Students', () => {
     await page.route('**/admin/enrollments', (route) => {
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) })
     })
+    await mockEmptyMaterials(page)
     page.once('dialog', (dialog) => dialog.accept())
 
     await page.goto('/admin/alumnos')
@@ -270,6 +285,7 @@ test.describe('Admin — Students', () => {
     await page.route('**/admin/enrollments', (route) => {
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) })
     })
+    await mockEmptyMaterials(page)
     page.once('dialog', (dialog) => dialog.dismiss())
 
     await page.goto('/admin/alumnos')
@@ -293,6 +309,7 @@ test.describe('Admin — Students', () => {
     await page.route('**/admin/enrollments', (route) => {
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) })
     })
+    await mockEmptyMaterials(page)
 
     // Listener permanente, igual que en workshops.spec.js y gallery.spec.js:
     // evita la condición de carrera entre el confirm y el alert nativos
