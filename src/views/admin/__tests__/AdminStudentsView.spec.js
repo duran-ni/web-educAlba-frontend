@@ -5,7 +5,10 @@ import AdminStudentsView from '../AdminStudentsView.vue'
 import StudentForm from '@/components/student/StudentForm.vue'
 import { fetchStudents, deleteStudent } from '@/services/students'
 import { fetchEnrollments } from '@/services/enrollments'
-import { fetchStudentMaterials } from '@/services/materials'
+import { fetchStudentMaterials, deleteStudentMaterial } from '@/services/materials'
+import StudentMaterialsDetail from '@/components/student/StudentMaterialsDetail.vue'
+import StudentMaterialUploadForm from '@/components/student/StudentMaterialUploadForm.vue'
+import StudentMaterialEditForm from '@/components/student/StudentMaterialEditForm.vue'
 
 vi.mock('@/services/students', () => ({
   fetchStudents: vi.fn(),
@@ -270,5 +273,197 @@ describe('AdminStudentsView.vue', () => {
     expect(window.alert).toHaveBeenCalledWith(
       'No se ha podido eliminar el alumno. Inténtalo de nuevo.'
     )
+  })
+
+  it('shows the materials detail view for a student when "Materiales" is clicked', async () => {
+    const material = { id: 100, studentId: 1, title: 'Ficha 1' }
+    const wrapper = await mountLoaded(
+      [STUDENT_LUCIA, STUDENT_MARCOS],
+      [ENROLLMENT_LUCIA],
+      [material]
+    )
+
+    await wrapper.get('.admin-students-view__materials').trigger('click')
+
+    const detail = wrapper.findComponent(StudentMaterialsDetail)
+    expect(detail.exists()).toBe(true)
+    expect(detail.props('student')).toEqual(STUDENT_LUCIA)
+    expect(detail.props('materials')).toEqual([material])
+  })
+
+  it('returns to the students table when StudentMaterialsDetail emits "back"', async () => {
+    const wrapper = await mountLoaded()
+    await wrapper.get('.admin-students-view__materials').trigger('click')
+
+    wrapper.findComponent(StudentMaterialsDetail).vm.$emit('back')
+    await flushPromises()
+
+    expect(wrapper.find('tbody').exists()).toBe(true)
+  })
+
+  it('opens the upload dialog for the right student when StudentMaterialsDetail emits "upload-material"', async () => {
+    const wrapper = await mountLoaded()
+    await wrapper.get('.admin-students-view__materials').trigger('click')
+
+    wrapper.findComponent(StudentMaterialsDetail).vm.$emit('upload-material', STUDENT_LUCIA)
+    await flushPromises()
+
+    expect(HTMLDialogElement.prototype.showModal).toHaveBeenCalled()
+    const uploadForm = wrapper.findComponent(StudentMaterialUploadForm)
+    expect(uploadForm.props('studentId')).toBe(STUDENT_LUCIA.id)
+    expect(uploadForm.props('studentName')).toBe('Lucía García López')
+  })
+
+  it('adds the new material to the list when StudentMaterialUploadForm emits "material-uploaded"', async () => {
+    const wrapper = await mountLoaded()
+    await wrapper.get('.admin-students-view__materials').trigger('click')
+    wrapper.findComponent(StudentMaterialsDetail).vm.$emit('upload-material', STUDENT_LUCIA)
+    await flushPromises()
+
+    const newMaterial = { id: 200, studentId: 1, title: 'Ficha nueva' }
+    wrapper.findComponent(StudentMaterialUploadForm).vm.$emit('material-uploaded', newMaterial)
+    await flushPromises()
+
+    expect(wrapper.findComponent(StudentMaterialsDetail).props('materials')).toEqual([
+      newMaterial,
+    ])
+  })
+
+  it('closes the upload dialog when StudentMaterialUploadForm emits "all-uploaded" or "cancel"', async () => {
+    const wrapper = await mountLoaded()
+    await wrapper.get('.admin-students-view__materials').trigger('click')
+    wrapper.findComponent(StudentMaterialsDetail).vm.$emit('upload-material', STUDENT_LUCIA)
+    await flushPromises()
+
+    wrapper.findComponent(StudentMaterialUploadForm).vm.$emit('all-uploaded')
+    await flushPromises()
+    expect(HTMLDialogElement.prototype.close).toHaveBeenCalledTimes(1)
+
+    wrapper.findComponent(StudentMaterialsDetail).vm.$emit('upload-material', STUDENT_LUCIA)
+    await flushPromises()
+    wrapper.findComponent(StudentMaterialUploadForm).vm.$emit('cancel')
+    await flushPromises()
+    expect(HTMLDialogElement.prototype.close).toHaveBeenCalledTimes(2)
+  })
+
+  it('clears the upload target when the upload dialog fires its native close event', async () => {
+    const wrapper = await mountLoaded()
+    await wrapper.get('.admin-students-view__materials').trigger('click')
+    wrapper.findComponent(StudentMaterialsDetail).vm.$emit('upload-material', STUDENT_LUCIA)
+    await flushPromises()
+    expect(wrapper.findComponent(StudentMaterialUploadForm).exists()).toBe(true)
+
+    await wrapper.findAll('.admin-students-view__dialog')[1].trigger('close')
+
+    expect(wrapper.findComponent(StudentMaterialUploadForm).exists()).toBe(false)
+  })
+
+  it('opens the edit dialog for the right material when StudentMaterialsDetail emits "edit-material"', async () => {
+    const material = { id: 100, studentId: 1, title: 'Ficha 1' }
+    const wrapper = await mountLoaded(
+      [STUDENT_LUCIA, STUDENT_MARCOS],
+      [ENROLLMENT_LUCIA],
+      [material]
+    )
+    await wrapper.get('.admin-students-view__materials').trigger('click')
+
+    wrapper.findComponent(StudentMaterialsDetail).vm.$emit('edit-material', material)
+    await flushPromises()
+
+    expect(HTMLDialogElement.prototype.showModal).toHaveBeenCalled()
+    expect(wrapper.findComponent(StudentMaterialEditForm).props('material')).toEqual(material)
+  })
+
+  it('updates the material in the list and closes the edit dialog when StudentMaterialEditForm emits "updated"', async () => {
+    const material = { id: 100, studentId: 1, title: 'Ficha 1' }
+    const otherMaterial = { id: 101, studentId: 1, title: 'Ficha 2' }
+    const wrapper = await mountLoaded(
+      [STUDENT_LUCIA, STUDENT_MARCOS],
+      [ENROLLMENT_LUCIA],
+      [material, otherMaterial]
+    )
+    await wrapper.get('.admin-students-view__materials').trigger('click')
+    wrapper.findComponent(StudentMaterialsDetail).vm.$emit('edit-material', material)
+    await flushPromises()
+
+    const updated = { ...material, title: 'Ficha actualizada' }
+    wrapper.findComponent(StudentMaterialEditForm).vm.$emit('updated', updated)
+    await flushPromises()
+
+    expect(wrapper.findComponent(StudentMaterialsDetail).props('materials')).toEqual([
+      updated,
+      otherMaterial,
+    ])
+    expect(HTMLDialogElement.prototype.close).toHaveBeenCalled()
+  })
+
+  it('closes the edit dialog when StudentMaterialEditForm emits "cancel"', async () => {
+    const material = { id: 100, studentId: 1, title: 'Ficha 1' }
+    const wrapper = await mountLoaded(
+      [STUDENT_LUCIA, STUDENT_MARCOS],
+      [ENROLLMENT_LUCIA],
+      [material]
+    )
+    await wrapper.get('.admin-students-view__materials').trigger('click')
+    wrapper.findComponent(StudentMaterialsDetail).vm.$emit('edit-material', material)
+    await flushPromises()
+
+    wrapper.findComponent(StudentMaterialEditForm).vm.$emit('cancel')
+    await flushPromises()
+
+    expect(HTMLDialogElement.prototype.close).toHaveBeenCalled()
+  })
+
+  it('clears the edit target when the edit dialog fires its native close event', async () => {
+    const material = { id: 100, studentId: 1, title: 'Ficha 1' }
+    const wrapper = await mountLoaded(
+      [STUDENT_LUCIA, STUDENT_MARCOS],
+      [ENROLLMENT_LUCIA],
+      [material]
+    )
+    await wrapper.get('.admin-students-view__materials').trigger('click')
+    wrapper.findComponent(StudentMaterialsDetail).vm.$emit('edit-material', material)
+    await flushPromises()
+    expect(wrapper.findComponent(StudentMaterialEditForm).exists()).toBe(true)
+
+    await wrapper.findAll('.admin-students-view__dialog')[2].trigger('close')
+
+    expect(wrapper.findComponent(StudentMaterialEditForm).exists()).toBe(false)
+  })
+
+  it('deletes the material and removes it from the list when StudentMaterialsDetail emits "delete-material"', async () => {
+    const material = { id: 100, studentId: 1, title: 'Ficha 1' }
+    deleteStudentMaterial.mockResolvedValueOnce({})
+    const wrapper = await mountLoaded(
+      [STUDENT_LUCIA, STUDENT_MARCOS],
+      [ENROLLMENT_LUCIA],
+      [material]
+    )
+    await wrapper.get('.admin-students-view__materials').trigger('click')
+
+    wrapper.findComponent(StudentMaterialsDetail).vm.$emit('delete-material', material.id)
+    await flushPromises()
+
+    expect(deleteStudentMaterial).toHaveBeenCalledWith(material.id)
+    expect(wrapper.findComponent(StudentMaterialsDetail).props('materials')).toEqual([])
+  })
+
+  it('shows an alert and keeps the material in the list when deleting it fails', async () => {
+    const material = { id: 100, studentId: 1, title: 'Ficha 1' }
+    deleteStudentMaterial.mockRejectedValueOnce(new Error('network error'))
+    const wrapper = await mountLoaded(
+      [STUDENT_LUCIA, STUDENT_MARCOS],
+      [ENROLLMENT_LUCIA],
+      [material]
+    )
+    await wrapper.get('.admin-students-view__materials').trigger('click')
+
+    wrapper.findComponent(StudentMaterialsDetail).vm.$emit('delete-material', material.id)
+    await flushPromises()
+
+    expect(window.alert).toHaveBeenCalledWith(
+      'No se ha podido eliminar el material. Inténtalo de nuevo.'
+    )
+    expect(wrapper.findComponent(StudentMaterialsDetail).props('materials')).toEqual([material])
   })
 })
