@@ -8,12 +8,13 @@ vi.mock('../http', () => ({
 }))
 
 describe('interestSubmissions service', () => {
-  it('posts the student name and course to the public endpoint', () => {
-    submitInterest({ studentName: 'Juanito', courseToReinforce: 'Matemáticas 2º ESO' })
+  it('posts the student name, course and phone to the public endpoint', () => {
+    submitInterest({ studentName: 'Juanito', courseToReinforce: 'Matemáticas 2º ESO', phone: '612345678' })
 
     expect(http.post).toHaveBeenCalledWith('/public/interest-submissions', {
       studentName: 'Juanito',
       courseToReinforce: 'Matemáticas 2º ESO',
+      phone: '612345678',
     })
   })
 })
