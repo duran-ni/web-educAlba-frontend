@@ -35,6 +35,22 @@
         </p>
       </div>
 
+      <div class="quick-interest-form__field">
+        <label class="quick-interest-form__label" for="interest-phone">Teléfono de contacto</label>
+        <input
+          id="interest-phone"
+          v-model.trim="phone"
+          class="quick-interest-form__input"
+          type="tel"
+          placeholder="600 000 000"
+          :aria-invalid="Boolean(phoneError)"
+          :aria-describedby="phoneError ? 'interest-phone-error' : undefined"
+        />
+        <p v-if="phoneError" id="interest-phone-error" class="quick-interest-form__field-error">
+          {{ phoneError }}
+        </p>
+      </div>
+
       <button class="quick-interest-form__submit" type="submit" :disabled="status === 'submitting'">
         {{ status === 'submitting' ? 'Enviando…' : 'Me apunto' }}
       </button>
@@ -64,17 +80,29 @@ import { submitInterest } from '@/services/interestSubmissions'
 
 const studentName = ref('')
 const courseToReinforce = ref('')
+const phone = ref('')
 const studentNameError = ref('')
 const courseError = ref('')
+const phoneError = ref('')
 const status = ref('idle')
 const submitErrorMessage = ref('')
+
+// Formato español de teléfono: 9 dígitos, empezando por 6, 7, 8 o 9
+const PHONE_PATTERN = /^[6789][0-9]{8}$/
 
 // Valida los campos obligatorios en el propio frontend, antes de llamar al backend
 function validate() {
   studentNameError.value = studentName.value ? '' : 'Escribe el nombre del alumno'
   courseError.value = courseToReinforce.value ? '' : 'Escribe el curso a reforzar'
 
-  return !studentNameError.value && !courseError.value
+  phoneError.value = ''
+  if (!phone.value) {
+    phoneError.value = 'Escribe un teléfono de contacto'
+  } else if (!PHONE_PATTERN.test(phone.value)) {
+    phoneError.value = 'El teléfono debe tener 9 dígitos y empezar por 6, 7, 8 o 9'
+  }
+
+  return !studentNameError.value && !courseError.value && !phoneError.value
 }
 
 async function handleSubmit() {
@@ -88,11 +116,13 @@ async function handleSubmit() {
     await submitInterest({
       studentName: studentName.value,
       courseToReinforce: courseToReinforce.value,
+      phone: phone.value,
     })
 
     status.value = 'success'
     studentName.value = ''
     courseToReinforce.value = ''
+    phone.value = ''
   } catch {
     status.value = 'error'
     submitErrorMessage.value = 'No hemos podido enviar tu solicitud. Inténtalo de nuevo en unos minutos.'
