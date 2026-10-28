@@ -15,6 +15,12 @@ export function markInterestSubmissionReviewed(id) {
   return http.put(`/admin/interest-submissions/${id}/reviewed`)
 }
 
+// Deshace el marcado como revisada, por si la administradora se ha
+// equivocado al pulsar el boton
+export function markInterestSubmissionUnreviewed(id) {
+  return http.put(`/admin/interest-submissions/${id}/unreviewed`)
+}
+
 // Cierra el ciclo de una solicitud de interés (ya se ha apuntado a clases
 // de refuerzo o no se ha llegado a un acuerdo con la familia)
 export function closeInterestSubmission(id) {
