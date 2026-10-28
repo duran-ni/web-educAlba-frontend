@@ -14,3 +14,9 @@ export function fetchAdminInterestSubmissions() {
 export function markInterestSubmissionReviewed(id) {
   return http.put(`/admin/interest-submissions/${id}/reviewed`)
 }
+
+// Cierra el ciclo de una solicitud de interés (ya se ha apuntado a clases
+// de refuerzo o no se ha llegado a un acuerdo con la familia)
+export function closeInterestSubmission(id) {
+  return http.put(`/admin/interest-submissions/${id}/closed`)
+}
