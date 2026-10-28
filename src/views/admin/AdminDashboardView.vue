@@ -46,6 +46,7 @@
       :status="interestSubmissionsStatus"
       :submissions="interestSubmissions"
       @mark-reviewed="handleInterestSubmissionReviewed"
+      @close="handleInterestSubmissionClosed"
     />
 
     <AdminWorkshopsList
@@ -102,6 +103,7 @@ import { fetchAdminTeachers, deleteTeacher } from '@/services/teachers'
 import {
   fetchAdminInterestSubmissions,
   markInterestSubmissionReviewed,
+  closeInterestSubmission,
 } from '@/services/interestSubmissions'
 import { useDashboardSummaryStream } from '@/composables/useDashboardSummaryStream'
 import AdminWorkshopsList from '@/components/workshop/AdminWorkshopsList.vue'
@@ -192,7 +194,8 @@ async function loadTeachers() {
   }
 }
 
-// Pide al backend el listado completo de solicitudes de interés para el panel de Admin
+// Pide al backend el listado de solicitudes de interés abiertas (no
+// cerradas) para el panel de Admin
 async function loadInterestSubmissions() {
   try {
     const response = await fetchAdminInterestSubmissions()
@@ -367,6 +370,20 @@ async function handleInterestSubmissionReviewed(id) {
     loadSummary()
   } catch {
     window.alert('No se ha podido marcar la solicitud como revisada. Inténtalo de nuevo.')
+  }
+}
+
+// Cierra el ciclo de la solicitud en el backend y, solo si la petición
+// tiene éxito, la quita del listado en memoria: a diferencia de marcarla
+// como revisada, aquí no se sustituye, se elimina de la vista
+async function handleInterestSubmissionClosed(id) {
+  try {
+    await closeInterestSubmission(id)
+    interestSubmissions.value = interestSubmissions.value.filter(
+      (submission) => submission.id !== id
+    )
+  } catch {
+    window.alert('No se ha podido finalizar la solicitud. Inténtalo de nuevo.')
   }
 }
 </script>
