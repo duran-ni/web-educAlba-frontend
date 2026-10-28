@@ -14,6 +14,8 @@ import { fetchAdminTeachers, deleteTeacher } from '@/services/teachers'
 import {
   fetchAdminInterestSubmissions,
   markInterestSubmissionReviewed,
+  markInterestSubmissionUnreviewed,
+  closeInterestSubmission,
 } from '@/services/interestSubmissions'
 
 vi.mock('@/services/dashboard', () => ({
@@ -39,6 +41,8 @@ vi.mock('@/services/teachers', () => ({
 vi.mock('@/services/interestSubmissions', () => ({
   fetchAdminInterestSubmissions: vi.fn(),
   markInterestSubmissionReviewed: vi.fn(),
+  markInterestSubmissionUnreviewed: vi.fn(),
+  closeInterestSubmission: vi.fn(),
 }))
 
 // El stream SSE en tiempo real no tiene sentido en un entorno de test (jsdom
@@ -596,6 +600,70 @@ describe('AdminDashboardView.vue', () => {
 
     expect(window.alert).toHaveBeenCalledWith(
       'No se ha podido marcar la solicitud como revisada. Inténtalo de nuevo.'
+    )
+  })
+
+  it('updates only the matching submission and refreshes the summary when AdminInterestSubmissionsList emits "mark-unreviewed"', async () => {
+    const wrapper = await mountLoaded()
+    const alreadyReviewed = { ...INTEREST_SUBMISSION_B, reviewed: true }
+    wrapper.findComponent(AdminInterestSubmissionsList).vm.$emit('mark-reviewed', alreadyReviewed.id)
+    markInterestSubmissionReviewed.mockResolvedValueOnce({ data: alreadyReviewed })
+    await flushPromises()
+
+    const backToUnreviewed = { ...INTEREST_SUBMISSION_B, reviewed: false }
+    markInterestSubmissionUnreviewed.mockResolvedValueOnce({ data: backToUnreviewed })
+    fetchDashboardSummary.mockResolvedValueOnce({
+      data: { totalEnrolledStudents: 12, totalActiveWorkshops: 3, pendingInterestSubmissions: 2 },
+    })
+
+    wrapper
+      .findComponent(AdminInterestSubmissionsList)
+      .vm.$emit('mark-unreviewed', INTEREST_SUBMISSION_B.id)
+    await flushPromises()
+
+    expect(markInterestSubmissionUnreviewed).toHaveBeenCalledWith(INTEREST_SUBMISSION_B.id)
+    expect(wrapper.findComponent(AdminInterestSubmissionsList).props('submissions')).toEqual([
+      INTEREST_SUBMISSION_A,
+      backToUnreviewed,
+    ])
+  })
+
+  it('shows an alert when undoing a reviewed interest submission fails', async () => {
+    markInterestSubmissionUnreviewed.mockRejectedValueOnce(new Error('network error'))
+    const wrapper = await mountLoaded()
+
+    wrapper
+      .findComponent(AdminInterestSubmissionsList)
+      .vm.$emit('mark-unreviewed', INTEREST_SUBMISSION_A.id)
+    await flushPromises()
+
+    expect(window.alert).toHaveBeenCalledWith(
+      'No se ha podido deshacer el marcado como revisada. Inténtalo de nuevo.'
+    )
+  })
+
+  it('removes the matching submission from the list when AdminInterestSubmissionsList emits "close"', async () => {
+    const wrapper = await mountLoaded()
+    closeInterestSubmission.mockResolvedValueOnce({})
+
+    wrapper.findComponent(AdminInterestSubmissionsList).vm.$emit('close', INTEREST_SUBMISSION_A.id)
+    await flushPromises()
+
+    expect(closeInterestSubmission).toHaveBeenCalledWith(INTEREST_SUBMISSION_A.id)
+    expect(wrapper.findComponent(AdminInterestSubmissionsList).props('submissions')).toEqual([
+      INTEREST_SUBMISSION_B,
+    ])
+  })
+
+  it('shows an alert when closing an interest submission fails', async () => {
+    closeInterestSubmission.mockRejectedValueOnce(new Error('network error'))
+    const wrapper = await mountLoaded()
+
+    wrapper.findComponent(AdminInterestSubmissionsList).vm.$emit('close', INTEREST_SUBMISSION_A.id)
+    await flushPromises()
+
+    expect(window.alert).toHaveBeenCalledWith(
+      'No se ha podido finalizar la solicitud. Inténtalo de nuevo.'
     )
   })
 
