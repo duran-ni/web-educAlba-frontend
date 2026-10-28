@@ -64,22 +64,52 @@ describe('AdminInterestSubmissionsList', () => {
     expect(wrapper.find('.admin-interest-submissions-list__item-date').text()).toBe('')
   })
 
-  it('emits mark-reviewed with the submission id when the button is clicked', async () => {
+  it('shows "Marcar como revisada" and emits mark-reviewed for a pending submission', async () => {
     const wrapper = mount(AdminInterestSubmissionsList, {
       props: { status: 'loaded', submissions: [pendingSubmission] },
     })
 
-    await wrapper.find('.admin-interest-submissions-list__review').trigger('click')
+    const button = wrapper.find('.admin-interest-submissions-list__review')
+    expect(button.text()).toBe('Marcar como revisada')
+
+    await button.trigger('click')
 
     expect(wrapper.emitted('mark-reviewed')).toEqual([[pendingSubmission.id]])
   })
 
-  it('shows a reviewed badge instead of the action button for reviewed submissions', () => {
+  it('does not show the reviewed badge or the close button for a pending submission', () => {
+    const wrapper = mount(AdminInterestSubmissionsList, {
+      props: { status: 'loaded', submissions: [pendingSubmission] },
+    })
+
+    expect(wrapper.find('.admin-interest-submissions-list__reviewed-badge').exists()).toBe(false)
+    expect(wrapper.find('.admin-interest-submissions-list__close').exists()).toBe(false)
+  })
+
+  it('shows the reviewed badge and "Marcar como no revisada", emitting mark-unreviewed when clicked', async () => {
     const wrapper = mount(AdminInterestSubmissionsList, {
       props: { status: 'loaded', submissions: [reviewedSubmission] },
     })
 
-    expect(wrapper.text()).toContain('Revisada')
-    expect(wrapper.find('.admin-interest-submissions-list__review').exists()).toBe(false)
+    expect(wrapper.find('.admin-interest-submissions-list__reviewed-badge').text()).toBe('Revisada')
+    const button = wrapper.find('.admin-interest-submissions-list__review')
+    expect(button.text()).toBe('Marcar como no revisada')
+
+    await button.trigger('click')
+
+    expect(wrapper.emitted('mark-unreviewed')).toEqual([[reviewedSubmission.id]])
+  })
+
+  it('shows the "Finalizado" button and emits close when clicked for a reviewed submission', async () => {
+    const wrapper = mount(AdminInterestSubmissionsList, {
+      props: { status: 'loaded', submissions: [reviewedSubmission] },
+    })
+
+    const closeButton = wrapper.find('.admin-interest-submissions-list__close')
+    expect(closeButton.text()).toBe('Finalizado')
+
+    await closeButton.trigger('click')
+
+    expect(wrapper.emitted('close')).toEqual([[reviewedSubmission.id]])
   })
 })
