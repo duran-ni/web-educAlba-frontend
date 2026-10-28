@@ -41,23 +41,25 @@
         </div>
 
         <div class="admin-interest-submissions-list__item-actions">
-          <template v-if="submission.reviewed">
-            <span class="admin-interest-submissions-list__reviewed-badge"> Revisada </span>
-            <button
-              type="button"
-              class="admin-interest-submissions-list__close"
-              @click="$emit('close', submission.id)"
-            >
-              Finalizado
-            </button>
-          </template>
+          <span v-if="submission.reviewed" class="admin-interest-submissions-list__reviewed-badge">
+            Revisada
+          </span>
+
           <button
-            v-else
             type="button"
             class="admin-interest-submissions-list__review"
-            @click="$emit('mark-reviewed', submission.id)"
+            @click="$emit(submission.reviewed ? 'mark-unreviewed' : 'mark-reviewed', submission.id)"
           >
-            Marcar como revisada
+            {{ submission.reviewed ? 'Marcar como no revisada' : 'Marcar como revisada' }}
+          </button>
+
+          <button
+            v-if="submission.reviewed"
+            type="button"
+            class="admin-interest-submissions-list__close"
+            @click="$emit('close', submission.id)"
+          >
+            Finalizado
           </button>
         </div>
       </li>
@@ -77,7 +79,7 @@ defineProps({
   },
 })
 
-defineEmits(['mark-reviewed', 'close'])
+defineEmits(['mark-reviewed', 'mark-unreviewed', 'close'])
 
 // Convierte la fecha/hora ISO que manda el backend (LocalDateTime) en texto
 // legible en español, con fecha y hora juntas
