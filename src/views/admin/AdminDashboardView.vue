@@ -31,7 +31,22 @@
           <span class="admin-dashboard-view__kpi-label">Talleres activos</span>
         </p>
       </article>
+
+      <article class="admin-dashboard-view__kpi admin-dashboard-view__kpi--interest">
+        <p class="admin-dashboard-view__kpi-line">
+          <span class="admin-dashboard-view__kpi-value admin-dashboard-view__kpi-value--dark">
+            {{ summary.pendingInterestSubmissions }}
+          </span>
+          <span class="admin-dashboard-view__kpi-label">Solicitudes pendientes</span>
+        </p>
+      </article>
     </div>
+
+    <AdminInterestSubmissionsList
+      :status="interestSubmissionsStatus"
+      :submissions="interestSubmissions"
+      @mark-reviewed="handleInterestSubmissionReviewed"
+    />
 
     <AdminWorkshopsList
       :status="workshopsStatus"
@@ -84,11 +99,16 @@ import { fetchDashboardSummary } from '@/services/dashboard'
 import { fetchAdminWorkshops, deleteWorkshop, updateWorkshop } from '@/services/workshops'
 import { fetchEnrollments, deleteEnrollment } from '@/services/enrollments'
 import { fetchAdminTeachers, deleteTeacher } from '@/services/teachers'
+import {
+  fetchAdminInterestSubmissions,
+  markInterestSubmissionReviewed,
+} from '@/services/interestSubmissions'
 import { useDashboardSummaryStream } from '@/composables/useDashboardSummaryStream'
 import AdminWorkshopsList from '@/components/workshop/AdminWorkshopsList.vue'
 import WorkshopForm from '@/components/workshop/WorkshopForm.vue'
 import AdminTeachersList from '@/components/teacher/AdminTeachersList.vue'
 import TeacherForm from '@/components/teacher/TeacherForm.vue'
+import AdminInterestSubmissionsList from '@/components/communication/AdminInterestSubmissionsList.vue'
 
 // loading | loaded | error
 const summaryStatus = ref('loading')
@@ -106,6 +126,10 @@ const enrollments = ref([])
 const teachersStatus = ref('loading')
 const teachers = ref([])
 
+// loading | loaded | error
+const interestSubmissionsStatus = ref('loading')
+const interestSubmissions = ref([])
+
 const dialogRef = ref(null)
 const editingWorkshop = ref(null)
 
@@ -113,7 +137,13 @@ const teacherDialogRef = ref(null)
 const editingTeacher = ref(null)
 
 onMounted(async () => {
-  await Promise.all([loadSummary(), loadWorkshops(), loadEnrollments(), loadTeachers()])
+  await Promise.all([
+    loadSummary(),
+    loadWorkshops(),
+    loadEnrollments(),
+    loadTeachers(),
+    loadInterestSubmissions(),
+  ])
 })
 
 // Se suscribe al stream en tiempo real: cualquier cambio que afecte al
@@ -162,6 +192,17 @@ async function loadTeachers() {
   }
 }
 
+// Pide al backend el listado completo de solicitudes de interés para el panel de Admin
+async function loadInterestSubmissions() {
+  try {
+    const response = await fetchAdminInterestSubmissions()
+    interestSubmissions.value = response.data
+    interestSubmissionsStatus.value = 'loaded'
+  } catch {
+    interestSubmissionsStatus.value = 'error'
+  }
+}
+
 function openDialog() {
   editingWorkshop.value = null
   dialogRef.value.showModal()
@@ -179,13 +220,13 @@ function closeDialog() {
 }
 
 // Al cerrar el dialog (tanto si se guarda como si se cancela o se pulsa
-// Esc) se limpia el taller en edición, para que la proxima vez que se abra
+// Esc) se limpia el taller en edición, para que la próxima vez que se abra
 // "+ Nuevo Taller" no arrastre datos de una edición anterior
 function handleDialogClose() {
   editingWorkshop.value = null
 }
 
-// Abre el dialog de "+ Nuevo Profesor", sin ningun profesor precargado
+// Abre el dialog de "+ Nuevo Profesor", sin ningún profesor precargado
 function openTeacherDialog() {
   editingTeacher.value = null
   teacherDialogRef.value.showModal()
@@ -202,15 +243,15 @@ function closeTeacherDialog() {
   teacherDialogRef.value.close()
 }
 
-// Al cerrar el dialog de profesores se limpia el profesor en edicion, para
-// que la proxima vez que se abra "+ Nuevo Profesor" no arrastre datos de
-// una edicion anterior
+// Al cerrar el dialog de profesores se limpia el profesor en edición, para
+// que la próxima vez que se abra "+ Nuevo Profesor" no arrastre datos de
+// una edición anterior
 function handleTeacherDialogClose() {
   editingTeacher.value = null
 }
 
-// Se inserta el taller recien creado y se reordena la lista por fecha/hora,
-// sin volver a pedirla al backend: evita una peticion de red innecesaria
+// Se inserta el taller recién creado y se reordena la lista por fecha/hora,
+// sin volver a pedirla al backend: evita una petición de red innecesaria
 // para algo que ya tenemos
 function handleWorkshopCreated(newWorkshop) {
   workshops.value = [...workshops.value, newWorkshop].sort((a, b) =>
@@ -220,8 +261,8 @@ function handleWorkshopCreated(newWorkshop) {
   loadSummary()
 }
 
-// Sustituye el taller editado en el listado por su version actualizada y
-// reordena por fecha/hora, por si la edicion ha cambiado la fecha o la hora
+// Sustituye el taller editado en el listado por su versión actualizada y
+// reordena por fecha/hora, por si la edición ha cambiado la fecha o la hora
 function handleWorkshopUpdated(updatedWorkshop) {
   workshops.value = workshops.value
     .map((workshop) => (workshop.id === updatedWorkshop.id ? updatedWorkshop : workshop))
@@ -232,8 +273,8 @@ function handleWorkshopUpdated(updatedWorkshop) {
   loadSummary()
 }
 
-// Elimina el taller en el backend y, solo si la peticion tiene exito, lo
-// quita tambien del listado en memoria, sin volver a pedirlo entero al
+// Elimina el taller en el backend y, solo si la petición tiene éxito, lo
+// quita también del listado en memoria, sin volver a pedirlo entero al
 // backend
 async function handleWorkshopDeleted(id) {
   try {
@@ -252,8 +293,8 @@ async function handleWorkshopDeleted(id) {
 }
 
 // Activa/desactiva el taller en el backend (PUT con el taller completo,
-// solo cambia "active") y, solo si la peticion tiene exito, actualiza
-// tambien el listado en memoria, sin volver a pedirlo entero al backend
+// solo cambia "active") y, solo si la petición tiene éxito, actualiza
+// también el listado en memoria, sin volver a pedirlo entero al backend
 async function handleWorkshopToggleActive(workshop) {
   try {
     const response = await updateWorkshop(workshop.id, { ...workshop, active: !workshop.active })
@@ -266,8 +307,8 @@ async function handleWorkshopToggleActive(workshop) {
   }
 }
 
-// Elimina la inscripcion en el backend y, solo si la peticion tiene exito,
-// la quita tambien del listado en memoria; ademas refresca el KPI de
+// Elimina la inscripción en el backend y, solo si la petición tiene éxito,
+// la quita también del listado en memoria; además refresca el KPI de
 // alumnos inscritos, igual que al crear/eliminar un taller
 async function handleEnrollmentDeleted(id) {
   try {
@@ -279,9 +320,9 @@ async function handleEnrollmentDeleted(id) {
   }
 }
 
-// Se inserta el profesor recien creado al final del listado, sin volver a
+// Se inserta el profesor recién creado al final del listado, sin volver a
 // pedirlo entero al backend. Si fallo la subida de la foto, el dialogo se
-// deja abierto a proposito para que el aviso de error sea visible
+// deja abierto a propósito para que el aviso de error sea visible
 function handleTeacherCreated(newTeacher, { photoFailed = false } = {}) {
   teachers.value = [...teachers.value, newTeacher]
 
@@ -290,8 +331,8 @@ function handleTeacherCreated(newTeacher, { photoFailed = false } = {}) {
   }
 }
 
-// Sustituye el profesor editado en el listado por su version actualizada.
-// Mismo criterio que al crear: si fallo la foto, el dialogo se queda abierto
+// Sustituye el profesor editado en el listado por su versión actualizada.
+// Mismo criterio que al crear: si fallo la foto, el diálogo se queda abierto
 function handleTeacherUpdated(updatedTeacher, { photoFailed = false } = {}) {
   teachers.value = teachers.value.map((teacher) =>
     teacher.id === updatedTeacher.id ? updatedTeacher : teacher
@@ -302,14 +343,30 @@ function handleTeacherUpdated(updatedTeacher, { photoFailed = false } = {}) {
   }
 }
 
-// Elimina el profesor en el backend y, solo si la peticion tiene exito, lo
-// quita tambien del listado en memoria
+// Elimina el profesor en el backend y, solo si la petición tiene éxito, lo
+// quita también del listado en memoria
 async function handleTeacherDeleted(id) {
   try {
     await deleteTeacher(id)
     teachers.value = teachers.value.filter((teacher) => teacher.id !== id)
   } catch {
     window.alert('No se ha podido eliminar el profesor. Inténtalo de nuevo.')
+  }
+}
+
+// Marca la solicitud como revisada en el backend y, solo si la petición
+// tiene éxito, sustituye su versión en el listado en memoria por la
+// devuelta (ya con reviewed=true); además refresca el resumen, para que el
+// contador de "Solicitudes pendientes" baje al momento
+async function handleInterestSubmissionReviewed(id) {
+  try {
+    const response = await markInterestSubmissionReviewed(id)
+    interestSubmissions.value = interestSubmissions.value.map((submission) =>
+      submission.id === id ? response.data : submission
+    )
+    loadSummary()
+  } catch {
+    window.alert('No se ha podido marcar la solicitud como revisada. Inténtalo de nuevo.')
   }
 }
 </script>
@@ -353,7 +410,7 @@ async function handleTeacherDeleted(id) {
     margin: 2rem 0;
 
     @include respond-to(tablet) {
-      grid-template-columns: repeat(2, auto);
+      grid-template-columns: repeat(3, auto);
       justify-items: start;
       margin: 5.5rem;
     }
@@ -381,6 +438,15 @@ async function handleTeacherDeleted(id) {
     @include respond-to(tablet) {
       margin-left: 5rem;
       transform: rotate(-4deg);
+    }
+  }
+
+  &__kpi--interest {
+    background-color: $color-accent-yellow-soft;
+
+    @include respond-to(tablet) {
+      margin-left: 3rem;
+      transform: rotate(3deg);
     }
   }
 
