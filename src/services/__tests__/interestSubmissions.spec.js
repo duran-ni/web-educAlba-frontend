@@ -5,6 +5,8 @@ import {
   submitInterest,
   fetchAdminInterestSubmissions,
   markInterestSubmissionReviewed,
+  markInterestSubmissionUnreviewed,
+  closeInterestSubmission,
 } from '../interestSubmissions'
 
 vi.mock('../http', () => ({
@@ -32,5 +34,17 @@ describe('interestSubmissions service', () => {
     markInterestSubmissionReviewed(7)
 
     expect(http.put).toHaveBeenCalledWith('/admin/interest-submissions/7/reviewed')
+  })
+
+  it('marks an interest submission as unreviewed by id', () => {
+    markInterestSubmissionUnreviewed(7)
+
+    expect(http.put).toHaveBeenCalledWith('/admin/interest-submissions/7/unreviewed')
+  })
+
+  it('closes an interest submission by id', () => {
+    closeInterestSubmission(7)
+
+    expect(http.put).toHaveBeenCalledWith('/admin/interest-submissions/7/closed')
   })
 })
