@@ -46,6 +46,7 @@
       :status="interestSubmissionsStatus"
       :submissions="interestSubmissions"
       @mark-reviewed="handleInterestSubmissionReviewed"
+      @mark-unreviewed="handleInterestSubmissionUnreviewed"
       @close="handleInterestSubmissionClosed"
     />
 
@@ -103,6 +104,7 @@ import { fetchAdminTeachers, deleteTeacher } from '@/services/teachers'
 import {
   fetchAdminInterestSubmissions,
   markInterestSubmissionReviewed,
+  markInterestSubmissionUnreviewed,
   closeInterestSubmission,
 } from '@/services/interestSubmissions'
 import { useDashboardSummaryStream } from '@/composables/useDashboardSummaryStream'
@@ -370,6 +372,22 @@ async function handleInterestSubmissionReviewed(id) {
     loadSummary()
   } catch {
     window.alert('No se ha podido marcar la solicitud como revisada. Inténtalo de nuevo.')
+  }
+}
+
+// Deshace el marcado como revisada (por si la administradora se ha
+// equivocado al pulsar el boton) y, solo si la peticion tiene exito,
+// sustituye su version en el listado en memoria; refresca el resumen,
+// para que el contador de "Solicitudes pendientes" vuelva a subir
+async function handleInterestSubmissionUnreviewed(id) {
+  try {
+    const response = await markInterestSubmissionUnreviewed(id)
+    interestSubmissions.value = interestSubmissions.value.map((submission) =>
+      submission.id === id ? response.data : submission
+    )
+    loadSummary()
+  } catch {
+    window.alert('No se ha podido deshacer el marcado como revisada. Inténtalo de nuevo.')
   }
 }
 
