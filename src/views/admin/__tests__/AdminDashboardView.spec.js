@@ -6,10 +6,15 @@ import AdminWorkshopsList from '@/components/workshop/AdminWorkshopsList.vue'
 import WorkshopForm from '@/components/workshop/WorkshopForm.vue'
 import AdminTeachersList from '@/components/teacher/AdminTeachersList.vue'
 import TeacherForm from '@/components/teacher/TeacherForm.vue'
+import AdminInterestSubmissionsList from '@/components/communication/AdminInterestSubmissionsList.vue'
 import { fetchDashboardSummary } from '@/services/dashboard'
 import { fetchAdminWorkshops, deleteWorkshop, updateWorkshop } from '@/services/workshops'
 import { fetchEnrollments, deleteEnrollment } from '@/services/enrollments'
 import { fetchAdminTeachers, deleteTeacher } from '@/services/teachers'
+import {
+  fetchAdminInterestSubmissions,
+  markInterestSubmissionReviewed,
+} from '@/services/interestSubmissions'
 
 vi.mock('@/services/dashboard', () => ({
   fetchDashboardSummary: vi.fn(),
@@ -31,6 +36,11 @@ vi.mock('@/services/teachers', () => ({
   deleteTeacher: vi.fn(),
 }))
 
+vi.mock('@/services/interestSubmissions', () => ({
+  fetchAdminInterestSubmissions: vi.fn(),
+  markInterestSubmissionReviewed: vi.fn(),
+}))
+
 // El stream SSE en tiempo real no tiene sentido en un entorno de test (jsdom
 // no implementa EventSource de verdad); se simula como una función vacía,
 // ya que la recarga manual del resumen ya se cubre en cada test por separado
@@ -49,17 +59,38 @@ const WORKSHOP_B = { id: 2, name: 'Pintura', date: '2026-10-20', time: '18:00', 
 const TEACHER_A = { id: 1, name: 'Laura Gómez', specialty: 'Matemáticas' }
 const TEACHER_B = { id: 2, name: 'Marcos Ruiz', specialty: 'Educación Física' }
 
+const INTEREST_SUBMISSION_A = {
+  id: 1,
+  studentName: 'Juanito',
+  courseToReinforce: 'Matemáticas 2º ESO',
+  phone: '612345678',
+  submittedAt: '2026-10-20T10:30:00',
+  reviewed: false,
+}
+
+const INTEREST_SUBMISSION_B = {
+  id: 2,
+  studentName: 'Maria',
+  courseToReinforce: 'Lengua 1º ESO',
+  phone: '698765432',
+  submittedAt: '2026-10-18T09:00:00',
+  reviewed: false,
+}
+
 function mountView() {
   return shallowMount(AdminDashboardView)
 }
 
 async function mountLoaded() {
   fetchDashboardSummary.mockResolvedValueOnce({
-    data: { totalEnrolledStudents: 12, totalActiveWorkshops: 3 },
+    data: { totalEnrolledStudents: 12, totalActiveWorkshops: 3, pendingInterestSubmissions: 2 },
   })
   fetchAdminWorkshops.mockResolvedValueOnce({ data: [WORKSHOP_B, WORKSHOP_A] })
   fetchEnrollments.mockResolvedValueOnce({ data: [] })
   fetchAdminTeachers.mockResolvedValueOnce({ data: [TEACHER_A, TEACHER_B] })
+  fetchAdminInterestSubmissions.mockResolvedValueOnce({
+    data: [INTEREST_SUBMISSION_A, INTEREST_SUBMISSION_B],
+  })
   const wrapper = mountView()
   await flushPromises()
   return wrapper
@@ -79,6 +110,7 @@ describe('AdminDashboardView.vue', () => {
     fetchAdminWorkshops.mockReturnValue(new Promise(() => {}))
     fetchEnrollments.mockReturnValue(new Promise(() => {}))
     fetchAdminTeachers.mockReturnValue(new Promise(() => {}))
+    fetchAdminInterestSubmissions.mockReturnValue(new Promise(() => {}))
     const wrapper = mountView()
 
     expect(wrapper.text()).toContain('Cargando indicadores…')
@@ -91,6 +123,8 @@ describe('AdminDashboardView.vue', () => {
     expect(wrapper.text()).toContain('Alumnos inscritos')
     expect(wrapper.text()).toContain('3')
     expect(wrapper.text()).toContain('Talleres activos')
+    expect(wrapper.text()).toContain('2')
+    expect(wrapper.text()).toContain('Solicitudes pendientes')
   })
 
   it('shows an error message when the summary request fails', async () => {
@@ -98,6 +132,7 @@ describe('AdminDashboardView.vue', () => {
     fetchAdminWorkshops.mockResolvedValueOnce({ data: [] })
     fetchEnrollments.mockResolvedValueOnce({ data: [] })
     fetchAdminTeachers.mockResolvedValueOnce({ data: [] })
+    fetchAdminInterestSubmissions.mockResolvedValueOnce({ data: [] })
     const wrapper = mountView()
     await flushPromises()
 
@@ -313,6 +348,7 @@ describe('AdminDashboardView.vue', () => {
       data: [{ id: 99, workshopId: WORKSHOP_A.id, studentFullName: 'Lucía García López' }],
     })
     fetchAdminTeachers.mockResolvedValueOnce({ data: [] })
+    fetchAdminInterestSubmissions.mockResolvedValueOnce({ data: [] })
     const wrapper = mountView()
     await flushPromises()
 
@@ -348,6 +384,7 @@ describe('AdminDashboardView.vue', () => {
     fetchAdminWorkshops.mockRejectedValueOnce(new Error('network error'))
     fetchEnrollments.mockResolvedValueOnce({ data: [] })
     fetchAdminTeachers.mockResolvedValueOnce({ data: [] })
+    fetchAdminInterestSubmissions.mockResolvedValueOnce({ data: [] })
 
     const wrapper = mountView()
     await flushPromises()
@@ -362,6 +399,7 @@ describe('AdminDashboardView.vue', () => {
     fetchAdminWorkshops.mockResolvedValueOnce({ data: [WORKSHOP_A] })
     fetchEnrollments.mockRejectedValueOnce(new Error('network error'))
     fetchAdminTeachers.mockResolvedValueOnce({ data: [] })
+    fetchAdminInterestSubmissions.mockResolvedValueOnce({ data: [] })
 
     const wrapper = mountView()
     await flushPromises()
@@ -508,10 +546,71 @@ describe('AdminDashboardView.vue', () => {
     fetchAdminWorkshops.mockResolvedValueOnce({ data: [] })
     fetchEnrollments.mockResolvedValueOnce({ data: [] })
     fetchAdminTeachers.mockRejectedValueOnce(new Error('network error'))
+    fetchAdminInterestSubmissions.mockResolvedValueOnce({ data: [] })
 
     const wrapper = mountView()
     await flushPromises()
 
     expect(wrapper.findComponent(AdminTeachersList).props('status')).toBe('error')
+  })
+
+  it('passes the loaded status and submissions to AdminInterestSubmissionsList', async () => {
+    const wrapper = await mountLoaded()
+
+    expect(wrapper.findComponent(AdminInterestSubmissionsList).props('status')).toBe('loaded')
+    expect(wrapper.findComponent(AdminInterestSubmissionsList).props('submissions')).toEqual([
+      INTEREST_SUBMISSION_A,
+      INTEREST_SUBMISSION_B,
+    ])
+  })
+
+  it('updates only the matching submission and refreshes the summary when AdminInterestSubmissionsList emits "mark-reviewed"', async () => {
+    const wrapper = await mountLoaded()
+    const reviewedSubmission = { ...INTEREST_SUBMISSION_A, reviewed: true }
+    markInterestSubmissionReviewed.mockResolvedValueOnce({ data: reviewedSubmission })
+    fetchDashboardSummary.mockResolvedValueOnce({
+      data: { totalEnrolledStudents: 12, totalActiveWorkshops: 3, pendingInterestSubmissions: 1 },
+    })
+
+    wrapper
+      .findComponent(AdminInterestSubmissionsList)
+      .vm.$emit('mark-reviewed', INTEREST_SUBMISSION_A.id)
+    await flushPromises()
+
+    expect(markInterestSubmissionReviewed).toHaveBeenCalledWith(INTEREST_SUBMISSION_A.id)
+    expect(wrapper.findComponent(AdminInterestSubmissionsList).props('submissions')).toEqual([
+      reviewedSubmission,
+      INTEREST_SUBMISSION_B,
+    ])
+    expect(fetchDashboardSummary).toHaveBeenCalledTimes(2)
+  })
+
+  it('shows an alert when marking an interest submission as reviewed fails', async () => {
+    markInterestSubmissionReviewed.mockRejectedValueOnce(new Error('network error'))
+    const wrapper = await mountLoaded()
+
+    wrapper
+      .findComponent(AdminInterestSubmissionsList)
+      .vm.$emit('mark-reviewed', INTEREST_SUBMISSION_A.id)
+    await flushPromises()
+
+    expect(window.alert).toHaveBeenCalledWith(
+      'No se ha podido marcar la solicitud como revisada. Inténtalo de nuevo.'
+    )
+  })
+
+  it('passes the error status to AdminInterestSubmissionsList when the interest submissions request fails', async () => {
+    fetchDashboardSummary.mockResolvedValueOnce({
+      data: { totalEnrolledStudents: 0, totalActiveWorkshops: 0, pendingInterestSubmissions: 0 },
+    })
+    fetchAdminWorkshops.mockResolvedValueOnce({ data: [] })
+    fetchEnrollments.mockResolvedValueOnce({ data: [] })
+    fetchAdminTeachers.mockResolvedValueOnce({ data: [] })
+    fetchAdminInterestSubmissions.mockRejectedValueOnce(new Error('network error'))
+
+    const wrapper = mountView()
+    await flushPromises()
+
+    expect(wrapper.findComponent(AdminInterestSubmissionsList).props('status')).toBe('error')
   })
 })
