@@ -36,12 +36,16 @@
         </div>
 
         <div class="admin-interest-submissions-list__item-actions">
-          <span
-            v-if="submission.reviewed"
-            class="admin-interest-submissions-list__reviewed-badge"
-          >
-            Revisada
-          </span>
+          <template v-if="submission.reviewed">
+            <span class="admin-interest-submissions-list__reviewed-badge"> Revisada </span>
+            <button
+              type="button"
+              class="admin-interest-submissions-list__close"
+              @click="$emit('close', submission.id)"
+            >
+              Finalizado
+            </button>
+          </template>
           <button
             v-else
             type="button"
@@ -68,7 +72,7 @@ defineProps({
   },
 })
 
-defineEmits(['mark-reviewed'])
+defineEmits(['mark-reviewed', 'close'])
 
 // Convierte la fecha/hora ISO que manda el backend (LocalDateTime) en texto
 // legible en español, con fecha y hora juntas
@@ -214,6 +218,28 @@ function formatSubmittedAt(isoDateTime) {
     &:hover,
     &:focus-visible {
       background-color: $color-primary;
+      color: $color-background;
+    }
+  }
+
+  &__close {
+    flex-shrink: 0;
+    padding: 0.4rem 1rem;
+    border: 2px solid $color-text-dark;
+    border-radius: 999px;
+    background-color: $color-background;
+    color: $color-text-dark;
+    font-family: $font-heading;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
+
+    &:hover,
+    &:focus-visible {
+      background-color: $color-text-dark;
       color: $color-background;
     }
   }
