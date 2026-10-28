@@ -27,7 +27,12 @@
         :class="{ 'admin-interest-submissions-list__item--reviewed': submission.reviewed }"
       >
         <div class="admin-interest-submissions-list__item-info">
-          <p class="admin-interest-submissions-list__item-name">{{ submission.studentName }}</p>
+          <p class="admin-interest-submissions-list__item-name">
+            <span v-if="submission.reviewed" class="admin-interest-submissions-list__item-icon" aria-hidden="true">
+              ✓
+            </span>
+            {{ submission.studentName }}
+          </p>
           <p class="admin-interest-submissions-list__item-course">{{ submission.courseToReinforce }}</p>
           <p class="admin-interest-submissions-list__item-phone">Tel: {{ submission.phone }}</p>
           <p class="admin-interest-submissions-list__item-date">
@@ -122,30 +127,27 @@ function formatSubmittedAt(isoDateTime) {
     list-style: none;
     display: grid;
     grid-template-columns: 1fr;
-    gap: 2rem;
+    gap: 1.5rem;
     margin: 0;
 
-    @include respond-to(desktop) {
-      grid-template-columns: repeat(auto-fit, minmax(30rem, 35rem));
-      gap: 3.5rem;
-      margin-left: 10rem;
-      margin-right: 4rem;
+    @include respond-to(tablet) {
+      grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+      gap: 2rem;
     }
   }
 
   &__item {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: flex-start;
     gap: 1rem;
-    flex-wrap: wrap;
-    padding: 1.75rem 2.25rem;
+    padding: 1.25rem 1.5rem;
     background-color: $color-accent-yellow-soft;
     @include doodle-frame;
   }
 
   &__item--reviewed {
-    opacity: 0.6;
+    background-color: $color-accent-green-soft;
   }
 
   &__item-info {
@@ -156,28 +158,45 @@ function formatSubmittedAt(isoDateTime) {
 
   &__item-name {
     margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     font-family: $font-heading;
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     font-weight: 600;
     color: $color-primary;
   }
 
+  &__item-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.25rem;
+    height: 1.25rem;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background-color: $color-green-dark;
+    color: $color-background;
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+
   &__item-course {
     margin: 0;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     font-family: cursive;
     color: $color-text-dark;
   }
 
   &__item-phone {
     margin: 0;
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     color: $color-text-dark;
   }
 
   &__item-date {
     margin: 0;
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
     color: $color-text-dark;
   }
 
@@ -185,18 +204,18 @@ function formatSubmittedAt(isoDateTime) {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: 0.75rem;
+    gap: 0.625rem;
   }
 
   &__reviewed-badge {
     flex-shrink: 0;
     padding: 0.4rem 1rem;
-    border: 2px solid $color-text-dark;
+    border: 2px solid $color-green-dark;
     border-radius: 999px;
-    background-color: transparent;
-    color: $color-text-dark;
+    background-color: $color-green-dark;
+    color: $color-background;
     font-family: $font-heading;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 700;
   }
 
@@ -208,7 +227,7 @@ function formatSubmittedAt(isoDateTime) {
     background-color: $color-background;
     color: $color-primary;
     font-family: $font-heading;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 700;
     cursor: pointer;
     transition:
@@ -230,7 +249,7 @@ function formatSubmittedAt(isoDateTime) {
     background-color: $color-background;
     color: $color-text-dark;
     font-family: $font-heading;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 700;
     cursor: pointer;
     transition:
