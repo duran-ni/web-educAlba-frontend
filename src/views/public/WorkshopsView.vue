@@ -32,13 +32,25 @@
 
   <WorkshopsList />
 
-  <WorkshopEnrollmentForm />
+  <!-- El formulario publico "Apuntate ya" es para visitantes sin cuenta:
+       un usuario de familia ya logueado se apunta con el boton "Apuntarme"
+       de cada taller, que usa directamente su alumno ya dado de alta -->
+  <WorkshopEnrollmentForm v-if="!isLoggedInFamily" />
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import WorkshopsCalendar from '@/components/workshop/WorkshopsCalendar.vue'
 import WorkshopsList from '@/components/workshop/WorkshopsList.vue'
 import WorkshopEnrollmentForm from '@/components/workshop/WorkshopEnrollmentForm.vue';
+import { useAuthStore } from '@/stores/auth'
+import { ROLES } from '@/config/roles'
+
+const authStore = useAuthStore()
+
+const isLoggedInFamily = computed(
+  () => authStore.isAuthenticated && authStore.user?.roles.includes(ROLES.FAMILY)
+)
 </script>
 
 <style lang="scss">
