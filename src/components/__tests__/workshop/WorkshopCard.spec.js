@@ -13,9 +13,10 @@ describe('WorkshopCard.vue', () => {
     recommendedAge: '1-2 años',
     room: null,
     active: true,
+    price: 15,
   }
 
-  it('shows the workshop name, description, date, time and recommended age', () => {
+  it('shows the workshop name, description, date, time, recommended age and price', () => {
     const wrapper = mount(WorkshopCard, { props: { workshop } })
 
     expect(wrapper.text()).toContain('Manos a la obra')
@@ -23,5 +24,13 @@ describe('WorkshopCard.vue', () => {
     expect(wrapper.text()).toContain('sábado, 24 de octubre')
     expect(wrapper.text()).toContain('11:00 h')
     expect(wrapper.text()).toContain('1-2 años')
+    expect(wrapper.text()).toContain('15,00 €')
+  })
+
+  it('shows "Gratis" when the workshop price is zero', () => {
+    const freeWorkshop = { ...workshop, price: 0 }
+    const wrapper = mount(WorkshopCard, { props: { workshop: freeWorkshop } })
+
+    expect(wrapper.text()).toContain('Gratis')
   })
 })
