@@ -14,8 +14,16 @@ export function formatWorkshopPrice(price) {
     return 'Gratis'
   }
 
-  return new Intl.NumberFormat('es-ES', {
+  const formatted = new Intl.NumberFormat('es-ES', {
     style: 'currency',
     currency: 'EUR',
   }).format(numericPrice)
+
+  // Intl.NumberFormat separa el numero del simbolo "€" con un espacio de
+  // no separacion ( ) o, segun la version de ICU del motor de Node,
+  // con un espacio fino de no separacion ( ) -- visualmente iguales
+  // a un espacio normal, pero un caracter distinto por debajo. Lo
+  // normalizamos a un espacio normal para que el texto sea siempre el
+  // mismo, sin importar donde se ejecute (local, CI, etc.)
+  return formatted.replace(/[  ]/g, ' ')
 }
