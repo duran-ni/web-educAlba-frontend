@@ -11,14 +11,16 @@ describe('MyWorkshopCard.vue', () => {
     date: '2026-11-10',
     time: '17:00:00',
     progress: 'iniciado',
+    price: 30,
   }
 
-  it('shows the workshop name, date, time and progress', () => {
+  it('shows the workshop name, date, time, progress and price', () => {
     const wrapper = mount(MyWorkshopCard, { props: { enrollment } })
 
     expect(wrapper.text()).toContain('Robótica')
     expect(wrapper.text()).toContain('martes, 10 de noviembre')
     expect(wrapper.text()).toContain('17:00 h')
     expect(wrapper.text()).toContain('iniciado')
+    expect(wrapper.text()).toContain('30,00 €')
   })
 })
