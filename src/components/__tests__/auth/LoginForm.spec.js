@@ -55,17 +55,17 @@ describe('LoginForm.vue', () => {
 
   it('logs in and redirects a family user to their dashboard', async () => {
     login.mockResolvedValueOnce({
-      data: { email: 'familia@educalba.com', roles: ['ALUMNO_FAMILIA'] },
+      data: { email: 'familia@example.com', roles: ['ALUMNO_FAMILIA'] },
     })
     const wrapper = mountForm()
 
-    await wrapper.get('#login-email').setValue('familia@educalba.com')
+    await wrapper.get('#login-email').setValue('familia@example.com')
     await wrapper.get('#login-password').setValue('Clave1234')
     await wrapper.find('form').trigger('submit.prevent')
     await flushPromises()
 
     expect(login).toHaveBeenCalledWith({
-      email: 'familia@educalba.com',
+      email: 'familia@example.com',
       password: 'Clave1234',
       rememberMe: false,
     })
@@ -74,18 +74,18 @@ describe('LoginForm.vue', () => {
 
   it('logs in and redirects an administrator to the admin panel, sending rememberMe', async () => {
     login.mockResolvedValueOnce({
-      data: { email: 'admin@educalba.com', roles: ['ADMINISTRADOR'] },
+      data: { email: 'admin@example.com', roles: ['ADMINISTRADOR'] },
     })
     const wrapper = mountForm()
 
-    await wrapper.get('#login-email').setValue('admin@educalba.com')
+    await wrapper.get('#login-email').setValue('admin@example.com')
     await wrapper.get('#login-password').setValue('Clave1234')
     await wrapper.get('.login-form__remember-input').setValue(true)
     await wrapper.find('form').trigger('submit.prevent')
     await flushPromises()
 
     expect(login).toHaveBeenCalledWith({
-      email: 'admin@educalba.com',
+      email: 'admin@example.com',
       password: 'Clave1234',
       rememberMe: true,
     })
@@ -93,10 +93,10 @@ describe('LoginForm.vue', () => {
   })
 
   it('redirects to the dashboard when the logged-in user has no roles at all', async () => {
-    login.mockResolvedValueOnce({ data: { email: 'familia@educalba.com' } })
+    login.mockResolvedValueOnce({ data: { email: 'familia@example.com' } })
     const wrapper = mountForm()
 
-    await wrapper.get('#login-email').setValue('familia@educalba.com')
+    await wrapper.get('#login-email').setValue('familia@example.com')
     await wrapper.get('#login-password').setValue('Clave1234')
     await wrapper.find('form').trigger('submit.prevent')
     await flushPromises()
@@ -108,7 +108,7 @@ describe('LoginForm.vue', () => {
     login.mockRejectedValueOnce(new Error('Unauthorized'))
     const wrapper = mountForm()
 
-    await wrapper.get('#login-email').setValue('familia@educalba.com')
+    await wrapper.get('#login-email').setValue('familia@example.com')
     await wrapper.get('#login-password').setValue('ClaveMala')
     await wrapper.find('form').trigger('submit.prevent')
     await flushPromises()
