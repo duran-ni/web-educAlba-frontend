@@ -23,3 +23,11 @@ export function fetchMyWorkshops() {
 export function fetchMyMaterials() {
   return http.get('/dashboard/my-materials')
 }
+
+// Apunta al propio alumno (el vinculado al usuario que ha iniciado sesion)
+// a un taller, desde la vista publica de Talleres. A diferencia del
+// formulario publico "Apuntate ya", no hace falta enviar nombre/edad/
+// telefono: el backend ya conoce al alumno a partir de la sesion
+export function enrollInWorkshop(workshopId) {
+  return http.post(`/dashboard/my-workshops/${workshopId}`)
+}
