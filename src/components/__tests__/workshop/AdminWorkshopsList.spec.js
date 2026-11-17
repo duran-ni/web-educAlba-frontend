@@ -12,6 +12,7 @@ const WORKSHOP_FULL = {
   recommendedAge: '8-12 años',
   room: 'Aula 3',
   description: 'Construye tu propio robot.',
+  price: 25,
 }
 const WORKSHOP_MINIMAL = {
   id: 2,
@@ -19,6 +20,7 @@ const WORKSHOP_MINIMAL = {
   date: '2026-10-20',
   time: '18:00:00',
   active: false,
+  price: 0,
 }
 const ENROLLMENT = { id: 100, workshopId: 1, studentFullName: 'Lucía García López' }
 
@@ -49,7 +51,7 @@ describe('AdminWorkshopsList.vue', () => {
     expect(wrapper.text()).toContain('Todavía no hay talleres creados.')
   })
 
-  it("renders a workshop's name, date, time and optional fields only when present", () => {
+  it("renders a workshop's name, date, time, price and optional fields only when present", () => {
     const wrapper = mountList({ workshops: [WORKSHOP_FULL, WORKSHOP_MINIMAL] })
     const items = wrapper.findAll('.admin-workshops-list__item')
 
@@ -59,10 +61,12 @@ describe('AdminWorkshopsList.vue', () => {
     expect(items[0].text()).toContain('8-12 años')
     expect(items[0].text()).toContain('Aula 3')
     expect(items[0].text()).toContain('Construye tu propio robot.')
+    expect(items[0].text()).toContain('25,00 €')
     expect(items[0].get('.admin-workshops-list__status').text()).toBe('Activo')
 
     expect(items[1].find('.admin-workshops-list__item-age').exists()).toBe(false)
     expect(items[1].find('.admin-workshops-list__item-description').exists()).toBe(false)
+    expect(items[1].text()).toContain('Gratis')
     expect(items[1].get('.admin-workshops-list__status').text()).toBe('Inactivo')
   })
 
