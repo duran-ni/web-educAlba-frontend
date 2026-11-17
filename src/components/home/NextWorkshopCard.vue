@@ -10,6 +10,7 @@
       <div v-else-if="status === 'has-workshop'" class="next-workshop-card__details">
         <p class="next-workshop-card__name">{{ workshop.name }}</p>
         <p class="next-workshop-card__description">{{ workshop.description }}</p>
+        <p class="next-workshop-card__price">{{ formattedPrice }}</p>
       </div>
 
       <p v-else-if="status === 'empty'" class="next-workshop-card__message">
@@ -42,12 +43,14 @@ import { ref, computed, onMounted } from 'vue'
 import { fetchNextWorkshop } from '@/services/workshops'
 import { formatWorkshopDate } from '@/utils/formatWorkshopDate'
 import { formatWorkshopTime } from '@/utils/formatWorkshopTime'
+import { formatWorkshopPrice } from '@/utils/formatWorkshopPrice'
 
 const status = ref('loading')
 const workshop = ref(null)
 
 const formattedDate = computed(() => formatWorkshopDate(workshop.value?.date))
 const formattedTime = computed(() => formatWorkshopTime(workshop.value?.time))
+const formattedPrice = computed(() => formatWorkshopPrice(workshop.value?.price))
 
 onMounted(async () => {
   try {
@@ -101,6 +104,18 @@ onMounted(async () => {
   &__description {
     margin: 0;
     color: $color-text-dark;
+  }
+
+  &__price {
+    margin: 0;
+    align-self: flex-start;
+    padding: 0.2rem 0.75rem;
+    border-radius: 999px;
+    background-color: $color-accent-green-soft;
+    color: $color-green-dark;
+    font-family: $font-heading;
+    font-weight: 700;
+    font-size: 0.8rem;
   }
 
   &__message {
