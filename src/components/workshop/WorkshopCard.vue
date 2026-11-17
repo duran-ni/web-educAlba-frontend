@@ -59,14 +59,40 @@
         <span>{{ formattedPrice }}</span>
       </div>
     </div>
+
+    <div v-if="canEnroll" class="workshop-card__enroll">
+      <p v-if="isEnrolled" class="workshop-card__enrolled-badge">
+        Ya estás apuntado/a
+      </p>
+
+      <template v-else>
+        <button
+          type="button"
+          class="workshop-card__enroll-button"
+          :disabled="enrollStatus === 'submitting'"
+          @click="handleEnroll"
+        >
+          {{ enrollStatus === 'submitting' ? 'Apuntando…' : 'Apuntarme' }}
+        </button>
+
+        <p
+          v-if="enrollStatus === 'error'"
+          class="workshop-card__enroll-error"
+          role="alert"
+        >
+          {{ enrollErrorMessage }}
+        </p>
+      </template>
+    </div>
   </article>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import { formatWorkshopDate } from '@/utils/formatWorkshopDate'
 import { formatWorkshopTime } from '@/utils/formatWorkshopTime'
 import { formatWorkshopPrice } from '@/utils/formatWorkshopPrice'
+import { enrollInWorkshop } from '@/services/dashboard'
 
 const props = defineProps({
   // Datos del taller a mostrar (tal como los devuelve el backend)
@@ -74,11 +100,46 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  // Solo true si el usuario ha iniciado sesion con el rol de familia/alumno:
+  // controla si se muestra el boton "Apuntarme" en esta tarjeta
+  canEnroll: {
+    type: Boolean,
+    default: false,
+  },
+  // Ids de los talleres en los que el alumno del usuario ya esta inscrito
+  enrolledWorkshopIds: {
+    type: Array,
+    default: () => [],
+  },
 })
+
+const emit = defineEmits(['enrolled'])
 
 const formattedDate = computed(() => formatWorkshopDate(props.workshop.date))
 const formattedTime = computed(() => formatWorkshopTime(props.workshop.time))
 const formattedPrice = computed(() => formatWorkshopPrice(props.workshop.price))
+
+const isEnrolled = computed(() => props.enrolledWorkshopIds.includes(props.workshop.id))
+
+// idle | submitting | error
+const enrollStatus = ref('idle')
+const enrollErrorMessage = ref('')
+
+async function handleEnroll() {
+  enrollStatus.value = 'submitting'
+
+  try {
+    await enrollInWorkshop(props.workshop.id)
+    enrollStatus.value = 'idle'
+    emit('enrolled', props.workshop.id)
+  } catch (error) {
+    enrollStatus.value = 'error'
+    enrollErrorMessage.value =
+      error.response?.status === 409
+        ? 'Ya estabas apuntado/a a este taller.'
+        : 'No se ha podido completar la inscripción. Inténtalo de nuevo.'
+  }
+}
 </script>
 
 <style lang="scss">
@@ -156,6 +217,52 @@ const formattedPrice = computed(() => formatWorkshopPrice(props.workshop.price))
     width: 18px;
     height: 18px;
     flex-shrink: 0;
+  }
+
+  &__enroll {
+    margin-top: 0.75rem;
+  }
+
+  &__enroll-button {
+    width: 100%;
+    padding: 0.625rem 1.5rem;
+    border: 2px solid $color-text-dark;
+    border-radius: 999px;
+    background-color: $color-primary;
+    color: $color-background;
+    font-family: $font-heading;
+    font-weight: 600;
+    box-shadow: 4px 4px 0 0 $color-text-dark;
+    transition: opacity 0.2s ease;
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    &:hover:not(:disabled),
+    &:focus-visible:not(:disabled) {
+      opacity: 0.9;
+    }
+  }
+
+  &__enrolled-badge {
+    margin: 0;
+    padding: 0.625rem 1.5rem;
+    text-align: center;
+    border-radius: 999px;
+    background-color: $color-accent-green-soft;
+    color: $color-text-dark;
+    font-family: $font-heading;
+    font-weight: 600;
+  }
+
+  &__enroll-error {
+    margin: 0.5rem 0 0;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: $color-error;
+    text-align: center;
   }
 }
 </style>
