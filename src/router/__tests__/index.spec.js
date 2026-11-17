@@ -27,7 +27,7 @@ describe('router navigation guard', () => {
 
   it('allows access to the user dashboard once the user is authenticated', async () => {
     const authStore = useAuthStore()
-    authStore.user = { email: 'familia@educalba.com', roles: ['ALUMNO_FAMILIA'] }
+    authStore.user = { email: 'familia@example.com', roles: ['ALUMNO_FAMILIA'] }
 
     await router.push({ name: 'dashboard' })
     expect(router.currentRoute.value.name).toBe('dashboard')
@@ -35,7 +35,7 @@ describe('router navigation guard', () => {
 
   it('allows access to the admin panel once the user is authenticated', async () => {
     const authStore = useAuthStore()
-    authStore.user = { email: 'admin@educalba.com', roles: ['ADMINISTRADOR'] }
+    authStore.user = { email: 'admin@example.com', roles: ['ADMINISTRADOR'] }
 
     await router.push({ name: 'students' })
     expect(router.currentRoute.value.name).toBe('students')
@@ -43,7 +43,7 @@ describe('router navigation guard', () => {
 
   it('allows access to the admin dashboard once the user is authenticated', async () => {
     const authStore = useAuthStore()
-    authStore.user = { email: 'admin@educalba.com', roles: ['ADMINISTRADOR'] }
+    authStore.user = { email: 'admin@example.com', roles: ['ADMINISTRADOR'] }
 
     await router.push({ name: 'admin' })
     expect(router.currentRoute.value.name).toBe('admin')
@@ -51,7 +51,7 @@ describe('router navigation guard', () => {
 
   it('allows access to the admin gallery once the user is authenticated', async () => {
     const authStore = useAuthStore()
-    authStore.user = { email: 'admin@educalba.com', roles: ['ADMINISTRADOR'] }
+    authStore.user = { email: 'admin@example.com', roles: ['ADMINISTRADOR'] }
 
     await router.push({ name: 'admin-gallery' })
     expect(router.currentRoute.value.name).toBe('admin-gallery')
@@ -59,7 +59,7 @@ describe('router navigation guard', () => {
 
   it('redirects a family account away from the admin panel to its own dashboard', async () => {
     const authStore = useAuthStore()
-    authStore.user = { email: 'familia@educalba.com', roles: ['ALUMNO_FAMILIA'] }
+    authStore.user = { email: 'familia@example.com', roles: ['ALUMNO_FAMILIA'] }
 
     await router.push({ name: 'admin' })
     expect(router.currentRoute.value.name).toBe('dashboard')
@@ -67,7 +67,7 @@ describe('router navigation guard', () => {
 
   it('redirects an administrator away from the user dashboard to the admin panel', async () => {
     const authStore = useAuthStore()
-    authStore.user = { email: 'admin@educalba.com', roles: ['ADMINISTRADOR'] }
+    authStore.user = { email: 'admin@example.com', roles: ['ADMINISTRADOR'] }
 
     await router.push({ name: 'dashboard' })
     expect(router.currentRoute.value.name).toBe('admin')
