@@ -9,20 +9,20 @@ vi.mock('../http', () => ({
 
 describe('auth service', () => {
   it('logs in sending credentials as Basic Auth, without a remember-me param', () => {
-    login({ email: 'ana@educalba.com', password: 'ClaveSegura123' })
+    login({ email: 'ana@example.com', password: 'ClaveSegura123' })
 
     expect(http.get).toHaveBeenCalledWith('/auth/me', {
-      auth: { username: 'ana@educalba.com', password: 'ClaveSegura123' },
+      auth: { username: 'ana@example.com', password: 'ClaveSegura123' },
       params: undefined,
       skipAuthRedirect: true,
     })
   })
 
   it('logs in requesting a persistent session when remember-me is checked', () => {
-    login({ email: 'ana@educalba.com', password: 'ClaveSegura123', rememberMe: true })
+    login({ email: 'ana@example.com', password: 'ClaveSegura123', rememberMe: true })
 
     expect(http.get).toHaveBeenCalledWith('/auth/me', {
-      auth: { username: 'ana@educalba.com', password: 'ClaveSegura123' },
+      auth: { username: 'ana@example.com', password: 'ClaveSegura123' },
       params: { 'remember-me': true },
       skipAuthRedirect: true,
     })
@@ -44,7 +44,7 @@ describe('auth service', () => {
     register({
       firstName: 'Ana',
       lastName: 'García',
-      email: 'ana@educalba.com',
+      email: 'ana@example.com',
       password: 'ClaveSegura123',
       serviceOfInterest: 'Clases de Refuerzo',
       educationalStage: 'PRIMARIA',
@@ -53,7 +53,7 @@ describe('auth service', () => {
     expect(http.post).toHaveBeenCalledWith('/auth/register', {
       firstName: 'Ana',
       lastName: 'García',
-      email: 'ana@educalba.com',
+      email: 'ana@example.com',
       password: btoa('ClaveSegura123'),
       serviceOfInterest: 'Clases de Refuerzo',
       educationalStage: 'PRIMARIA',
@@ -61,9 +61,9 @@ describe('auth service', () => {
   })
 
   it('requests a password reset email for the given address', () => {
-    requestPasswordReset('ana@educalba.com')
+    requestPasswordReset('ana@example.com')
 
-    expect(http.post).toHaveBeenCalledWith('/auth/forgot-password', { email: 'ana@educalba.com' })
+    expect(http.post).toHaveBeenCalledWith('/auth/forgot-password', { email: 'ana@example.com' })
   })
 
   it('resets the password encoding the new one in Base64', () => {
