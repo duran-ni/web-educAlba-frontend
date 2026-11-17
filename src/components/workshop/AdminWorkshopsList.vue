@@ -33,6 +33,9 @@
                 → {{ workshop.recommendedAge }}
               </span>
               <span v-if="workshop.room"> · {{ workshop.room }}</span>
+              <span class="admin-workshops-list__item-price">
+                · {{ formatWorkshopPrice(workshop.price) }}
+              </span>
             </p>
 
             <hr class="admin-workshops-list__divider" />
@@ -114,6 +117,7 @@
 import { ref } from 'vue'
 import { formatWorkshopDate } from '@/utils/formatWorkshopDate'
 import { formatWorkshopTime } from '@/utils/formatWorkshopTime'
+import { formatWorkshopPrice } from '@/utils/formatWorkshopPrice'
 
 const props = defineProps({
   status: {
@@ -318,6 +322,11 @@ function handleDeleteEnrollmentClick(enrollment) {
 
   &__item-age {
     color: $color-primary;
+    font-weight: 600;
+  }
+
+  &__item-price {
+    color: $color-green-dark;
     font-weight: 600;
   }
 
