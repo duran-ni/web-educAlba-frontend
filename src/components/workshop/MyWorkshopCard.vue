@@ -25,7 +25,10 @@
       <span>{{ formattedDate }} / {{ formattedTime }}</span>
     </div>
 
-    <p class="my-workshop-card__progress">{{ enrollment.progress }}</p>
+    <div class="my-workshop-card__footer">
+      <p class="my-workshop-card__progress">{{ enrollment.progress }}</p>
+      <p class="my-workshop-card__price">{{ formattedPrice }}</p>
+    </div>
   </article>
 </template>
 
@@ -33,11 +36,12 @@
 import { computed } from 'vue'
 import { formatWorkshopDate } from '@/utils/formatWorkshopDate'
 import { formatWorkshopTime } from '@/utils/formatWorkshopTime'
+import { formatWorkshopPrice } from '@/utils/formatWorkshopPrice'
 
 const props = defineProps({
   // Datos de una inscripcion, tal como los devuelve /api/dashboard/my-workshops
   // (MyWorkshopResponse en el backend): enrollmentId, workshopId, workshopName,
-  // date, time, progress
+  // date, time, progress, price
   enrollment: {
     type: Object,
     required: true,
@@ -46,6 +50,7 @@ const props = defineProps({
 
 const formattedDate = computed(() => formatWorkshopDate(props.enrollment.date))
 const formattedTime = computed(() => formatWorkshopTime(props.enrollment.time))
+const formattedPrice = computed(() => formatWorkshopPrice(props.enrollment.price))
 </script>
 
 <style lang="scss">
@@ -105,9 +110,15 @@ const formattedTime = computed(() => formatWorkshopTime(props.enrollment.time))
     flex-shrink: 0;
   }
 
+  &__footer {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
   &__progress {
     margin: 0;
-    align-self: flex-start;
     padding: 0.25rem 0.75rem;
     border-radius: 999px;
     background-color: $color-background;
@@ -116,6 +127,17 @@ const formattedTime = computed(() => formatWorkshopTime(props.enrollment.time))
     font-size: 0.875rem;
     font-weight: 600;
     text-transform: capitalize;
+  }
+
+  &__price {
+    margin: 0;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    background-color: $color-background;
+    color: $color-primary;
+    font-family: $font-heading;
+    font-size: 0.875rem;
+    font-weight: 700;
   }
 }
 </style>
