@@ -31,7 +31,7 @@ describe('DashboardButton.vue', () => {
 
   it('links to the user dashboard and shows "Mi Perfil" for a family user', async () => {
     const { wrapper, store } = mountButton()
-    store.user = { email: 'familia@educalba.com', roles: ['ALUMNO_FAMILIA'] }
+    store.user = { email: 'familia@example.com', roles: ['ALUMNO_FAMILIA'] }
     await nextTick()
 
     expect(wrapper.text()).toBe('Mi Perfil')
@@ -40,7 +40,7 @@ describe('DashboardButton.vue', () => {
 
   it('links to the admin panel and shows "Dashboard Admin" for an administrator', async () => {
     const { wrapper, store } = mountButton()
-    store.user = { email: 'admin@educalba.com', roles: ['ADMINISTRADOR'] }
+    store.user = { email: 'admin@example.com', roles: ['ADMINISTRADOR'] }
     await nextTick()
 
     expect(wrapper.text()).toBe('Dashboard Admin')
@@ -49,7 +49,7 @@ describe('DashboardButton.vue', () => {
 
   it('treats a user with no roles at all as a non-admin', async () => {
     const { wrapper, store } = mountButton()
-    store.user = { email: 'familia@educalba.com' }
+    store.user = { email: 'familia@example.com' }
     await nextTick()
 
     expect(wrapper.text()).toBe('Mi Perfil')
