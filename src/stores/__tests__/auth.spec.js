@@ -24,23 +24,23 @@ describe('Auth Store', () => {
   })
 
   it('logs in and stores the returned user', async () => {
-    loginRequest.mockResolvedValue({ data: { id: 1, email: 'ana@educalba.com' } })
+    loginRequest.mockResolvedValue({ data: { id: 1, email: 'ana@example.com' } })
     const store = useAuthStore()
 
-    await store.login({ email: 'ana@educalba.com', password: 'ClaveSegura123' })
+    await store.login({ email: 'ana@example.com', password: 'ClaveSegura123' })
 
     expect(loginRequest).toHaveBeenCalledWith({
-      email: 'ana@educalba.com',
+      email: 'ana@example.com',
       password: 'ClaveSegura123',
     })
-    expect(store.user).toEqual({ id: 1, email: 'ana@educalba.com' })
+    expect(store.user).toEqual({ id: 1, email: 'ana@example.com' })
     expect(store.isAuthenticated).toBe(true)
   })
 
   it('clears the user after a successful logout', async () => {
     logoutRequest.mockResolvedValue()
     const store = useAuthStore()
-    store.user = { id: 1, email: 'ana@educalba.com' }
+    store.user = { id: 1, email: 'ana@example.com' }
 
     await store.logout()
 
@@ -51,7 +51,7 @@ describe('Auth Store', () => {
   it('clears the user even when the logout request fails', async () => {
     logoutRequest.mockRejectedValue(new Error('Network error'))
     const store = useAuthStore()
-    store.user = { id: 1, email: 'ana@educalba.com' }
+    store.user = { id: 1, email: 'ana@example.com' }
 
     await expect(store.logout()).rejects.toThrow('Network error')
 
@@ -59,12 +59,12 @@ describe('Auth Store', () => {
   })
 
   it('restores the user when a valid session cookie exists', async () => {
-    getCurrentUser.mockResolvedValue({ data: { id: 2, email: 'marcos@educalba.com' } })
+    getCurrentUser.mockResolvedValue({ data: { id: 2, email: 'marcos@example.com' } })
     const store = useAuthStore()
 
     await store.checkSession()
 
-    expect(store.user).toEqual({ id: 2, email: 'marcos@educalba.com' })
+    expect(store.user).toEqual({ id: 2, email: 'marcos@example.com' })
   })
 
   it('leaves the user as null when there is no active session', async () => {
