@@ -42,6 +42,22 @@
         </svg>
         <span>{{ workshop.recommendedAge }}</span>
       </div>
+
+      <div class="workshop-card__detail-row">
+        <svg class="workshop-card__icon" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2" />
+          <text
+            x="12"
+            y="16"
+            text-anchor="middle"
+            font-size="11"
+            font-weight="700"
+            fill="currentColor"
+            stroke="none"
+          >€</text>
+        </svg>
+        <span>{{ formattedPrice }}</span>
+      </div>
     </div>
   </article>
 </template>
@@ -50,6 +66,7 @@
 import { computed } from 'vue'
 import { formatWorkshopDate } from '@/utils/formatWorkshopDate'
 import { formatWorkshopTime } from '@/utils/formatWorkshopTime'
+import { formatWorkshopPrice } from '@/utils/formatWorkshopPrice'
 
 const props = defineProps({
   // Datos del taller a mostrar (tal como los devuelve el backend)
@@ -61,6 +78,7 @@ const props = defineProps({
 
 const formattedDate = computed(() => formatWorkshopDate(props.workshop.date))
 const formattedTime = computed(() => formatWorkshopTime(props.workshop.time))
+const formattedPrice = computed(() => formatWorkshopPrice(props.workshop.price))
 </script>
 
 <style lang="scss">
