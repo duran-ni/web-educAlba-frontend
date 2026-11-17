@@ -86,7 +86,7 @@ describe('AppHeader.vue', () => {
     await router.push('/')
     await router.isReady()
     const { wrapper, store } = mountHeader()
-    store.user = { email: 'familia@educalba.com', roles: ['ALUMNO_FAMILIA'] }
+    store.user = { email: 'familia@example.com', roles: ['ALUMNO_FAMILIA'] }
     await nextTick()
 
     expect(wrapper.find('.dashboard-button').exists()).toBe(true)
