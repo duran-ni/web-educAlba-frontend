@@ -32,7 +32,7 @@ function mountForm() {
 async function fillValidForm(wrapper) {
   await wrapper.get('#register-first-name').setValue('Lucía')
   await wrapper.get('#register-last-name').setValue('García López')
-  await wrapper.get('#register-email').setValue('familia@educalba.com')
+  await wrapper.get('#register-email').setValue('familia@example.com')
   await wrapper.get('#register-stage').setValue('PRIMARIA')
   await wrapper.get('#register-service').setValue('Talleres')
   await wrapper.get('#register-password').setValue('Clave1234')
@@ -99,7 +99,7 @@ describe('RegisterForm.vue', () => {
     const wrapper = mountForm()
     await wrapper.get('#register-first-name').setValue('Lucía')
     await wrapper.get('#register-last-name').setValue('García López')
-    await wrapper.get('#register-email').setValue('familia@educalba.com')
+    await wrapper.get('#register-email').setValue('familia@example.com')
     await wrapper.get('#register-stage').setValue('PRIMARIA')
     await wrapper.get('#register-service').setValue('Talleres')
     await wrapper.get('#register-password').setValue('Clave1234')
@@ -121,7 +121,7 @@ describe('RegisterForm.vue', () => {
 
   it('registers the account, logs in automatically and redirects to the dashboard', async () => {
     register.mockResolvedValueOnce({})
-    login.mockResolvedValueOnce({ data: { email: 'familia@educalba.com', roles: [] } })
+    login.mockResolvedValueOnce({ data: { email: 'familia@example.com', roles: [] } })
     const wrapper = mountForm()
     await fillValidForm(wrapper)
 
@@ -131,12 +131,12 @@ describe('RegisterForm.vue', () => {
     expect(register).toHaveBeenCalledWith({
       firstName: 'Lucía',
       lastName: 'García López',
-      email: 'familia@educalba.com',
+      email: 'familia@example.com',
       password: 'Clave1234',
       serviceOfInterest: 'Talleres',
       educationalStage: 'PRIMARIA',
     })
-    expect(login).toHaveBeenCalledWith({ email: 'familia@educalba.com', password: 'Clave1234' })
+    expect(login).toHaveBeenCalledWith({ email: 'familia@example.com', password: 'Clave1234' })
     expect(router.currentRoute.value.name).toBe('dashboard')
   })
 
