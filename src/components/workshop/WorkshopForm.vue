@@ -87,6 +87,24 @@
       </div>
     </div>
 
+    <div class="workshop-form__field">
+      <label class="workshop-form__label" for="workshop-price">Precio (€)</label>
+      <input
+        id="workshop-price"
+        v-model.number="price"
+        class="workshop-form__input"
+        type="number"
+        min="0"
+        step="0.01"
+        placeholder="0 para taller gratuito"
+        :aria-invalid="Boolean(priceError)"
+        :aria-describedby="priceError ? 'workshop-price-error' : undefined"
+      />
+      <p v-if="priceError" id="workshop-price-error" class="workshop-form__field-error">
+        {{ priceError }}
+      </p>
+    </div>
+
     <label class="workshop-form__active">
       <input v-model="active" type="checkbox" class="workshop-form__active-input" />
       Taller activo (visible en la web pública)
@@ -143,10 +161,13 @@ const time = ref(props.workshop?.time ?? '')
 const recommendedAge = ref(props.workshop?.recommendedAge ?? '')
 const room = ref(props.workshop?.room ?? '')
 const active = ref(props.workshop?.active ?? true)
+// 0 por defecto: un taller nuevo es gratuito hasta que la admin indique lo contrario
+const price = ref(props.workshop?.price ?? 0)
 
 const nameError = ref('')
 const dateError = ref('')
 const timeError = ref('')
+const priceError = ref('')
 
 const status = ref('idle')
 const submitErrorMessage = ref('')
@@ -163,8 +184,10 @@ function validate() {
   nameError.value = name.value ? '' : 'Escribe el nombre del taller'
   dateError.value = date.value ? '' : 'Selecciona una fecha'
   timeError.value = time.value ? '' : 'Selecciona una hora'
+  priceError.value =
+    price.value !== null && price.value >= 0 ? '' : 'El precio no puede ser negativo'
 
-  return !nameError.value && !dateError.value && !timeError.value
+  return !nameError.value && !dateError.value && !timeError.value && !priceError.value
 }
 
 async function handleSubmit() {
@@ -182,6 +205,7 @@ async function handleSubmit() {
     recommendedAge: recommendedAge.value,
     room: room.value,
     active: active.value,
+    price: price.value,
   }
 
   try {
