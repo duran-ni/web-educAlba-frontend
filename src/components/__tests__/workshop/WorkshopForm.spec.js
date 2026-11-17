@@ -18,6 +18,7 @@ const EXISTING_WORKSHOP = {
   recommendedAge: '8-12',
   room: 'Aula 3',
   active: false,
+  price: 25,
 }
 
 async function fillValidForm(wrapper) {
@@ -27,6 +28,7 @@ async function fillValidForm(wrapper) {
   await wrapper.get('#workshop-time').setValue('16:00')
   await wrapper.get('#workshop-age').setValue('6-10')
   await wrapper.get('#workshop-room').setValue('Sala A')
+  await wrapper.get('#workshop-price').setValue(12)
   await wrapper.get('.workshop-form__active-input').setValue(false)
 }
 
@@ -46,6 +48,17 @@ describe('WorkshopForm.vue', () => {
     expect(wrapper.find('#workshop-time-error').text()).toBe('Selecciona una hora')
   })
 
+  it('blocks the submission and shows an error when the price is negative', async () => {
+    const wrapper = mount(WorkshopForm)
+    await fillValidForm(wrapper)
+    await wrapper.get('#workshop-price').setValue(-5)
+
+    await wrapper.find('form').trigger('submit.prevent')
+
+    expect(createWorkshop).not.toHaveBeenCalled()
+    expect(wrapper.find('#workshop-price-error').text()).toBe('El precio no puede ser negativo')
+  })
+
   it('pre-fills the fields and shows "Guardar cambios" when editing an existing workshop', () => {
     const wrapper = mount(WorkshopForm, { props: { workshop: EXISTING_WORKSHOP } })
 
@@ -53,6 +66,7 @@ describe('WorkshopForm.vue', () => {
     expect(wrapper.get('#workshop-description').element.value).toBe('Construye tu propio robot.')
     expect(wrapper.get('#workshop-age').element.value).toBe('8-12')
     expect(wrapper.get('#workshop-room').element.value).toBe('Aula 3')
+    expect(wrapper.get('#workshop-price').element.value).toBe('25')
     expect(wrapper.get('.workshop-form__active-input').element.checked).toBe(false)
     expect(wrapper.get('.workshop-form__submit').text()).toBe('Guardar cambios')
   })
@@ -74,6 +88,7 @@ describe('WorkshopForm.vue', () => {
       recommendedAge: '6-10',
       room: 'Sala A',
       active: false,
+      price: 12,
     })
     expect(wrapper.emitted('created')).toEqual([[created]])
   })
