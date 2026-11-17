@@ -49,20 +49,20 @@ describe('ForgotPasswordForm.vue', () => {
     requestPasswordReset.mockResolvedValueOnce({})
     const wrapper = mountForm()
 
-    await wrapper.get('#forgot-password-email').setValue('familia@educalba.com')
+    await wrapper.get('#forgot-password-email').setValue('familia@example.com')
     await wrapper.find('form').trigger('submit.prevent')
     await flushPromises()
 
-    expect(requestPasswordReset).toHaveBeenCalledWith('familia@educalba.com')
+    expect(requestPasswordReset).toHaveBeenCalledWith('familia@example.com')
     expect(wrapper.find('.forgot-password-form--success').exists()).toBe(true)
-    expect(wrapper.text()).toContain('familia@educalba.com')
+    expect(wrapper.text()).toContain('familia@example.com')
   })
 
   it('shows an error message when the request genuinely fails', async () => {
     requestPasswordReset.mockRejectedValueOnce(new Error('network error'))
     const wrapper = mountForm()
 
-    await wrapper.get('#forgot-password-email').setValue('familia@educalba.com')
+    await wrapper.get('#forgot-password-email').setValue('familia@example.com')
     await wrapper.find('form').trigger('submit.prevent')
     await flushPromises()
 
